@@ -15,7 +15,7 @@ const LoginScreen = () => {
         <View style={styles.container}>
     
           <Image
-            source={require('../../assets/İconlar/icon1.png')}
+            source={require('../../assets/İmage/icon1.png')}
             style={styles.image}
           />
     
@@ -35,7 +35,7 @@ const LoginScreen = () => {
       {isLoading && <Loading />}
 
       <Image
-        source={require('../../assets/İconlar/3.jpeg')}
+        source={require('../../assets/İmage/3.jpeg')}
         style={styles.image_alt}
       />
     </View>
