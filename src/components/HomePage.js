@@ -94,14 +94,24 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
    paddingTop: 10,
   },
-  
+  titleContainer: {
+    alignItems: 'center',
+  },
   title: {
-    fontSize: 30,
+    fontSize: 20,
+    color: 'white',
+   
+  },
+  subtitle: {
+    fontSize: 20,
     color: 'white',
     
+    position: 'relative',
+    left:37,
+    top:-5,
   },
   logoyazi:{
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   logo: {
