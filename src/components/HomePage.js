@@ -6,16 +6,21 @@ const HomePage = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View>
-            <Image source={require('../../assets/İmage/icon1.png')} style={styles.logo} />
-            <Text style={styles.title}>DARKTON</Text>
-          
-        </View>
-        <TouchableOpacity onPress={() => console.log("Ayarlar açıldı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.settingicon} />
+        
+         <TouchableOpacity onPress={() => console.log("Ayarlar açıldı")}>
+          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
         </TouchableOpacity>
+
+        <View style={styles.logoyazi}>
+            <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
+            <View style={styles.titleContainer}>
+            <Text style={styles.title}>DARK</Text>
+            <Text style={styles.subtitle}>TON</Text>
+          </View>
+        </View>
+       
         <TouchableOpacity onPress={() => console.log("Bildirimler açıldı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.bildirimicon} />
+          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
 
@@ -60,16 +65,16 @@ const HomePage = () => {
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => console.log("Ana Sayfa tıklandı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.navIcon} />
+          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => console.log("Keşfet tıklandı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.navIcon} />
+          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => console.log("Kaydedilenler tıklandı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.navIcon} />
+          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => console.log("Profil tıklandı")}>
-          <Image source={require('../../assets/İmage/icon1.png')} style={styles.navIcon} />
+          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -80,35 +85,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'purple',
+    paddingTop:20,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+   paddingTop: 10,
   },
+  
   title: {
     fontSize: 30,
     color: 'white',
-    marginTop:-10,
-    marginLeft:180,
+    
+  },
+  logoyazi:{
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   logo: {
     marginRight: 10,
     width: 30,
     height: 30,
-    marginLeft:150,
-    marginTop:10,
+    
   },
   settingicon: {
-    width: 40,
-    height: 40,
-    marginLeft:5,
-    marginTop:-60,
+    width: 35,
+    height: 35,
+    
   },
   bildirimicon: {
-    width: 40,
-    height: 40,
-    marginLeft:340,
-    marginTop:-60,
+    width: 35,
+    height: 35,
+    
   },
   scrollView: {
     paddingHorizontal: 20,
@@ -118,8 +128,9 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   sectionTitle: {
-    fontSize: 20,
-    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'black',
   },
   horizontalScroll: {
     marginTop: 10,
@@ -144,13 +155,14 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 20,
+    justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+   paddingTop: 10,
   },
   navIcon: {
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,  
   },
 });
 
