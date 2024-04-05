@@ -13,11 +13,12 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-    
-          <Image
-            source={require('../../assets/İmage/icon1.png')}
-            style={styles.image}
-          />
+    <View style={styles.imageContainer}>
+        <Image
+          source={require('../../assets/İmage/icon1.png')}
+          style={styles.image}
+        />
+      </View>
     
           <TextInput
             placeholder='Kullanıcı Adı'
@@ -25,6 +26,12 @@ const LoginScreen = () => {
             onChangeText={setName}
             value={name}
           />
+           <TextInput
+            placeholder='Şifre'
+            style={styles.TextInputStyle}
+            onChangeText={setLastName}
+            value={lastname}
+            />
           <Pressable
         onPress={handleSavePress}
         style={({ pressed }) => [{
@@ -34,10 +41,12 @@ const LoginScreen = () => {
       </Pressable>
       {isLoading && <Loading />}
 
-      <Image
-        source={require('../../assets/İmage/3.jpeg')}
-        style={styles.image_alt}
-      />
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('../../assets/İmage/3.jpeg')}
+          style={styles.image_alt}
+        />
+      </View>
     </View>
   );
 }
@@ -56,30 +65,36 @@ const styles = StyleSheet.create({
       marginVertical: 10,
       textAlign: 'center',
       fontSize: 18,
+      margin: 15,
     },
     button: {
       borderWidth: 1,
-      width: 75,
+      width: 125,
       height: 40,
       borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: 20,
+      marginTop: 30,
     },
     buttonText: {
       fontWeight: 'bold',
       color: 'white',
       fontSize: 18,
     },
+    imageContainer: {
+      alignItems: 'center',
+      marginTop: 5,
+    },
     image: {
       width: 200,
       height: 200,
       marginTop: 50,
+      margin:25,
     },
     image_alt: {
       width: 410,
       height: 410,
-      marginTop: 50,
+      marginTop: 40,
     }
   });
 

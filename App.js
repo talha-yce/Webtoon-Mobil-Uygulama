@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import LoginScreen from './src/components/LoginScreen';
+import LoginScreen from './src/components/SettingsScreen';
 export default function App() {
   return (
     <View style={styles.container}>
