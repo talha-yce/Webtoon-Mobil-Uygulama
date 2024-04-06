@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Switch,ScrollView  } from 'react-native';
 
-const SettingsScreen = () => {
+const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
   const [resolution, setResolution] = useState('Düşük');
 
@@ -50,7 +50,7 @@ const SettingsScreen = () => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -113,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SettingsScreen;
+export default SettingsPage;

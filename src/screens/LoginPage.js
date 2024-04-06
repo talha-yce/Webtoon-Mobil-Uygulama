@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text, Image } from 'react-native';
-import Loading from './Loading';
+import Loading from '../components/Loading';
 
-const LoginScreen = () => {
+const LoginPage = () => {
   const [name, setName] = useState("");
   const [lastname, setLastName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -98,4 +98,4 @@ const styles = StyleSheet.create({
     }
   });
 
-  export default LoginScreen;
+  export default LoginPage;
