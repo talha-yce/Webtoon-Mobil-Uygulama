@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView } from 'react-native';
+import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
 import Loading from '../components/Loading';
 import { useNavigation } from '@react-navigation/native';
 
@@ -15,7 +15,7 @@ const LoginPage = () => {
 
     return (
       <SafeAreaView style={styles.container}>
-      
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.imageContainer}>
           <Image
             source={require('../../assets/İmage/icon1.png')}
@@ -27,7 +27,7 @@ const LoginPage = () => {
         <View style={styles.bilgiContainer}>
           
           <TextInput
-            placeholder='Kullanıcı Adı'
+            placeholder='Email'
             style={styles.TextInputStyle}
             onChangeText={setEmail}
             value={email}
@@ -72,7 +72,7 @@ const LoginPage = () => {
           style={styles.image_alt}
         />
       </View>
-   
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -94,6 +94,11 @@ const styles = StyleSheet.create({
       
       flex:1,
       alignItems: 'center',
+    },
+    scrollViewContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      
     },
     TextInputStyle: {
       borderWidth: 1,

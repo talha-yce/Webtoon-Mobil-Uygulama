@@ -1,34 +1,37 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable, Text, Image } from 'react-native';
+import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
 import { CustomTextinput } from "../components";
 import { useNavigation } from '@react-navigation/native';
 
 const SignupPage=()=>{
     const navigation = useNavigation();
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
       return (
-            <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
               <View style={styles.imageContainer}>
+                
                 <Image
-                  source={require('../../assets/İmage/icon1.png')}
+                  source={require('../../assets/İmage/3.jpeg')}
                   style={styles.image}
                 />
               </View>
       
       
               <View style={styles.bilgiContainer}>
-
+              <Text style={{width:'100%', fontWeight:'bold',textAlign:'left',fontSize:28,marginLeft:'10%'}}>Sign up</Text>
               <TextInput
                   placeholder='Ad Soyad'
                   style={styles.TextInputStyle}
-                  onChangeText={setEmail}
-                  value={email}
+                  onChangeText={setName}
+                  value={name}
                 />
 
                 <TextInput
-                  placeholder='Kullanıcı Adı'
+                  placeholder='Email'
                   style={styles.TextInputStyle}
                   onChangeText={setEmail}
                   value={email}
@@ -44,52 +47,56 @@ const SignupPage=()=>{
       
               <View style={styles.buttonContainer}>
                 <Pressable
-                  onPress={() => navigation.navigate('Login')}
-                  style={({ pressed }) => [{
-                  backgroundColor: pressed ? "gray" : "#8a1194"
-                  }, styles.button]}>
-                  <Text style={styles.buttonText}>Giriş</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => console.log("Kaydet işlemi gerçekleşti")}
+                  onPress={() => console.log("Kaydet işlemi gerçekleşti, ad:",name," email:",email)}
                   style={({ pressed }) => [{
                   backgroundColor: pressed ? "gray" : "#8a1194"
                   }, styles.button]}>
                   <Text style={styles.buttonText}>Kaydet</Text>
                 </Pressable>
-      
+                <Pressable 
+                  onPress={() => navigation.navigate('Login')}>
+                  <Text style={{fontWeight:'bold'}}>Mevcut bir hesabınız mı var? Login</Text>
+                </Pressable>
+                
               </View>
-     
             </View>
 
-            <View style={styles.imageContainer}>
-              <Image
-                source={require('../../assets/İmage/3.jpeg')}
-                style={styles.image_alt}
-              />
-            </View>
-          </View>
+            </ScrollView>
+          </SafeAreaView>
         );
       }
       
       const styles = StyleSheet.create({
         container: {
-            
             flex: 1,
             backgroundColor: '#fff',
             
           },
           imageContainer: {
-            
+            width:'100%',
             flex:1,
             alignItems: 'center',
             justifyContent: 'center',
-            
+            // borderWidth: 1,
           },
           bilgiContainer:{
-            
-            flex:1,
+            width:'100%',
+            flex:3,
             alignItems: 'center',
+           // borderWidth: 1,
+          },
+          buttonContainer: {
+            flex:2,
+            justifyContent: 'space-between', 
+            width: '100%', 
+            alignItems: 'center',
+           // borderWidth: 1,
+          },
+          scrollViewContent: {
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            
           },
           TextInputStyle: {
             borderWidth: 1,
@@ -101,11 +108,7 @@ const SignupPage=()=>{
             fontSize: 18,
             margin: 15,
           },
-           buttonContainer: {
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            width: '70%', 
-          },
+           
           button: {
             borderWidth: 1,
            width: '48%', 
@@ -122,14 +125,9 @@ const SignupPage=()=>{
           },
           
           image: {
-            width: 200,
-            height: 200,
-         
-          },
-          image_alt: {
             width: 300,
             height: 300,
-            
-          }
+          },
+          
         });
 export default SignupPage;
