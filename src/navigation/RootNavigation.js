@@ -5,7 +5,7 @@ import UserStack from './UserStack'
 
 const RootNavigation = () => {
 
-    const isAuth = true;
+    const isAuth = false;
 
     return (
         <NavigationContainer>

@@ -14,9 +14,14 @@ const Loading = () => {
 
 const styles = StyleSheet.create({
     container: {
+        position: 'absolute',
         flex: 1,
+        zIndex: 999,
         justifyContent: 'center',
         alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#8a1194',
     },
     loadingText: {
         fontWeight: 'bold',
