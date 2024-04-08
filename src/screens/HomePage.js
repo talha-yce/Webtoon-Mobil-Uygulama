@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
+
+
 const HomePage = () => {
+
+  const [currentPage, setCurrentPage] = useState(0); // Sayfa indeksi sıfırdan başlıyor
+  const totalPages = 10; // Toplam sayfa sayısı
+
+  const handlePageChange = (index) => {
+    setCurrentPage(index);
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -146,7 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   newWebtoon: {
-    width: 100,
+    width: 200,
     height: 150,
     backgroundColor: 'gray',
     marginRight: 10,

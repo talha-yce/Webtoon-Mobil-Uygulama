@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
 import Loading from '../components/Loading';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux'
+import { setEmail,setPassword,setIsLoading,setLogin } from '../redux/userSlice';
+
 
 const LoginPage = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  
 
-  const handleSavePress = () => {
-    setIsLoading(true);
-    };
+  //userSlice dan veri okuma
+  const {email,password,isLoading}=useSelector((state)=>state.user)
+  //userSlice reducer yapısına veri gönderme
+  const dispatch = useDispatch()
+
+  
 
     return (
       <SafeAreaView style={styles.container}>
@@ -29,7 +33,7 @@ const LoginPage = () => {
           <TextInput
             placeholder='Email'
             style={styles.TextInputStyle}
-            onChangeText={setEmail}
+            onChangeText ={(email)=>dispatch(setEmail(email))}
             value={email}
           />
 
@@ -37,13 +41,13 @@ const LoginPage = () => {
           placeholder='Şifre'
           secureTextEntry={true}
           style={styles.TextInputStyle}
-          onChangeText={setPassword}
+          onChangeText={(password)=>dispatch(setPassword(password))}
           value={password}
         />
 
         <View style={styles.buttonContainer}>
           <Pressable
-            onPress={handleSavePress}
+            onPress={() => dispatch(setLogin())}
             style={({ pressed }) => [{
             backgroundColor: pressed ? "gray" : "#8a1194"
             }, styles.button]}>
@@ -64,7 +68,7 @@ const LoginPage = () => {
       </View>
 
 
-        {isLoading && <Loading />}
+        {isLoading && <Loading isLoading={()=> dispatch(setIsLoading(false))}/>}
 
       <View style={styles.imageContainer}>
         <Image
