@@ -33,16 +33,32 @@ const HomePage = () => {
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-
-      {/* yeni Webtoonlar Bölümü*/}
       <ScrollView style={styles.scrollView}>
+      
+      
+        {/* yeni Webtoonlar Bölümü*/}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Yeni</Text>
-          
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-            
             {[...Array(10)].map((_, index) => (
-              <View key={index} style={styles.newWebtoon} />
+            <View key={index} style={styles.newWebtoon}>
+              {/* Sol kısım */}
+              <View style={styles.newWebtoonLeft}>
+                <Image source={require('../../assets/İmage/icon.png')} style={styles.webtoonImage} />
+              </View>
+              {/* Sağ kısım */}
+              <View style={styles.newWebtoonRight}>
+                <Text style={styles.webtoonTitle}>Webtoon Başlığı</Text>
+                  <View style={styles.webtoonButtons}>
+                    <TouchableOpacity onPress={() => console.log("Buton 1 tıklandı")} style={[styles.webtoonButton, { marginBottom: 5 }]}>
+                      <Text style={styles.buttonText}>Buton 1</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => console.log("Buton 2 tıklandı")} style={styles.webtoonButton}>
+                      <Text style={styles.buttonText}>Buton 2</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
             ))}
           </ScrollView>
         </View>
@@ -70,7 +86,7 @@ const HomePage = () => {
             ))}
           </ScrollView>
         </View>
-      </ScrollView>
+    </ScrollView>
 
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
@@ -95,14 +111,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'purple',
-    paddingTop:20,
+    paddingTop: 20,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 25,
     paddingBottom: 15,
-   paddingTop: 10,
+    paddingTop: 10,
   },
   titleContainer: {
     alignItems: 'center',
@@ -110,17 +126,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     color: 'white',
-   
   },
   subtitle: {
     fontSize: 20,
     color: 'white',
-    
     position: 'relative',
-    left:37,
-    top:-5,
+    left: 37,
+    top: -5,
   },
-  logoyazi:{
+  logoyazi: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -128,17 +142,14 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 30,
     height: 30,
-    
   },
   settingicon: {
     width: 35,
     height: 35,
-    
   },
   bildirimicon: {
     width: 35,
     height: 35,
-    
   },
   scrollView: {
     paddingHorizontal: 20,
@@ -156,10 +167,53 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   newWebtoon: {
-    width: 200,
+    flexDirection: 'row',
+    width: 275, 
     height: 150,
     backgroundColor: 'gray',
     marginRight: 10,
+   
+  },
+  newWebtoonLeft: {
+    width: 150, 
+    
+    
+  },
+  newWebtoonRight: {
+    width: 125, 
+    alignItems:'center',
+    
+  },
+  webtoonImage: {
+    width: 150, 
+    height: 150,
+    backgroundColor: 'lightgray',
+    
+  },
+  
+  webtoonTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    margin: 10,
+    
+  },
+  webtoonButtons: {
+    flexDirection: 'column', 
+    flexDirection: 'column',
+    alignItems:'center',
+  },
+  webtoonButton: {
+    backgroundColor: 'blue',
+    borderRadius: 5,
+    marginTop: 10,
+    width:75, 
+    height: 20, 
+    alignItems:'center',
+    
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   personalWebtoon: {
     width: 150,
@@ -178,12 +232,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 25,
     paddingBottom: 15,
-   paddingTop: 10,
+    paddingTop: 10,
   },
   navIcon: {
     width: 35,
-    height: 35,  
+    height: 35,
   },
 });
+
 
 export default HomePage;
