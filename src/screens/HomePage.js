@@ -4,14 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const HomePage = () => {
-
-  const [currentPage, setCurrentPage] = useState(0); 
-  const totalPages = 10; 
   const navigation = useNavigation();
-  const handlePageChange = (index) => {
-    setCurrentPage(index);
-  };
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -93,13 +86,13 @@ const HomePage = () => {
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Keşfet tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
           <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Kaydedilenler tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
           <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Profil tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
           <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>

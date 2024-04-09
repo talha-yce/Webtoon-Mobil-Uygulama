@@ -1,27 +1,15 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-
-const Bildirim = ({ tarih, icerik }) => {
-  return (
-    <View style={styles.notificationContainer}>
-      <Text style={styles.notificationDate}>{tarih}</Text>
-      <Text style={styles.notificationContent}>{icerik}</Text>
-    </View>
-  );
-}
-
-const BildirimlerPage = () => {
+const KesfetPage = () => {
   const navigation = useNavigation();
 
-  // Bildirimler listesi burada olacak
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        
-         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
         </TouchableOpacity>
 
@@ -32,24 +20,18 @@ const BildirimlerPage = () => {
             <Text style={styles.subtitle}>TON</Text>
           </View>
         </View>
-       
+
         <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
 
-      {/* Bildirimler */}
-      <ScrollView style={styles.scrollView}>
-       <View style={styles.notificationSection}>
-          <Text style={styles.sectionTitle}>Bugün</Text>
-          <Bildirim tarih="Bugün" icerik="Yeni bölüm yayında! - Webtoon adı" />
-        </View>
-        <View style={styles.notificationSection}>
-          <Text style={styles.sectionTitle}>Dün</Text>
-          <Bildirim tarih="Dün" icerik="Güncelleme: Yeni özellikler eklendi!" />
-        </View>
-       
-      </ScrollView>
+      {/* Profile Content */}
+      <View style={styles.profileContent}>
+        <Text style={styles.profileHeaderText}>Kesfet Sayfası</Text>
+        {/* İçerik buraya gelecek */}
+      </View>
+
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -100,13 +82,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  headerText: {
-    fontSize: 18,
-    color: 'white',
+  logo: {
+    marginRight: 10,
+    width: 30,
+    height: 30,
   },
-  scrollView: {
-    paddingHorizontal: 20,
-    backgroundColor: 'white',
+  settingicon: {
+    width: 35,
+    height: 35,
+  },
+  bildirimicon: {
+    width: 35,
+    height: 35,
+  },
+  profileContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileHeaderText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
   },
   bottomNav: {
     flexDirection: 'row',
@@ -115,50 +112,10 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     paddingTop: 10,
   },
-  navText: {
-    fontSize: 16,
-    color: 'white',
-  },
-  settingicon: {
-    width: 35,
-    height: 35,
-  },
-  logo: {
-    marginRight: 10,
-    width: 30,
-    height: 30,
-  },
-  bildirimicon: {
-    width: 35,
-    height: 35,
-  },
   navIcon: {
     width: 35,
     height: 35,
   },
-  notificationSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 10,
-  },
-  notificationContainer: {
-    backgroundColor: 'lightgray',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  notificationDate: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  notificationContent: {
-    fontSize: 16,
-  },
 });
 
-export default BildirimlerPage;
+export default KesfetPage;

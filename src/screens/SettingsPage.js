@@ -67,16 +67,16 @@ const SettingsPage = () => {
       </ScrollView>
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Keşfet tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
           <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Kaydedilenler tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
           <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("Profil tıklandı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
           <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>
