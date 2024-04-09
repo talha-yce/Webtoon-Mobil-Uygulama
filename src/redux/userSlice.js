@@ -33,10 +33,13 @@ export const userSlice = createSlice({
             else{
                 state.isAuth=false
             }
+        },
+        setExit:(state)=>{
+            state.isAuth=false
         }
       }
 })
 
        
-export const {setEmail,setPassword,setIsLoading,setLogin}= userSlice.actions
+export const {setEmail,setPassword,setIsLoading,setLogin,setExit}= userSlice.actions
 export default userSlice.reducer;

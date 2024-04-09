@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
-import Loading from '../components/Loading';
+import Loading from '../components/';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
 import { setEmail,setPassword,setIsLoading,setLogin } from '../redux/userSlice';
 
 

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { useNavigation } from '@react-navigation/native';
 
 
 const HomePage = () => {
 
-  const [currentPage, setCurrentPage] = useState(0); // Sayfa indeksi sıfırdan başlıyor
-  const totalPages = 10; // Toplam sayfa sayısı
-
+  const [currentPage, setCurrentPage] = useState(0); 
+  const totalPages = 10; 
+  const navigation = useNavigation();
   const handlePageChange = (index) => {
     setCurrentPage(index);
   };
@@ -17,7 +17,7 @@ const HomePage = () => {
       {/* Header */}
       <View style={styles.header}>
         
-         <TouchableOpacity onPress={() => console.log("Ayarlar açıldı")}>
+         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
         </TouchableOpacity>
 
@@ -29,7 +29,7 @@ const HomePage = () => {
           </View>
         </View>
        
-        <TouchableOpacity onPress={() => console.log("Bildirimler açıldı")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
@@ -90,7 +90,7 @@ const HomePage = () => {
 
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => console.log("Ana Sayfa tıklandı")}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => console.log("Keşfet tıklandı")}>

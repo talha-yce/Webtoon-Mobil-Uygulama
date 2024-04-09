@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Switch,ScrollView  } from 'react-native';
-
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { setExit } from '../redux/userSlice';
 const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
-  const [resolution, setResolution] = useState('Düşük');
+  const navigation = useNavigation();
+  const dispatch = useDispatch()
 
   const renderItem = (title, content) => (
     <View style={styles.itemContainer}>
@@ -16,9 +19,20 @@ const SettingsPage = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>DARKTON</Text>
-        <Text style={styles.subHeaderText}>Ayarlar</Text>
-      </View>
+      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
+        </TouchableOpacity>
+        <View style={styles.logoyazi}>
+          <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>DARK</Text>
+            <Text style={styles.subtitle}>TON</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
+          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        </TouchableOpacity>
+        </View>
       {/* Content */}
       <ScrollView style={styles.scrollView}>
       {/* ayarMenu */}
@@ -42,11 +56,29 @@ const SettingsPage = () => {
         {renderItem("Fark Etme:", <TouchableOpacity><Text>Fark Etme</Text></TouchableOpacity>)}
         {renderItem("Yardım:", <TouchableOpacity><Text>Yardım</Text></TouchableOpacity>)}
         {renderItem("Kullanım Şekilleri:", <TouchableOpacity><Text>Kullanım Şekilleri</Text></TouchableOpacity>)}
+        
+        {/* Çıkış Yap butonu */}
+        <View style={styles.exitButtonContainer}>
+          <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(setExit())}>
+            <Text style={styles.exitButtonText}>Çıkış Yap</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       </ScrollView>
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>DARKTON</Text>
+      {/* alt navigaysyon bölümu*/}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log("Keşfet tıklandı")}>
+          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log("Kaydedilenler tıklandı")}>
+          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => console.log("Profil tıklandı")}>
+          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -56,19 +88,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'purple',
+    paddingTop: 20,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+    paddingTop: 10,
+  },
+  titleContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
   },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  subHeaderText: {
+  title: {
     fontSize: 20,
     color: 'white',
+  },
+  subtitle: {
+    fontSize: 20,
+    color: 'white',
+    position: 'relative',
+    left: 37,
+    top: -5,
+  },
+  logoyazi: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  settingicon: {
+    width: 35,
+    height: 35,
+  },
+  logo: {
+    marginRight: 10,
+    width: 30,
+    height: 30,
   },
   ayarMenu: {
     flex: 1,
@@ -92,24 +146,44 @@ const styles = StyleSheet.create({
   optionButtonText: {
     color: 'black',
   },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  switchText: {
-    marginLeft: 10,
-  },
   footer: {
     alignItems: 'center',
     paddingVertical: 20,
   },
   footerText: {
     color: 'white',
+  },
+  bildirimicon: {
+    width: 35,
+    height: 35,
+  },
+  navIcon: {
+    width: 35,
+    height: 35,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+    paddingTop: 10,
+  },
+  exitButtonContainer: {
+    alignItems: 'flex-end', 
+    margin: 10,
+    marginRight: 20,
+    justifyContent: 'center',
+  },
+  exitButton: {
+    backgroundColor: 'purple', 
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  exitButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
