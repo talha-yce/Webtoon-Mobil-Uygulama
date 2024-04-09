@@ -1,17 +1,18 @@
-import React from 'react';
+import React,{useState} from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
-import Loading from '../components/';
+import {Loading} from '../components';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-import { setEmail,setPassword,setIsLoading,setLogin } from '../redux/userSlice';
-
+import { setIsLoading } from '../redux/userSlice';
+import {login} from '../redux/userSlice';
 
 const LoginPage = () => {
   const navigation = useNavigation();
-  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   //userSlice dan veri okuma
-  const {email,password,isLoading}=useSelector((state)=>state.user)
+  const {isLoading}=useSelector((state)=>state.user)
   //userSlice reducer yapısına veri gönderme
   const dispatch = useDispatch()
 
@@ -33,7 +34,7 @@ const LoginPage = () => {
           <TextInput
             placeholder='Email'
             style={styles.TextInputStyle}
-            onChangeText ={(email)=>dispatch(setEmail(email))}
+            onChangeText ={(email)=>setEmail(email)}
             value={email}
           />
 
@@ -41,13 +42,13 @@ const LoginPage = () => {
           placeholder='Şifre'
           secureTextEntry={true}
           style={styles.TextInputStyle}
-          onChangeText={(password)=>dispatch(setPassword(password))}
+          onChangeText={(password)=>setPassword(password)}
           value={password}
         />
 
         <View style={styles.buttonContainer}>
           <Pressable
-            onPress={() => dispatch(setLogin())}
+            onPress={() => dispatch(login({email,password}))}
             style={({ pressed }) => [{
             backgroundColor: pressed ? "gray" : "#8a1194"
             }, styles.button]}>
@@ -61,13 +62,8 @@ const LoginPage = () => {
             <Text style={styles.buttonText}>Kaydol</Text>
           </Pressable>
 
-        </View>
-        
-        
-        
+        </View> 
       </View>
-
-
         {isLoading && <Loading isLoading={()=> dispatch(setIsLoading(false))}/>}
 
       <View style={styles.imageContainer}>

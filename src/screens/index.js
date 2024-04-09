@@ -6,6 +6,7 @@ import BildirimlerPage from "./BildirimlerPage";
 import ProfilPage from "./ProfilPage";
 import KaydetPage from "./KaydetPage";
 import KesifPage from "./KesfetPage";
+
 export{
     LoginPage,
     HomePage,

@@ -1,7 +1,6 @@
 import Loading from "./Loading";
 
 
-export{
+export {
     Loading,
-    
-}
+  };
