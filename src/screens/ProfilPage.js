@@ -113,7 +113,7 @@ const ProfilePage = () => {
             <Text style={styles.contentTitle}>Okuduğun Webtoonlar</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {[...Array(8)].map((_, index) => (
-                <TouchableOpacity key={index} onPress={() => console.log("Sana özel webtoon gösterildi")}>
+                <TouchableOpacity key={index} onPress={() => console.log("Okuduğun webtoon gösterildi")}>
                   <View style={styles.personalWebtoon} />
                 </TouchableOpacity>
               ))}
@@ -125,7 +125,7 @@ const ProfilePage = () => {
             <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {[...Array(6)].map((_, index) => (
-                <TouchableOpacity key={index} onPress={() => console.log("Trend webtoon gösterildi")}>
+                <TouchableOpacity key={index} onPress={() => console.log("Kaydettiğin webtoon gösterildi")}>
                   <View style={styles.trendingWebtoon} />
                 </TouchableOpacity>
               ))}
