@@ -1,48 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { db } from '../../firebaseConfig';
+import { getAuth } from "firebase/auth";
+import { query, where, getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 
 const ProfilePage = () => {
   const navigation = useNavigation();
   const [editing, setEditing] = useState(false);
-  const [username, setUsername] = useState("PetrO");
-  const [quote, setQuote] = useState("The worst to death, fake world Never lose your inner child 2020/4/20");
-  const [newUsername, setNewUsername] = useState("");
+  const [username, setUsername] = useState("");
+  const [quote, setQuote] = useState("");
+  const [newname, setNewname] = useState("");
   const [newQuote, setNewQuote] = useState("");
 
-  const handleEditProfile = () => {
-    if (editing) {
-      const usernameIsEmpty = newUsername.trim() === '';
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
+      if (user) {
+        const userUid = user.uid; 
+
+        const q = query(collection(db, "users"), where("uid", "==", userUid));
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          console.log("User Data:", userData);
+          setUsername(userData.name); 
+          setQuote(userData.quote); 
+        });
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    });
+  }, []);
   
-      if (usernameIsEmpty) {
-        alert("Kullanıcı adı boş bırakılamaz.");
+  const handleEditProfile = async () => {
+    if (editing) {
+      if (newname.trim() === '') {
+        Alert.alert("Kullanıcı adı boş bırakılamaz.");
         return;
       }
   
-      const updatedUsername = newUsername.trim();
-      const updatedQuote = newQuote.trim().slice(0, 50); // Max 50 characters
-      setUsername(updatedUsername);
-      setQuote(updatedQuote);
-      console.log("Kullanıcı bilgileri kaydedildi:", updatedUsername, updatedQuote);
-      setEditing(false);
+      try {
+        const user = getAuth().currentUser;
+  
+        if (user) {
+          const userUid = user.uid;
+  
+          const q = query(collection(db, "users"), where("uid", "==", userUid));
+          const querySnapshot = await getDocs(q);
+  
+          querySnapshot.forEach(async (doc) => {
+            const docRef = doc.ref;
+            await updateDoc(docRef, {
+              name: newname,
+              quote: newQuote
+            });
+  
+            console.log("Kullanıcı verileri güncellendi.");
+            setUsername(newname);
+            setQuote(newQuote);
+            setEditing(false);
+          });
+        } else {
+          console.log("Kullanıcı oturum açmamış.");
+        }
+      } catch (error) {
+        console.error("Kullanıcı verilerini güncellemede hata oluştu:", error);
+      }
     } else {
-      setNewUsername(username); // Set newUsername to current username
+      setNewname(username);
+      setNewQuote(quote);
       setEditing(true);
     }
   };
   
-
+  
+  
   const handleQuoteChange = (text) => {
     if (text.length > 50) {
       Alert.alert("Uyarı", "Maximum 50 karaktere izin verilmektedir.");
     } else {
-      setNewQuote(text);
+      setNewQuote(text); // Alıntı metnini güncelle
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
@@ -61,19 +105,15 @@ const ProfilePage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Content */}
       <ScrollView style={styles.scrollView}>
-        {/* Profile */}
         <View style={styles.section}>
           <View style={styles.profileSection}>
             <Image source={require('../../assets/İmage/HomePage_images/person.png')} style={styles.profileImage} />
             <TextInput
               style={styles.profileUsername}
-              value={editing ? newUsername : username}
-              onChangeText={(text) => {
-                setNewUsername(text);
-              }}
-              placeholder={newUsername.trim() === '' ? "Kullanıcı Adı" : ""}
+              value={editing ? newname : username}
+              onChangeText={(text) => setNewname(text)}
+              placeholder={editing ? "Kullanıcı Adı" : ""}
               placeholderTextColor="grey"
               editable={editing}
             />
@@ -95,7 +135,7 @@ const ProfilePage = () => {
               style={styles.quoteText}
               value={editing ? newQuote : quote}
               onChangeText={handleQuoteChange}
-              placeholder={newQuote.trim() === '' ? "Alıntı Metni" : ""}
+              placeholder={editing ? "Alıntı Metni" : ""}
               placeholderTextColor="grey"
               editable={editing}
               multiline={true}
@@ -106,9 +146,7 @@ const ProfilePage = () => {
           </View>
         </View>
 
-        {/* İçerik */}
         <View style={styles.section}>
-          {/* OKUDUĞUN WEBTOONLAR */}
           <View style={styles.contentSection}>
             <Text style={styles.contentTitle}>Okuduğun Webtoonlar</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -120,7 +158,6 @@ const ProfilePage = () => {
             </ScrollView>
           </View>
 
-          {/* KAYDETTİĞİN WEBTOONLAR */}
           <View style={styles.contentSection}>
             <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -134,7 +171,6 @@ const ProfilePage = () => {
         </View>
       </ScrollView>
 
-      {/* alt navigasyon bölümü */}
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
@@ -255,15 +291,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'black',
     paddingHorizontal: 20,
-    maxHeight: 100, // Max height for quote text input
-    textAlignVertical: 'top', // Start from the top
+    maxHeight: 100,
+    textAlignVertical: 'top',
   },
   editProfileButton: {
-    color: 'blue',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
+  backgroundColor: 'purple',
+  color: '#ff9a82',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 10,
+  borderWidth: 2,
+  borderColor: 'purple',
+  marginTop: 10,
+},
+
   contentSection: {
     backgroundColor: 'white',
     padding: 15,
@@ -299,6 +342,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     marginRight: 10,
   },
+  
 });
 
 export default ProfilePage;

@@ -1,10 +1,10 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { View, StyleSheet, TextInput, Pressable, Text, Image,SafeAreaView,ScrollView  } from 'react-native';
 import {Loading} from '../components';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { setIsLoading } from '../redux/userSlice';
-import {login} from '../redux/userSlice';
+import {login,autoLogin} from '../redux/userSlice';
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -16,7 +16,11 @@ const LoginPage = () => {
   //userSlice reducer yapısına veri gönderme
   const dispatch = useDispatch()
 
-  
+  //Kullanıcı daha önce giriş yapmış mı
+  useEffect(()=>{
+    dispatch(autoLogin())
+  },[])
+
 
     return (
       <SafeAreaView style={styles.container}>

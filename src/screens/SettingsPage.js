@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { setExit } from '../redux/userSlice';
+import { logout } from '../redux/userSlice';
 const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
   const navigation = useNavigation();
@@ -59,7 +59,7 @@ const SettingsPage = () => {
         
         {/* Çıkış Yap butonu */}
         <View style={styles.exitButtonContainer}>
-          <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(setExit())}>
+          <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(logout())}>
             <Text style={styles.exitButtonText}>Çıkış Yap</Text>
           </TouchableOpacity>
         </View>
@@ -74,7 +74,7 @@ const SettingsPage = () => {
           <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
+          <Image source={require( '../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
           <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />

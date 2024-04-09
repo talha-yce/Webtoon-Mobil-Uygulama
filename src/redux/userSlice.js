@@ -1,6 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
+import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
+import { getAuth,signOut, signInWithEmailAndPassword,createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import AsyncStorge from "@react-native-async-storage/async-storage";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from '../../firebaseConfig';
+//kullanıcı giriş işlemleri
 export const login = createAsyncThunk('user/login', async ({ email, password }) => {
     try {
       const auth = getAuth();
@@ -8,11 +11,14 @@ export const login = createAsyncThunk('user/login', async ({ email, password }) 
       const user = userCredential.user;
       const token = user.stsTokenManager.accessToken;
   
-      // Sadece e-posta adresini içeren bir nesne döndürün
+      
       const userData = {
         token,
-        email: user.email,
+        user: user,
       }
+
+      await AsyncStorge.setItem("userToken",token)
+
   
       return userData;
     } catch (error) {
@@ -20,6 +26,62 @@ export const login = createAsyncThunk('user/login', async ({ email, password }) 
       throw error;
     }
   });
+
+
+  //kullanıcı otomatik giriş işlemleri
+export const autoLogin=createAsyncThunk("user/autoLogin",async()=>{
+  try {
+    const token=await AsyncStorge.getItem("userToken")
+    if (token) {
+      return token
+    } else {
+      throw new Error("User Not Found")
+    }
+
+  } catch (error) {
+    throw error
+  }
+});
+
+//kullanıcı çıkış işlemleri
+export const logout=createAsyncThunk("user/logout",async()=>{
+try {
+  const auth=getAuth()
+  await signOut(auth)
+  await AsyncStorge.removeItem("userToken")
+  return null;
+} catch (error) {
+  throw error
+}
+
+})
+
+//kullanıcı kaydı
+export const register = createAsyncThunk("user/register", async ({ name, email, password }) => {
+  try {
+    const auth = getAuth();
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    const token = user.stsTokenManager.accessToken;
+
+    // Firestore'da yeni bir belge eklemek için addDoc fonksiyonunu kullan
+    await addDoc(collection(db, "users"), {
+      uid: user.uid,
+      name: name,
+      email: email,
+      // Diğer kullanıcı bilgilerini buraya ekleyebilirsiniz
+    });
+
+    await sendEmailVerification(user);
+    await AsyncStorge.setItem("userToken", token);
+
+    return token;
+  } catch (error) {
+    console.log("Register Error:", error); // Hata mesajını konsola yazdır
+    throw error;
+  }
+});
+
 
 const initialState = {
   isLoading: false,
@@ -41,9 +103,6 @@ export const userSlice = createSlice({
     },
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
-    },
-    setExit: (state) => {
-      state.isAuth = false;
     }
   },
   extraReducers: (builder) => {
@@ -62,7 +121,59 @@ export const userSlice = createSlice({
         state.isLoading = false;
         state.isAuth = false;
         state.error = action.error.message;
-      });
+      })
+
+
+      .addCase(autoLogin.pending, (state) => {
+        state.isLoading = true;
+        state.isAuth = false;
+      })
+      .addCase(autoLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = true;
+        state.token = action.payload;
+      })
+      .addCase(autoLogin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.token=null;
+      })
+
+
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+       
+      })
+      .addCase(logout.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.token = null;
+        state.error=null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error=action.payload
+      })
+
+
+      .addCase(register.pending, (state) => {
+        state.isLoading = true;
+        state.isAuth = false;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = true;
+        console.log("Durum:",state.isAuth);
+        state.token = action.payload
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = false;
+        state.error="Geçersiz Email veya Şifre"
+      })
+
+
+      
   }
 });
 
