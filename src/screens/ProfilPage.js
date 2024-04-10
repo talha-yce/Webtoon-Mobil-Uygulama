@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { db } from '../../firebaseConfig';
 import { getAuth } from "firebase/auth";
 import { query, where, getDocs, collection, updateDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage, db } from '../../firebaseConfig'; // assuming you have a separate file for Firebase configurations
+import * as ImagePicker from 'expo-image-picker';
 
 const ProfilePage = () => {
   const navigation = useNavigation();
@@ -13,27 +14,38 @@ const ProfilePage = () => {
   const [quote, setQuote] = useState("");
   const [newname, setNewname] = useState("");
   const [newQuote, setNewQuote] = useState("");
-
+  const [profileImage, setProfileImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [okunan, setOkunan] = useState(0); 
+  const [kaydet, setKaydet] = useState(0); 
+  const [like, setLike] = useState(0); 
+  
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
-        const userUid = user.uid; 
-
-        const q = query(collection(db, "users"), where("uid", "==", userUid));
+        const userId = user.uid; 
+  
+        const q = query(collection(db, "users"), where("uid", "==", userId));
         const querySnapshot = await getDocs(q);
-
+  
         querySnapshot.forEach((doc) => {
           const userData = doc.data();
           console.log("User Data:", userData);
           setUsername(userData.name); 
           setQuote(userData.quote); 
+          setProfileImage(userData.profileImage);
+          setOkunan(userData.okunan || 0);
+          setKaydet(userData.kaydet || 0); 
+          setLike(userData.like || 0);
         });
       } else {
         console.log("Kullanıcı oturum açmamış.");
       }
     });
-  }, []);
   
+    return () => unsubscribe();
+  }, []);
+
   const handleEditProfile = async () => {
     if (editing) {
       if (newname.trim() === '') {
@@ -45,9 +57,9 @@ const ProfilePage = () => {
         const user = getAuth().currentUser;
   
         if (user) {
-          const userUid = user.uid;
+          const userId = user.uid;
   
-          const q = query(collection(db, "users"), where("uid", "==", userUid));
+          const q = query(collection(db, "users"), where("uid", "==", userId));
           const querySnapshot = await getDocs(q);
   
           querySnapshot.forEach(async (doc) => {
@@ -74,14 +86,80 @@ const ProfilePage = () => {
       setEditing(true);
     }
   };
-  
-  
-  
+
   const handleQuoteChange = (text) => {
     if (text.length > 50) {
       Alert.alert("Uyarı", "Maximum 50 karaktere izin verilmektedir.");
     } else {
-      setNewQuote(text); // Alıntı metnini güncelle
+      setNewQuote(text);
+    }
+  };
+
+  const uploadProfileImage = async (imageUri) => {
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      const userId = getAuth().currentUser.uid;
+      const storageRef = ref(storage, `users/${userId}/profileImage.jpg`);
+      await uploadBytes(storageRef, blob);
+      const imageUrl = await getDownloadURL(storageRef);
+      setImageUrl(imageUrl);
+      await updateProfileImageUrl(imageUrl); // Firestore'daki kullanıcı belgesini güncelle
+      console.log("Profile image updated.");
+    } catch (error) {
+      console.error("Profil resmi yüklenirken hata oluştu:", error);
+    }
+  };
+
+  const updateProfileImageUrl = async (imageUrl) => {
+    try {
+      const user = getAuth().currentUser;
+      if (user) {
+        const userId = user.uid;
+        const q = query(collection(db, "users"), where("uid", "==", userId));
+        const querySnapshot = await getDocs(q);
+  
+        querySnapshot.forEach(async (doc) => {
+          const docRef = doc.ref;
+          await updateDoc(docRef, {
+            profileImage: imageUrl
+          });
+        });
+  
+        console.log("Firestore'daki profil resmi URL'si güncellendi.");
+        setProfileImage(imageUrl); // Profil resmini güncelle
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    } catch (error) {
+      console.error("Firestore'daki profil resmi URL'sini güncellemede hata oluştu:", error);
+    }
+  };
+  
+
+  const changeProfileImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log("Permission status:", status);
+      if (status !== 'granted') {
+        Alert.alert('Uyarı', 'Galeri erişimi reddedildi.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      console.log("Image Picker result:", result);
+      if (!result.canceled) {
+        const imageUri = result.assets[0].uri;
+        await uploadProfileImage(imageUri);
+      }
+    } catch (error) {
+      console.error('Profil resmi yükleme hatası:', error);
     }
   };
 
@@ -108,7 +186,15 @@ const ProfilePage = () => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.section}>
           <View style={styles.profileSection}>
-            <Image source={require('../../assets/İmage/HomePage_images/person.png')} style={styles.profileImage} />
+          <TouchableOpacity onPress={() => {
+              if (editing) {
+                changeProfileImage();
+              } else {
+                console.log("Profil düzenleme modu kapalı, fotoğraf değiştirme işlemi yapılamaz.");
+              }
+            }}>
+              <Image source={profileImage ? {uri: profileImage} : require('../../assets/İmage/HomePage_images/person.png')} style={styles.profileImage} />
+            </TouchableOpacity>
             <TextInput
               style={styles.profileUsername}
               value={editing ? newname : username}
@@ -118,17 +204,17 @@ const ProfilePage = () => {
               editable={editing}
             />
             <View style={styles.profileCounters}>
-              <View style={styles.counterContainer}>
+            <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/okunan.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>25</Text>
+                <Text style={styles.counterText}>{okunan}</Text>
               </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>36</Text>
+                <Text style={styles.counterText}>{kaydet}</Text>
               </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>86</Text>
+                <Text style={styles.counterText}>{like}</Text>
               </View>
             </View>
             <TextInput
@@ -295,18 +381,17 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   editProfileButton: {
-  backgroundColor: 'purple',
-  color: '#ff9a82',
-  fontWeight: 'bold',
-  textAlign: 'center',
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  borderRadius: 10,
-  borderWidth: 2,
-  borderColor: 'purple',
-  marginTop: 10,
-},
-
+    backgroundColor: 'purple',
+    color: '#ff9a82',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'purple',
+    marginTop: 10,
+  },
   contentSection: {
     backgroundColor: 'white',
     padding: 15,
@@ -342,7 +427,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     marginRight: 10,
   },
-  
 });
 
 export default ProfilePage;

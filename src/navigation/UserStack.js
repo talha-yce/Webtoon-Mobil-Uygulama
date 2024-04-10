@@ -1,23 +1,29 @@
 import React from "react";
-import { HomePage,SettingsPage,BildirimlerPage,ProfilPage,KaydetPage,KesifPage } from "../screens";
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { HomePage, SettingsPage, BildirimlerPage, ProfilPage, KaydetPage, KesifPage } from "../screens";
 
-const Stack=createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const UserStack=()=>{
-    return(
-        <Stack.Navigator 
-        initialRouteName="Home"
-        screenOptions={{headerShown:false}}>
-
-            <Stack.Screen name="Home" component={HomePage}/>
-            <Stack.Screen name="Settings" component={SettingsPage}/>
-            <Stack.Screen name="Bildirimler" component={BildirimlerPage}/>
-            <Stack.Screen name="Profil" component={ProfilPage}/>
-            <Stack.Screen name="Kaydet" component={KaydetPage}/>
-            <Stack.Screen name="Kesfet" component={KesifPage}/>
-
-        </Stack.Navigator>
-    );
+const UserStack = () => {
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        tabBarShowLabel: false, // Etiketleri gizlemek için
+        tabBarStyle: {
+          display: 'none' // Alt navigasyon çubuğunu gizlemek için
+        },
+        headerShown: false // Üst kısımdaki başlık çubuğunu gizlemek için
+      }}
+    >
+      <Tab.Screen name="Home" component={HomePage} />
+      <Tab.Screen name="Settings" component={SettingsPage} />
+      <Tab.Screen name="Bildirimler" component={BildirimlerPage} />
+      <Tab.Screen name="Profil" component={ProfilPage} />
+      <Tab.Screen name="Kaydet" component={KaydetPage} />
+      <Tab.Screen name="Kesfet" component={KesifPage} />
+    </Tab.Navigator>
+  );
 }
+
 export default UserStack;
