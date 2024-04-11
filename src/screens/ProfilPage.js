@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getAuth } from "firebase/auth";
 import { query, where, getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage, db } from '../../firebaseConfig'; // assuming you have a separate file for Firebase configurations
+import { storage, db } from '../../firebaseConfig'; 
 import * as ImagePicker from 'expo-image-picker';
 
 const ProfilePage = () => {
@@ -104,7 +104,7 @@ const ProfilePage = () => {
       await uploadBytes(storageRef, blob);
       const imageUrl = await getDownloadURL(storageRef);
       setImageUrl(imageUrl);
-      await updateProfileImageUrl(imageUrl); // Firestore'daki kullanıcı belgesini güncelle
+      await updateProfileImageUrl(imageUrl);
       console.log("Profile image updated.");
     } catch (error) {
       console.error("Profil resmi yüklenirken hata oluştu:", error);
@@ -127,7 +127,7 @@ const ProfilePage = () => {
         });
   
         console.log("Firestore'daki profil resmi URL'si güncellendi.");
-        setProfileImage(imageUrl); // Profil resmini güncelle
+        setProfileImage(imageUrl);
       } else {
         console.log("Kullanıcı oturum açmamış.");
       }
@@ -145,14 +145,14 @@ const ProfilePage = () => {
         Alert.alert('Uyarı', 'Galeri erişimi reddedildi.');
         return;
       }
-
+  
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
       });
-
+  
       console.log("Image Picker result:", result);
       if (!result.canceled) {
         const imageUri = result.assets[0].uri;
@@ -162,6 +162,7 @@ const ProfilePage = () => {
       console.error('Profil resmi yükleme hatası:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -257,8 +258,9 @@ const ProfilePage = () => {
         </View>
       </ScrollView>
 
+      {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>

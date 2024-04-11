@@ -22,7 +22,7 @@ const auth = initializeAuth(app, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage)
   });
   const db = getFirestore(app);
-  const storage = getStorage(app); // Storage bağlantısını da ekleyin
+  const storage = getStorage(app); 
   
-  export { app, auth, db, storage }; // storage'i dışa aktarın
+  export { app, auth, db, storage }; 
   export default app;

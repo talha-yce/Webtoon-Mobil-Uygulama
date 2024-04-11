@@ -1,9 +1,36 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const KesfetPage = () => {
   const navigation = useNavigation();
+  const [searchText, setSearchText] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const categories = ['Kategori1', 'Kategori2', 'Kategori3'];
+
+  // Firestore'dan arama 
+  const searchFromFirestore = async () => {
+    console.log('Arama yapıldı');
+    
+  };
+
+  const handleSearch = () => {
+    searchFromFirestore();
+  };
+
+  const handleCategorySelection = (category) => {
+    setSelectedCategory(category);
+    console.log(`Filtreleme yapıldı: ${category}`);
+    navigation.navigate('KesfetWebtoonPage', { category: category });
+  };
+
+  const handleFilter = () => {
+    setSelectedCategory(null); 
+    console.log("Filtreleme sıfırlandı");
+    
+  };
 
   return (
     <View style={styles.container}>
@@ -26,11 +53,55 @@ const KesfetPage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Content */}
-      <View style={styles.profileContent}>
-        <Text style={styles.profileHeaderText}>Kesfet Sayfası</Text>
-        {/* İçerik buraya gelecek */}
+      {/* Arama bölümü */}
+      <View style={styles.searchContainer}>
+        {/* Arama metni konteynerı */}
+        <View style={styles.searchTextContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Webtoon Ara..."
+            value={searchText}
+            onChangeText={(text) => setSearchText(text)}
+          />
+        </View>
+        
+        
+        <View style={styles.buttonsContainer}>
+          
+          <View style={styles.searchButtonContainer}>
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+              <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.searchIcon} />
+            </TouchableOpacity>
+          </View>
+          
+          
+          <View style={styles.filterButtonContainer}>
+            <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
+              <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.filterIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
+
+      
+      {searchResults.length > 0 && (
+        <ScrollView style={styles.searchResultsContainer}>
+          {searchResults.map((result, index) => (
+            <Text key={index} style={styles.searchResultItem}>
+              {result.title}
+            </Text>
+          ))}
+        </ScrollView>
+      )}
+
+      
+      <ScrollView style={styles.categoryContainer}>
+        {categories.map((category, index) => (
+          <TouchableOpacity key={index} style={styles.categoryItem} onPress={() => handleCategorySelection(category)}>
+            <Text style={styles.categoryText}>{category}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
@@ -49,7 +120,7 @@ const KesfetPage = () => {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -95,15 +166,73 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
   },
-  profileContent: {
+  searchContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+  },
+  searchTextContainer: {
     flex: 1,
+  },
+  searchInput: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  searchButtonContainer: {
+    marginRight: 10,
+  },
+  filterButtonContainer: {
+  },
+  searchButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 40,
+    height: 40,
   },
-  profileHeaderText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+  filterButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+  searchIcon: {
+    width: 20,
+    height: 20,
+  },
+  filterIcon: {
+    width: 20,
+    height: 20,
+  },
+  searchResultsContainer: {
+    backgroundColor: 'lightgray',
+    paddingHorizontal: 25,
+    paddingVertical: 15,
+  },
+  searchResultItem: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  categoryContainer: {
+    paddingHorizontal: 25,
+    marginTop: 10,
+  },
+  categoryItem: {
+    backgroundColor: 'white',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  categoryText: {
+    fontSize: 16,
   },
   bottomNav: {
     flexDirection: 'row',

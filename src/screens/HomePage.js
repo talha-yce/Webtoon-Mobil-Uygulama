@@ -209,14 +209,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   personalWebtoon: {
-    width: 150,
-    height: 200,
+    width: 100,
+    height: 150,
     backgroundColor: 'gray',
     marginRight: 10,
   },
   trendingWebtoon: {
-    width: 150,
-    height: 200,
+    width: 100,
+    height: 150,
     backgroundColor: 'gray',
     marginRight: 10,
   },

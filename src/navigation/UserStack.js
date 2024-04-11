@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { HomePage, SettingsPage, BildirimlerPage, ProfilPage, KaydetPage, KesifPage } from "../screens";
+import { HomePage, SettingsPage, BildirimlerPage, ProfilPage, KaydetPage, KesifPage,KesfetWebtoonPage } from "../screens";
 
 const Tab = createBottomTabNavigator();
 
@@ -9,11 +9,11 @@ const UserStack = () => {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
-        tabBarShowLabel: false, // Etiketleri gizlemek için
+        tabBarShowLabel: false, 
         tabBarStyle: {
-          display: 'none' // Alt navigasyon çubuğunu gizlemek için
+          display: 'none' 
         },
-        headerShown: false // Üst kısımdaki başlık çubuğunu gizlemek için
+        headerShown: false 
       }}
     >
       <Tab.Screen name="Home" component={HomePage} />
@@ -22,6 +22,7 @@ const UserStack = () => {
       <Tab.Screen name="Profil" component={ProfilPage} />
       <Tab.Screen name="Kaydet" component={KaydetPage} />
       <Tab.Screen name="Kesfet" component={KesifPage} />
+      <Tab.Screen name="KesfetWebtoonPage" component={KesfetWebtoonPage} />
     </Tab.Navigator>
   );
 }
