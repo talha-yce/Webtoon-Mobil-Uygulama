@@ -79,19 +79,19 @@ const KesfetPage = () => {
         <View style={styles.buttonsContainer}>
           <View style={styles.searchButtonContainer}>
             <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-              <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.searchIcon} />
+              <Image source={require('../../assets/İmage/HomePage_images/arama.png')} style={styles.searchIcon} />
             </TouchableOpacity>
           </View>
           
           <View style={styles.filterButtonContainer}>
             <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
-              <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.filterIcon} />
+              <Image source={require('../../assets/İmage/HomePage_images/filtre.png')} style={styles.filterIcon} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
         {categories.map(category => (
           <View key={category.id} style={styles.categoryContainer}>
             <Text style={styles.categoryTitle}>{category.id}</Text>
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
     height: 35,
   },
   searchContainer: {
+    backgroundColor: 'white',
     flexDirection: 'row',
     paddingHorizontal: 25,
     paddingBottom: 15,
@@ -181,7 +182,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchInput: {
-    backgroundColor: 'white',
+    marginTop:10,
+    backgroundColor: 'lightgray',
     borderRadius: 5,
     paddingHorizontal: 10,
   },
@@ -211,12 +213,12 @@ const styles = StyleSheet.create({
     height: 40,
   },
   searchIcon: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
   },
   filterIcon: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
   },
   categoryContainer: {
     paddingHorizontal: 25,
@@ -237,10 +239,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: 'white',
+    color: 'black',
   },
   webtoonList: {
-    backgroundColor: 'white',
+    backgroundColor: 'purple',
     borderRadius: 5,
     padding: 10,
   },
@@ -248,7 +250,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   webtoonText: {
-    color: 'black',
+    color: 'white',
+  },
+  scrollView: {
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
   },
 });
 

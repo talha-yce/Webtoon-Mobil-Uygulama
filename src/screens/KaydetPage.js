@@ -7,6 +7,7 @@ import { db } from '../../firebaseConfig';
 const KaydetPage = () => {
   const navigation = useNavigation();
   const [categories, setCategories] = useState([]);
+  const [searchText, setSearchText] = useState('');
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -34,6 +35,17 @@ const KaydetPage = () => {
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
+  const handleSearch = () => {
+    console.log('Arama yapıldı');
+    // Firestore'dan arama işlemleri buraya eklenebilir.
+  };
+
+  const handleFilter = () => {
+    console.log("Filtreleme sıfırlandı");
+    // Filtreleme işlemleri buraya eklenebilir.
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -54,8 +66,32 @@ const KaydetPage = () => {
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
+      <View style={styles.searchContainer}>
+        <View style={styles.searchTextContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Webtoon Ara..."
+            value={searchText}
+            onChangeText={(text) => setSearchText(text)}
+          />
+        </View>
+        
+        <View style={styles.buttonsContainer}>
+          <View style={styles.searchButtonContainer}>
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+              <Image source={require('../../assets/İmage/HomePage_images/arama.png')} style={styles.searchIcon} />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.filterButtonContainer}>
+            <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
+              <Image source={require('../../assets/İmage/HomePage_images/filtre.png')} style={styles.filterIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
 
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
         {categories.map(category => (
           <View key={category.id} style={styles.categoryContainer}>
             <Text style={styles.categoryTitle}>{category.id}</Text>
@@ -165,10 +201,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: 'white',
+    color: 'black',
   },
   webtoonList: {
-    backgroundColor: 'white',
+    backgroundColor: 'purple',
     borderRadius: 5,
     padding: 10,
   },
@@ -176,7 +212,59 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   webtoonText: {
-    color: 'black',
+    color: 'white',
+  },
+  scrollView: {
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
+  },
+  searchContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+  },
+  searchTextContainer: {
+    flex: 1,
+  },
+  searchInput: {
+    marginTop:10,
+    backgroundColor: 'lightgray',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  searchButtonContainer: {
+    marginRight: 10,
+  },
+  filterButtonContainer: {
+  },
+  searchButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+  filterButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+  searchIcon: {
+    width: 30,
+    height: 30,
+  },
+  filterIcon: {
+    width: 30,
+    height: 30,
   },
 });
 
