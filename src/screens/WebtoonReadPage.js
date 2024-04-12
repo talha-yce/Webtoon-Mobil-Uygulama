@@ -4,7 +4,9 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import * as ImagePicker from 'expo-image-picker';
+
 const windowWidth = Dimensions.get('window').width;
+
 const WebtoonReadPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -19,6 +21,7 @@ const WebtoonReadPage = () => {
   ];
 
   const [resimler, setResimler] = useState([]);
+  const [resimYukseklik, setResimYukseklik] = useState(0);
 
   useEffect(() => {
     const getBolumResimler = async () => {
@@ -36,6 +39,29 @@ const WebtoonReadPage = () => {
     };
     getBolumResimler();
   }, [webtoon, episode]);
+
+  useEffect(() => {
+    if (resimler.length > 0) {
+      Image.getSize(resimler[0], (width, height) => {
+        const oran = height / width;
+        setResimYukseklik(windowWidth * oran);
+      });
+    }
+  }, [resimler]);
+
+  const [resimIndex, setResimIndex] = useState(0);
+
+  const handleIleri = () => {
+    if (resimIndex < resimler.length - 1) {
+      setResimIndex(resimIndex + 1);
+    }
+  };
+
+  const handleGeri = () => {
+    if (resimIndex > 0) {
+      setResimIndex(resimIndex - 1);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -59,14 +85,31 @@ const WebtoonReadPage = () => {
       </View>
 
       {/* Orta Bölüm */}
-      <ScrollView contentContainerStyle={{ flexGrow: 10 }}>
-      {resimler.map((resim, index) => (
-        <View key={index} style={{ alignItems: 'center', justifyContent: 'center'}}>
-          <Image source={{ uri: resim }} style={{ width:windowWidth * 1, height: undefined, aspectRatio: 800 / 1800,resizeMode: 'contain'}} />
-          {/* veya aspectRatio: 800 / 1900 */}
+      <View style={styles.middleContainer}>
+        {/* Üst Buton Konteynırı */}
+        <View style={styles.topButtonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleGeri}>
+            <Text style={styles.buttonText}>Geri</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleIleri}>
+            <Text style={styles.buttonText}>İleri</Text>
+          </TouchableOpacity>
         </View>
-      ))}
-    </ScrollView>
+
+        {/* Alt Bölge Konteynırı */}
+        <ScrollView style={styles.bottomContainer}>
+          {/* Resimler Konteynırı */}
+          <View style={styles.imageContainer}>
+          <Image source={{ uri: resimler[resimIndex] }} style={[styles.image, { height: resimYukseklik }]} resizeMode="contain" />
+          </View>
+
+          {/* Yorumlar Konteynırı */}
+          <View style={styles.commentsContainer}>
+            <Text style={styles.commentsTitle}>Yorumlar</Text>
+            {/* Yorumlar buraya eklenecek */}
+          </View>
+        </ScrollView>
+      </View>
 
       {/* alt navigasyon bölümü*/}
       <View style={styles.bottomNav}>
@@ -131,16 +174,42 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
   },
-  
-  resimContainer: {
-    alignItems: 'center',
+  middleContainer: {
+    flex: 1,
+    paddingHorizontal: 25,
   },
-  resim: {
-    width: 800,
-    height: null,
-    
+  topButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
-  
+  button: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  bottomContainer: {
+    flex: 1,
+    marginTop: 20,
+  },
+  imageContainer: {
+    marginBottom: 20,
+  },
+  image: {
+    width: windowWidth,
+  },
+  commentsContainer: {
+    marginBottom: 20,
+  },
+  commentsTitle: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 10,
+  },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
