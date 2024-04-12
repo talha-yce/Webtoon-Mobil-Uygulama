@@ -1,9 +1,38 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig'; 
 
 const KaydetPage = () => {
   const navigation = useNavigation();
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesSnapshot = await getDocs(collection(db, 'recorded'));
+        const categoriesData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
+          const webtoonsSnapshot = await getDocs(collection(db, `recorded/${doc.id}/webtoons`));
+          const webtoonsData = webtoonsSnapshot.docs.map(webtoonDoc => webtoonDoc.id);
+          return {
+            id: doc.id,
+            webtoons: webtoonsData
+          };
+        }));
+        
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Kategorileri getirirken hata oluştu:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleCategorySelect = (webtoon) => {
+    console.log(`Seçilen webtoon: ${webtoon}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
+  };
 
   return (
     <View style={styles.container}>
@@ -26,12 +55,24 @@ const KaydetPage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Content */}
-      <View style={styles.profileContent}>
-        <Text style={styles.profileHeaderText}>Kaydedilenler Sayfası</Text>
-        {/* İçerik buraya gelecek */}
-      </View>
-
+      <ScrollView>
+        {categories.map(category => (
+          <View key={category.id} style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>{category.id}</Text>
+            <View style={styles.webtoonList}>
+              {category.webtoons.map(webtoon => (
+                <TouchableOpacity 
+                  key={webtoon} 
+                  style={styles.webtoonItem} 
+                  onPress={() => handleCategorySelect(webtoon)}
+                >
+                  <Text style={styles.webtoonText}>{webtoon}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -115,6 +156,27 @@ const styles = StyleSheet.create({
   navIcon: {
     width: 35,
     height: 35,
+  },
+  categoryContainer: {
+    paddingHorizontal: 25,
+    marginTop: 10,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'white',
+  },
+  webtoonList: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    padding: 10,
+  },
+  webtoonItem: {
+    paddingVertical: 5,
+  },
+  webtoonText: {
+    color: 'black',
   },
 });
 
