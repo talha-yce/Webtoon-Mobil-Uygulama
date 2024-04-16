@@ -30,13 +30,13 @@ const ProfilePage = () => {
   
         querySnapshot.forEach((doc) => {
           const userData = doc.data();
-          console.log("User Data:", userData);
+          
           setUsername(userData.name); 
           setQuote(userData.quote); 
           setProfileImage(userData.profileImage);
-          setOkunan(userData.okunan || 0);
-          setKaydet(userData.kaydet || 0); 
-          setLike(userData.like || 0);
+          setOkunan(userData.okunan);
+          setKaydet(userData.kaydet); 
+          setLike(userData.like );
         });
       } else {
         console.log("Kullanıcı oturum açmamış.");
@@ -69,7 +69,7 @@ const ProfilePage = () => {
               quote: newQuote
             });
   
-            console.log("Kullanıcı verileri güncellendi.");
+            Alert.alert("Kullanıcı verileri güncellendi.");
             setUsername(newname);
             setQuote(newQuote);
             setEditing(false);
@@ -153,7 +153,7 @@ const ProfilePage = () => {
         quality: 1,
       });
   
-      console.log("Image Picker result:", result);
+      
       if (!result.canceled) {
         const imageUri = result.assets[0].uri;
         await uploadProfileImage(imageUri);

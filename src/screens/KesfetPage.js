@@ -1,40 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig'; 
 
 const KesfetPage = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-  const categories = ['Kategori1', 'Kategori2', 'Kategori3'];
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+        const categoriesData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
+          const webtoonsSnapshot = await getDocs(collection(db, `categories/${doc.id}/webtoons`));
+          const webtoonsData = webtoonsSnapshot.docs.map(webtoonDoc => webtoonDoc.id);
+          return {
+            id: doc.id,
+            webtoons: webtoonsData
+          };
+        }));
+        
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Kategorileri getirirken hata oluştu:', error);
+      }
+    };
 
-  // Firestore'dan arama 
-  const searchFromFirestore = async () => {
-    console.log('Arama yapıldı');
-    
+    fetchCategories();
+  }, []);
+
+  const handleCategorySelect = (webtoon) => {
+    console.log(`Seçilen webtoon: ${webtoon}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
   const handleSearch = () => {
-    searchFromFirestore();
-  };
-
-  const handleCategorySelection = (category) => {
-    setSelectedCategory(category);
-    console.log(`Filtreleme yapıldı: ${category}`);
-    navigation.navigate('KesfetWebtoonPage', { category: category });
+    console.log('Arama yapıldı');
+    // Firestore'dan arama işlemleri buraya eklenebilir.
   };
 
   const handleFilter = () => {
-    setSelectedCategory(null); 
     console.log("Filtreleme sıfırlandı");
-    
+    // Filtreleme işlemleri buraya eklenebilir.
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
@@ -53,9 +66,7 @@ const KesfetPage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Arama bölümü */}
       <View style={styles.searchContainer}>
-        {/* Arama metni konteynerı */}
         <View style={styles.searchTextContainer}>
           <TextInput
             style={styles.searchInput}
@@ -65,47 +76,42 @@ const KesfetPage = () => {
           />
         </View>
         
-        
         <View style={styles.buttonsContainer}>
-          
           <View style={styles.searchButtonContainer}>
             <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-              <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.searchIcon} />
+              <Image source={require('../../assets/İmage/HomePage_images/arama.png')} style={styles.searchIcon} />
             </TouchableOpacity>
           </View>
           
-          
           <View style={styles.filterButtonContainer}>
             <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
-              <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.filterIcon} />
+              <Image source={require('../../assets/İmage/HomePage_images/filtre.png')} style={styles.filterIcon} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      
-      {searchResults.length > 0 && (
-        <ScrollView style={styles.searchResultsContainer}>
-          {searchResults.map((result, index) => (
-            <Text key={index} style={styles.searchResultItem}>
-              {result.title}
-            </Text>
-          ))}
-        </ScrollView>
-      )}
-
-      
-      <ScrollView style={styles.categoryContainer}>
-        {categories.map((category, index) => (
-          <TouchableOpacity key={index} style={styles.categoryItem} onPress={() => handleCategorySelection(category)}>
-            <Text style={styles.categoryText}>{category}</Text>
-          </TouchableOpacity>
+      <ScrollView style={styles.scrollView}>
+        {categories.map(category => (
+          <View key={category.id} style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>{category.id}</Text>
+            <View style={styles.webtoonList}>
+              {category.webtoons.map(webtoon => (
+                <TouchableOpacity 
+                  key={webtoon} 
+                  style={styles.webtoonItem} 
+                  onPress={() => handleCategorySelect(webtoon)}
+                >
+                  <Text style={styles.webtoonText}>{webtoon}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         ))}
       </ScrollView>
-
-      {/* alt navigaysyon bölümu*/}
+      
       <View style={styles.bottomNav}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
@@ -167,6 +173,7 @@ const styles = StyleSheet.create({
     height: 35,
   },
   searchContainer: {
+    backgroundColor: 'white',
     flexDirection: 'row',
     paddingHorizontal: 25,
     paddingBottom: 15,
@@ -175,7 +182,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchInput: {
-    backgroundColor: 'white',
+    marginTop:10,
+    backgroundColor: 'lightgray',
     borderRadius: 5,
     paddingHorizontal: 10,
   },
@@ -205,34 +213,16 @@ const styles = StyleSheet.create({
     height: 40,
   },
   searchIcon: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
   },
   filterIcon: {
-    width: 20,
-    height: 20,
-  },
-  searchResultsContainer: {
-    backgroundColor: 'lightgray',
-    paddingHorizontal: 25,
-    paddingVertical: 15,
-  },
-  searchResultItem: {
-    fontSize: 16,
-    marginBottom: 10,
+    width: 30,
+    height: 30,
   },
   categoryContainer: {
     paddingHorizontal: 25,
     marginTop: 10,
-  },
-  categoryItem: {
-    backgroundColor: 'white',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  categoryText: {
-    fontSize: 16,
   },
   bottomNav: {
     flexDirection: 'row',
@@ -244,6 +234,27 @@ const styles = StyleSheet.create({
   navIcon: {
     width: 35,
     height: 35,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'black',
+  },
+  webtoonList: {
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    padding: 10,
+  },
+  webtoonItem: {
+    paddingVertical: 5,
+  },
+  webtoonText: {
+    color: 'white',
+  },
+  scrollView: {
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
   },
 });
 

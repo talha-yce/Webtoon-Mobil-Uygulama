@@ -1,9 +1,50 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getDocs, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig'; 
 
 const KaydetPage = () => {
   const navigation = useNavigation();
+  const [categories, setCategories] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesSnapshot = await getDocs(collection(db, 'recorded'));
+        const categoriesData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
+          const webtoonsSnapshot = await getDocs(collection(db, `recorded/${doc.id}/webtoons`));
+          const webtoonsData = webtoonsSnapshot.docs.map(webtoonDoc => webtoonDoc.id);
+          return {
+            id: doc.id,
+            webtoons: webtoonsData
+          };
+        }));
+        
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Kategorileri getirirken hata oluştu:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleCategorySelect = (webtoon) => {
+    console.log(`Seçilen webtoon: ${webtoon}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
+  };
+
+  const handleSearch = () => {
+    console.log('Arama yapıldı');
+    // Firestore'dan arama işlemleri buraya eklenebilir.
+  };
+
+  const handleFilter = () => {
+    console.log("Filtreleme sıfırlandı");
+    // Filtreleme işlemleri buraya eklenebilir.
+  };
+
 
   return (
     <View style={styles.container}>
@@ -25,13 +66,49 @@ const KaydetPage = () => {
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-
-      {/* Profile Content */}
-      <View style={styles.profileContent}>
-        <Text style={styles.profileHeaderText}>Kaydedilenler Sayfası</Text>
-        {/* İçerik buraya gelecek */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchTextContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Webtoon Ara..."
+            value={searchText}
+            onChangeText={(text) => setSearchText(text)}
+          />
+        </View>
+        
+        <View style={styles.buttonsContainer}>
+          <View style={styles.searchButtonContainer}>
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+              <Image source={require('../../assets/İmage/HomePage_images/arama.png')} style={styles.searchIcon} />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.filterButtonContainer}>
+            <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
+              <Image source={require('../../assets/İmage/HomePage_images/filtre.png')} style={styles.filterIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
 
+      <ScrollView style={styles.scrollView}>
+        {categories.map(category => (
+          <View key={category.id} style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>{category.id}</Text>
+            <View style={styles.webtoonList}>
+              {category.webtoons.map(webtoon => (
+                <TouchableOpacity 
+                  key={webtoon} 
+                  style={styles.webtoonItem} 
+                  onPress={() => handleCategorySelect(webtoon)}
+                >
+                  <Text style={styles.webtoonText}>{webtoon}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
       {/* alt navigaysyon bölümu*/}
       <View style={styles.bottomNav}>
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -115,6 +192,79 @@ const styles = StyleSheet.create({
   navIcon: {
     width: 35,
     height: 35,
+  },
+  categoryContainer: {
+    paddingHorizontal: 25,
+    marginTop: 10,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'black',
+  },
+  webtoonList: {
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    padding: 10,
+  },
+  webtoonItem: {
+    paddingVertical: 5,
+  },
+  webtoonText: {
+    color: 'white',
+  },
+  scrollView: {
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
+  },
+  searchContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    paddingHorizontal: 25,
+    paddingBottom: 15,
+  },
+  searchTextContainer: {
+    flex: 1,
+  },
+  searchInput: {
+    marginTop:10,
+    backgroundColor: 'lightgray',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  searchButtonContainer: {
+    marginRight: 10,
+  },
+  filterButtonContainer: {
+  },
+  searchButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+  filterButton: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+  searchIcon: {
+    width: 30,
+    height: 30,
+  },
+  filterIcon: {
+    width: 30,
+    height: 30,
   },
 });
 

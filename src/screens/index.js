@@ -6,8 +6,8 @@ import BildirimlerPage from "./BildirimlerPage";
 import ProfilPage from "./ProfilPage";
 import KaydetPage from "./KaydetPage";
 import KesifPage from "./KesfetPage";
-import KesfetWebtoonPage from "./KesfetWebtoonPage";
-
+import WebtoonInfoPage from "./WebtoonInfoPage";
+import WebtoonReadPage from "./WebtoonReadPage";
 export{
     LoginPage,
     HomePage,
@@ -17,5 +17,6 @@ export{
     ProfilPage,
     KaydetPage,
     KesifPage,
-    KesfetWebtoonPage,
+    WebtoonInfoPage,
+    WebtoonReadPage,
 }

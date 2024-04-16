@@ -69,11 +69,13 @@ export const register = createAsyncThunk("user/register", async ({ name, email, 
       uid: user.uid,
       name: name,
       email: email,
-      // Diğer kullanıcı bilgilerini buraya ekleyebilirsiniz
+      kaydet: 0,
+      like: 0,
+      okunan: 0
     });
 
     await sendEmailVerification(user);
-    await AsyncStorge.setItem("userToken", token);
+    await AsyncStorage.setItem("userToken", token); // AsyncStorge yerine AsyncStorage kullanılmalı
 
     return token;
   } catch (error) {
@@ -81,6 +83,7 @@ export const register = createAsyncThunk("user/register", async ({ name, email, 
     throw error;
   }
 });
+
 
 
 const initialState = {
