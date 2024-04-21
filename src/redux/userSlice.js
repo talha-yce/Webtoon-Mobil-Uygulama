@@ -75,7 +75,7 @@ export const register = createAsyncThunk("user/register", async ({ name, email, 
     });
 
     await sendEmailVerification(user);
-    await AsyncStorage.setItem("userToken", token); // AsyncStorge yerine AsyncStorage kullanılmalı
+    await AsyncStorge.setItem("userToken", token); // AsyncStorge yerine AsyncStorage kullanılmalı
 
     return token;
   } catch (error) {
