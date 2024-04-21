@@ -19,6 +19,7 @@ const ProfilePage = () => {
   const [okunan, setOkunan] = useState(0); 
   const [kaydet, setKaydet] = useState(0); 
   const [like, setLike] = useState(0); 
+  const [webtoon, setWebtoon] = useState([]);
   
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
@@ -45,6 +46,56 @@ const ProfilePage = () => {
   
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const categoriesSnapshot = await getDocs(collection(db, 'recorded'));
+      const webtoonData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
+        const webtoonsSnapshot = await getDocs(collection(db, `recorded/${doc.id}/webtoons`));
+        const webtoonsData = webtoonsSnapshot.docs.map(async webtoonDoc => {
+          const webtoonName = webtoonDoc.id;
+          let coverUrl = '';
+          try {
+            coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
+          } catch (error) {
+            try {
+              coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
+            } catch (error) {
+              try {
+                coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
+              } catch (error) {
+                console.error(`Kapak resmi alınamadı: ${webtoonName}`, error);
+              }
+            }
+          }
+          console.log(`Webtoon adı: ${webtoonName}, Kapak resmi URL'si: ${coverUrl}`);
+          return {
+            name: webtoonName,
+            coverUrl: coverUrl
+          };
+        });
+        return {
+          id: doc.id,
+          webtoons: await Promise.all(webtoonsData)
+        };
+      }));
+      
+      setWebtoon(webtoonData);
+    } catch (error) {
+      console.error('Kategorileri getirirken hata oluştu:', error);
+    }
+  };
+  
+  
+  fetchCategories();
+}, []);
+
+  const handleCategorySelect = (webtoonName) => {
+    console.log(`Seçilen webtoon: ${webtoonName}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
+  };
+  
 
   const handleEditProfile = async () => {
     if (editing) {
@@ -235,23 +286,16 @@ const ProfilePage = () => {
 
         <View style={styles.section}>
           <View style={styles.contentSection}>
-            <Text style={styles.contentTitle}>Okuduğun Webtoonlar</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {[...Array(8)].map((_, index) => (
-                <TouchableOpacity key={index} onPress={() => console.log("Okuduğun webtoon gösterildi")}>
-                  <View style={styles.personalWebtoon} />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-
-          <View style={styles.contentSection}>
             <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {[...Array(6)].map((_, index) => (
-                <TouchableOpacity key={index} onPress={() => console.log("Kaydettiğin webtoon gösterildi")}>
-                  <View style={styles.trendingWebtoon} />
-                </TouchableOpacity>
+              {webtoon.map(category => (
+                category.webtoons.map(webtoon => (
+                  <TouchableOpacity key={webtoon.name} onPress={() => handleCategorySelect(webtoon.name)}>
+                    <View style={styles.trendingWebtoon}>
+                      <Image source={{uri: webtoon.coverUrl}} style={styles.webtoonCover} />
+                    </View>
+                  </TouchableOpacity>
+                ))
               ))}
             </ScrollView>
           </View>
@@ -397,14 +441,22 @@ const styles = StyleSheet.create({
   contentSection: {
     backgroundColor: 'white',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     marginBottom: 20,
   },
   contentTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: 'black',
+    marginBottom: 10,
+  },
+  trendingWebtoon: {
+    marginRight: 15,
+  },
+  webtoonCover: {
+    width: 150,
+    height: 200,
+    borderRadius: 10,
   },
   bottomNav: {
     flexDirection: 'row',
@@ -424,10 +476,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   trendingWebtoon: {
-    width: 100,
-    height: 150,
+    width: 150,
+    height: 200,
     backgroundColor: 'gray',
     marginRight: 10,
+    borderRadius: 10,
   },
 });
 
