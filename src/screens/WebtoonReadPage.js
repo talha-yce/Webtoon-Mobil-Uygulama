@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
@@ -54,13 +54,23 @@ const WebtoonReadPage = () => {
   const handleIleri = () => {
     if (resimIndex < resimler.length - 1) {
       setResimIndex(resimIndex + 1);
+      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
     }
   };
 
   const handleGeri = () => {
     if (resimIndex > 0) {
       setResimIndex(resimIndex - 1);
+      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
     }
+  };
+
+  // ScrollView referansı oluştur
+  const scrollViewRef = useRef();
+
+  // ScrollView'in en başına gitmek için fonksiyon
+  const scrollToTop = () => {
+    scrollViewRef.current.scrollTo({ y: 0, animated: true });
   };
 
   return (
@@ -97,16 +107,30 @@ const WebtoonReadPage = () => {
         </View>
 
         {/* Alt Bölge Konteynırı */}
-        <ScrollView style={styles.bottomContainer}>
+        <ScrollView
+          ref={scrollViewRef} // ScrollView referansını ata
+          style={styles.bottomContainer}
+          onContentSizeChange={scrollToTop} // İçerik değiştiğinde en başa git
+        >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
-          <Image source={{ uri: resimler[resimIndex] }} style={[styles.image, { height: resimYukseklik }]} resizeMode="contain" />
+            <Image source={{ uri: resimler[resimIndex] }} style={[styles.image, { height: resimYukseklik }]} resizeMode="contain" />
+          
           </View>
 
-          {/* Yorumlar Konteynırı */}
+          {/* Yorumlar */}
           <View style={styles.commentsContainer}>
             <Text style={styles.commentsTitle}>Yorumlar</Text>
-            {/* Yorumlar buraya eklenecek */}
+            {/* Yorumları listeleme */}
+            {comments.map((comment, index) => (
+              <View key={index} style={styles.comment}>
+                <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.commentAvatar} />
+                <View style={styles.commentTextContainer}>
+                  <Text style={styles.commentUsername}>{comment.username}</Text>
+                  <Text style={styles.commentText}>{comment.text}</Text>
+                </View>
+              </View>
+            ))}
           </View>
         </ScrollView>
       </View>
@@ -176,12 +200,13 @@ const styles = StyleSheet.create({
   },
   middleContainer: {
     flex: 1,
-    paddingHorizontal: 25,
+    
   },
   topButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
   },
   button: {
     backgroundColor: 'white',
@@ -194,22 +219,19 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flex: 1,
-    marginTop: 20,
+    marginTop: 10,
+    borderWidth:1,
+    
   },
   imageContainer: {
     marginBottom: 20,
+    borderWidth:1,
   },
   image: {
     width: windowWidth,
+    borderWidth:1,
   },
-  commentsContainer: {
-    marginBottom: 20,
-  },
-  commentsTitle: {
-    fontSize: 18,
-    color: 'white',
-    marginBottom: 10,
-  },
+  
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -220,6 +242,38 @@ const styles = StyleSheet.create({
   navIcon: {
     width: 35,
     height: 35,
+  },
+  commentsContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  commentsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10,
+  },
+  comment: {
+    flexDirection: 'row',
+    marginBottom: 15,
+  },
+  commentAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  commentTextContainer: {
+    flex: 1,
+  },
+  commentUsername: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  commentText: {
+    fontSize: 14,
+    color: 'black',
   },
 });
 

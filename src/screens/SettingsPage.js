@@ -1,12 +1,82 @@
-import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/userSlice';
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { query, where, getDocs, collection } from 'firebase/firestore';
+import { db } from '../../firebaseConfig'; 
+
 const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
+  const [username, setUsername] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [theme, setTheme] = useState('Açık'); // Default theme
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+
   const navigation = useNavigation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
+      if (user) {
+        const userId = user.uid;
+
+        const q = query(collection(db, "users"), where("uid", "==", userId));
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
+          setUsername(userData.name);
+          setUserEmail(userData.email);
+        });
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    });
+
+    // Cleanup
+    return () => unsubscribe();
+  }, []);
+
+  const handleLanguageChange = (language) => {
+    setContentLanguage(language);
+    setShowLanguageModal(false); // Hide language modal after selection
+    console.log(`Selected language: ${language}`);
+  };
+
+  const handleThemeChange = (selectedTheme) => {
+    setTheme(selectedTheme);
+    setShowThemeModal(false); // Hide theme modal after selection
+    console.log(`Selected theme: ${selectedTheme}`);
+  };
+
+  const handlePasswordReset = async () => {
+    try {
+      // Kontrol et: E-posta aynı mı?
+      if (emailForPasswordReset === userEmail) {
+        await sendPasswordResetEmail(getAuth(), emailForPasswordReset);
+        Alert.alert(
+          "Şifre Sıfırlama Gönderildi",
+          "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.",
+          [{ text: "Tamam" }]
+        );
+        setEmailForPasswordReset('');
+      } else {
+        Alert.alert(
+          "Uyarı",
+          "Girdiğiniz e-posta adresi ile kayıtlı bir kullanıcı bulunamadı. Lütfen geçerli bir e-posta adresi girin.",
+          [{ text: "Tamam" }]
+        );
+      }
+    } catch (error) {
+      Alert.alert("Hata", "Şifre sıfırlama gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+      console.error("Şifre sıfırlama hatası:", error);
+    }
+  };
 
   const renderItem = (title, content) => (
     <View style={styles.itemContainer}>
@@ -19,7 +89,7 @@ const SettingsPage = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
         </TouchableOpacity>
         <View style={styles.logoyazi}>
@@ -32,54 +102,129 @@ const SettingsPage = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
           <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
         </TouchableOpacity>
-        </View>
+      </View>
       {/* Content */}
       <ScrollView style={styles.scrollView}>
-      {/* ayarMenu */}
-      <View style={styles.ayarMenu}>
-        {renderItem("HESAP:", <Text>Petro 8290</Text>)}
-        
-        {renderItem("TAKMA AD:", <Text>Petro #8290</Text>)}
-        {renderItem("SEÇENEKLER:", null)}
-        {renderItem("Uygulama Dili:", 
-          <TouchableOpacity style={styles.optionButton} onPress={() => setContentLanguage('Türkçe')}>
-            <Text style={styles.optionButtonText}>{contentLanguage}</Text>
-          </TouchableOpacity>
-        )}
-        {renderItem("Önbelleği Temizle:", <TouchableOpacity><Text>30-41 MB</Text></TouchableOpacity>)}
-        {renderItem("Tema:", <TouchableOpacity><Text>Tema</Text></TouchableOpacity>)}
-        {renderItem("BİLDİRİMLER:", null)}
-        {renderItem("Servis Bildirimi", <Switch/>)}
-        {renderItem("Güncel Yeni Bölüm", <Switch/>)} 
-        {renderItem("Göz rahatlığı:", <Switch/>)}
-        {renderItem("HAKKINDA:", null)}
-        {renderItem("Fark Etme:", <TouchableOpacity><Text>Fark Etme</Text></TouchableOpacity>)}
-        {renderItem("Yardım:", <TouchableOpacity><Text>Yardım</Text></TouchableOpacity>)}
-        {renderItem("Kullanım Şekilleri:", <TouchableOpacity><Text>Kullanım Şekilleri</Text></TouchableOpacity>)}
-        
-        {/* Çıkış Yap butonu */}
-        <View style={styles.exitButtonContainer}>
-          <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(logout())}>
-            <Text style={styles.exitButtonText}>Çıkış Yap</Text>
-          </TouchableOpacity>
+        {/* ayarMenu */}
+        <View style={styles.ayarMenu}>
+          {renderItem("HESAP:", <Text>{userEmail}</Text>)}
+          {renderItem("TAKMA AD:", <Text>{username}</Text>)}
+          {/* Şifremi unuttum */}
+          {renderItem("Şifremi Unuttum:", 
+            <View>
+              <TouchableOpacity onPress={() => setShowResetPasswordModal(true)}>
+                <Text>Şifremi Unuttum</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {renderItem("SEÇENEKLER:", null)}
+          {renderItem("Uygulama Dili:", 
+            <TouchableOpacity style={styles.optionButton} onPress={() => setShowLanguageModal(true)}>
+              <Text style={styles.optionButtonText}>{contentLanguage}</Text>
+            </TouchableOpacity>
+          )}
+          {renderItem("Tema:", 
+            <TouchableOpacity style={styles.optionButton} onPress={() => setShowThemeModal(true)}>
+              <Text style={styles.optionButtonText}>{theme}</Text>
+            </TouchableOpacity>
+          )}
+          {renderItem("BİLDİRİMLER:", null)}
+          {renderItem("Servis Bildirimi", <Switch />)}
+          {renderItem("Güncel Yeni Bölüm", <Switch />)}
+          
+          {renderItem("HAKKINDA:", null)}
+          {renderItem("Fark Etme:", <TouchableOpacity><Text>SSS</Text></TouchableOpacity>)}
+          {renderItem("Yardım:", <TouchableOpacity><Text>Yardım</Text></TouchableOpacity>)}
+          {renderItem("Kullanım Şekilleri:", <TouchableOpacity><Text>Kullanım Şekilleri</Text></TouchableOpacity>)}
+          {/* Çıkış Yap butonu */}
+          <View style={styles.exitButtonContainer}>
+            <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(logout())}>
+              <Text style={styles.exitButtonText}>Çıkış Yap</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
       </ScrollView>
-      {/* alt navigaysyon bölümu*/}
+      {/* alt navigasyon bölümü*/}
       <View style={styles.bottomNav}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
           <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require( '../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
+          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
           <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>
+      {/* Dil seçim modal */}
+      {showLanguageModal && (
+        <View style={styles.languageModal}>
+          <View style={styles.languageModalContent}>
+            <Text style={styles.languageModalTitle}>Uygulama Dili Seçin</Text>
+            <TouchableOpacity onPress={() => handleLanguageChange('Türkçe')}>
+              <Text style={styles.languageOption}>Türkçe</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleLanguageChange('English')}>
+              <Text style={styles.languageOption}>English</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleLanguageChange('Deutsch')}>
+              <Text style={styles.languageOption}>Deutsch</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleLanguageChange('한국어')}>
+              <Text style={styles.languageOption}>한국어</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleLanguageChange('日本語')}>
+              <Text style={styles.languageOption}>日本語</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+              <Text style={styles.languageModalClose}>Kapat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {/* Tema seçim modal */}
+      {showThemeModal && (
+        <View style={styles.themeModal}>
+          <View style={styles.themeModalContent}>
+            <Text style={styles.themeModalTitle}>Uygulama Teması Seçin</Text>
+            <TouchableOpacity onPress={() => handleThemeChange('Açık')}>
+              <Text style={styles.themeOption}>Açık</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleThemeChange('Koyu')}>
+              <Text style={styles.themeOption}>Koyu</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleThemeChange('DarkToon')}>
+              <Text style={styles.themeOption}>DarkToon</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowThemeModal(false)}>
+              <Text style={styles.themeModalClose}>Kapat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+      {/* Şifre sıfırlama modalı */}
+      {showResetPasswordModal && (
+        <View style={styles.resetPasswordModal}>
+          <View style={styles.resetPasswordModalContent}>
+            <Text style={styles.resetPasswordModalTitle}>Şifremi Unuttum</Text>
+            <TextInput
+              style={styles.inputmail}
+              placeholder="E-posta Adresi"
+              onChangeText={setEmailForPasswordReset}
+              value={emailForPasswordReset}
+            />
+            <TouchableOpacity onPress={handlePasswordReset}>
+              <Text style={styles.resetPasswordButton}>Şifremi Sıfırla</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowResetPasswordModal(false)}>
+              <Text style={styles.resetPasswordModalClose}>Kapat</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -184,6 +329,117 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  languageModal: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  languageModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  languageModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  languageOption: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  languageModalClose: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  themeModal: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themeModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  themeModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  themeOption: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  themeModalClose: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  resetPasswordModal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resetPasswordModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  resetPasswordModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  inputmail: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  resetPasswordButton: {
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: 10,
+    textAlign: 'center',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  resetPasswordModalClose: {
+    textAlign: 'center',
+    color: 'blue',
   },
 });
 
