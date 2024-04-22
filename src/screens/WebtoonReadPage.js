@@ -54,21 +54,21 @@ const WebtoonReadPage = () => {
   const handleIleri = () => {
     if (resimIndex < resimler.length - 1) {
       setResimIndex(resimIndex + 1);
-      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
+      scrollToTop(); 
     }
   };
 
   const handleGeri = () => {
     if (resimIndex > 0) {
       setResimIndex(resimIndex - 1);
-      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
+      scrollToTop(); 
     }
   };
 
-  // ScrollView referansı oluştur
+ 
   const scrollViewRef = useRef();
 
-  // ScrollView'in en başına gitmek için fonksiyon
+  
   const scrollToTop = () => {
     scrollViewRef.current.scrollTo({ y: 0, animated: true });
   };
@@ -84,8 +84,8 @@ const WebtoonReadPage = () => {
         <View style={styles.logoyazi}>
           <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
           <View style={styles.titleContainer}>
-            {/* Webtoon bilgisini kullanarak başlık oluştur */}
-            <Text style={styles.title}>{webtoon}</Text>
+            <Text style={styles.title}>DARK</Text>
+            <Text style={styles.subtitle}>TON</Text>
           </View>
         </View>
 
@@ -101,6 +101,7 @@ const WebtoonReadPage = () => {
           <TouchableOpacity style={styles.button} onPress={handleGeri}>
             <Text style={styles.buttonText}>Geri</Text>
           </TouchableOpacity>
+          <Text style={styles.title}>{webtoon}</Text>
           <TouchableOpacity style={styles.button} onPress={handleIleri}>
             <Text style={styles.buttonText}>İleri</Text>
           </TouchableOpacity>
