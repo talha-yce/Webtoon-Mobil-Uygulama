@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
-import * as ImagePicker from 'expo-image-picker';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -65,9 +64,7 @@ const WebtoonReadPage = () => {
     }
   };
 
- 
   const scrollViewRef = useRef();
-
   
   const scrollToTop = () => {
     scrollViewRef.current.scrollTo({ y: 0, animated: true });
@@ -115,9 +112,15 @@ const WebtoonReadPage = () => {
         >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
-            <Image source={{ uri: resimler[resimIndex] }} style={[styles.image, { height: resimYukseklik }]} resizeMode="contain" />
-          
-          </View>
+  {resimler.length > 0 && (
+    <Image
+      source={{ uri: resimler[resimIndex] }}
+      style={[styles.image, { height: resimYukseklik }]}
+      resizeMode="contain" // Resmi ekran genişliğine uygun şekilde boyutlandır
+    />
+  )}
+</View>
+
 
           {/* Yorumlar */}
           <View style={styles.commentsContainer}>
@@ -201,7 +204,6 @@ const styles = StyleSheet.create({
   },
   middleContainer: {
     flex: 1,
-    
   },
   topButtonContainer: {
     flexDirection: 'row',
@@ -221,18 +223,14 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     marginTop: 10,
-    borderWidth:1,
-    
   },
   imageContainer: {
     marginBottom: 20,
-    borderWidth:1,
+    alignItems: 'center',
   },
   image: {
-    width: windowWidth,
-    borderWidth:1,
+    width: windowWidth, // Ekran genişliği kadar genişlik
   },
-  
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
