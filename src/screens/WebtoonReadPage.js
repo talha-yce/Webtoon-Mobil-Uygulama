@@ -3,7 +3,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
-
+import { useDispatch, useSelector } from 'react-redux';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 const windowWidth = Dimensions.get('window').width;
 
 const WebtoonReadPage = () => {
@@ -11,7 +12,7 @@ const WebtoonReadPage = () => {
   const route = useRoute();
   
   const { webtoon, episode } = route.params;
-
+  const theme = useSelector(state => state.user.theme);
   // Örnek yorumlar
   const comments = [
     { username: 'Kullanıcı1', text: 'Harika bir webtoon!' },
@@ -71,7 +72,10 @@ const WebtoonReadPage = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -176,11 +180,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
   },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,

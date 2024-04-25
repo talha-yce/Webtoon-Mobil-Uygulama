@@ -4,7 +4,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import * as ImagePicker from 'expo-image-picker';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 const WebtoonInfoPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -16,7 +17,7 @@ const WebtoonInfoPage = () => {
     { username: 'Kullanıcı2', text: 'Çok keyifli okudum.' },
     { username: 'Kullanıcı3', text: 'Biraz daha uzun olabilirdi.' },
   ];
-
+  const theme = useSelector(state => state.user.theme);
   
   const [bolumler, setBolumler] = useState([]);
   
@@ -49,7 +50,10 @@ const WebtoonInfoPage = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -175,18 +179,19 @@ const styles = StyleSheet.create({
     
     alignItems: 'center',
   },
-  title: {
-    fontSize: 20,
-    color: 'white',
-  },
+  
   basliktitle: {
     fontSize: 28,
     color: 'black',
     marginBottom:10,
   },
+  title: {
+    fontSize: 20,
+    color: '#ffb685',
+  },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,

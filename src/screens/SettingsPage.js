@@ -6,7 +6,7 @@ import { logout, changeTheme } from '../redux/userSlice';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { query, where, getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { lightTheme, darkTheme } from '../components/ThemaStil';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 
 
 const SettingsPage = () => {
@@ -89,7 +89,10 @@ const SettingsPage = () => {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: theme === 'lightTheme' ? lightTheme.whiteStil.backgroundColor : darkTheme.whiteStil.backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -249,11 +252,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
   },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,

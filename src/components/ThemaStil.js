@@ -1,17 +1,17 @@
 export const lightTheme = {
-    purpleStil: {
-      backgroundColor: 'purple',
-    },
-    whiteStil: {
-      backgroundColor: 'white',
-    },
+  whiteStil: {
+    backgroundColor: 'white',
+  },
   };
   
   export const darkTheme = {
-    purpleStil: {
-      backgroundColor: 'black',
+    darkStil:{
+      backgroundColor:'black',
     },
-    whiteStil: {
+  };
+
+  export const DarkToonTheme = {
+    purpleStil: {
       backgroundColor: 'purple',
     },
   };

@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
+import { useDispatch, useSelector } from 'react-redux';
 const Bildirim = ({ tarih, icerik }) => {
   return (
     <View style={styles.notificationContainer}>
@@ -14,10 +14,13 @@ const Bildirim = ({ tarih, icerik }) => {
 
 const BildirimlerPage = () => {
   const navigation = useNavigation();
-
+  const theme = useSelector(state => state.user.theme);
   // Bildirimler listesi burada olacak
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         
@@ -87,11 +90,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
   },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,

@@ -3,12 +3,13 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView 
 import { useNavigation } from '@react-navigation/native';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
-
+import { useDispatch, useSelector } from 'react-redux';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 const KesfetPage = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [categories, setCategories] = useState([]);
-
+  const theme = useSelector(state => state.user.theme);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -47,7 +48,10 @@ const KesfetPage = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
@@ -146,11 +150,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
   },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,
