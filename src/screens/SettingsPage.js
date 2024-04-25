@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { logout } from '../redux/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, changeTheme } from '../redux/userSlice';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { query, where, getDocs, collection } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; 
+import { db } from '../../firebaseConfig';
+import { lightTheme, darkTheme } from '../components/ThemaStil';
+
 
 const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [theme, setTheme] = useState('Açık'); // Default theme
+  
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
@@ -19,6 +21,8 @@ const SettingsPage = () => {
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const theme = useSelector(state => state.user.theme);
 
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
@@ -44,19 +48,18 @@ const SettingsPage = () => {
 
   const handleLanguageChange = (language) => {
     setContentLanguage(language);
-    setShowLanguageModal(false); // Hide language modal after selection
+    setShowLanguageModal(false); 
     console.log(`Selected language: ${language}`);
   };
 
   const handleThemeChange = (selectedTheme) => {
-    setTheme(selectedTheme);
-    setShowThemeModal(false); // Hide theme modal after selection
+    dispatch(changeTheme(selectedTheme));
+    setShowThemeModal(false);
     console.log(`Selected theme: ${selectedTheme}`);
   };
 
   const handlePasswordReset = async () => {
     try {
-      // Kontrol et: E-posta aynı mı?
       if (emailForPasswordReset === userEmail) {
         await sendPasswordResetEmail(getAuth(), emailForPasswordReset);
         Alert.alert(
@@ -86,7 +89,7 @@ const SettingsPage = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'lightTheme' ? lightTheme.whiteStil.backgroundColor : darkTheme.whiteStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -190,11 +193,11 @@ const SettingsPage = () => {
         <View style={styles.themeModal}>
           <View style={styles.themeModalContent}>
             <Text style={styles.themeModalTitle}>Uygulama Teması Seçin</Text>
-            <TouchableOpacity onPress={() => handleThemeChange('Açık')}>
-              <Text style={styles.themeOption}>Açık</Text>
+            <TouchableOpacity onPress={() => handleThemeChange('lightTheme')}>
+              <Text style={styles.themeOption}>lightTheme</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleThemeChange('Koyu')}>
-              <Text style={styles.themeOption}>Koyu</Text>
+            <TouchableOpacity onPress={() => handleThemeChange('darkTheme')}>
+              <Text style={styles.themeOption}>darkTheme</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleThemeChange('DarkToon')}>
               <Text style={styles.themeOption}>DarkToon</Text>
@@ -232,7 +235,6 @@ const SettingsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'purple',
     paddingTop: 20,
   },
   header: {
@@ -333,9 +335,9 @@ const styles = StyleSheet.create({
   languageModal: {
     position: 'absolute',
     top: 0,
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -347,27 +349,26 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   languageModalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   languageOption: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   languageModalClose: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'red',
-    textAlign: 'center',
+    fontSize: 18,
+    color: 'blue',
     marginTop: 10,
+    textAlign: 'right',
   },
   themeModal: {
     position: 'absolute',
     top: 0,
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -379,35 +380,27 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   themeModalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   themeOption: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   themeModalClose: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'red',
-    textAlign: 'center',
+    fontSize: 18,
+    color: 'blue',
     marginTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
+    textAlign: 'right',
   },
   resetPasswordModal: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     position: 'absolute',
     top: 0,
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -418,28 +411,30 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   resetPasswordModalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   inputmail: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+    borderRadius: 5,
   },
   resetPasswordButton: {
-    backgroundColor: 'blue',
+    backgroundColor: 'purple',
     color: 'white',
-    padding: 10,
     textAlign: 'center',
+    paddingVertical: 10,
     borderRadius: 5,
     marginBottom: 10,
   },
   resetPasswordModalClose: {
-    textAlign: 'center',
+    fontSize: 18,
     color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
   },
 });
 

@@ -11,12 +11,12 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  //userSlice dan veri okuma
+  
   const {isLoading}=useSelector((state)=>state.user)
-  //userSlice reducer yapısına veri gönderme
+  
   const dispatch = useDispatch()
 
-  //Kullanıcı daha önce giriş yapmış mı
+ 
   useEffect(()=>{
     dispatch(autoLogin())
   },[])

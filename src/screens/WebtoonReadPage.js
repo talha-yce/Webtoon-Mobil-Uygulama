@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
-import * as ImagePicker from 'expo-image-picker';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -54,21 +53,19 @@ const WebtoonReadPage = () => {
   const handleIleri = () => {
     if (resimIndex < resimler.length - 1) {
       setResimIndex(resimIndex + 1);
-      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
+      scrollToTop(); 
     }
   };
 
   const handleGeri = () => {
     if (resimIndex > 0) {
       setResimIndex(resimIndex - 1);
-      scrollToTop(); // Yeni resmin gösterildiği zaman ScrollView'i en başa götür
+      scrollToTop(); 
     }
   };
 
-  // ScrollView referansı oluştur
   const scrollViewRef = useRef();
-
-  // ScrollView'in en başına gitmek için fonksiyon
+  
   const scrollToTop = () => {
     scrollViewRef.current.scrollTo({ y: 0, animated: true });
   };
@@ -84,8 +81,8 @@ const WebtoonReadPage = () => {
         <View style={styles.logoyazi}>
           <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
           <View style={styles.titleContainer}>
-            {/* Webtoon bilgisini kullanarak başlık oluştur */}
-            <Text style={styles.title}>{webtoon}</Text>
+            <Text style={styles.title}>DARK</Text>
+            <Text style={styles.subtitle}>TON</Text>
           </View>
         </View>
 
@@ -101,6 +98,7 @@ const WebtoonReadPage = () => {
           <TouchableOpacity style={styles.button} onPress={handleGeri}>
             <Text style={styles.buttonText}>Geri</Text>
           </TouchableOpacity>
+          <Text style={styles.title}>{webtoon}</Text>
           <TouchableOpacity style={styles.button} onPress={handleIleri}>
             <Text style={styles.buttonText}>İleri</Text>
           </TouchableOpacity>
@@ -108,15 +106,21 @@ const WebtoonReadPage = () => {
 
         {/* Alt Bölge Konteynırı */}
         <ScrollView
-          ref={scrollViewRef} // ScrollView referansını ata
+          ref={scrollViewRef} 
           style={styles.bottomContainer}
-          onContentSizeChange={scrollToTop} // İçerik değiştiğinde en başa git
+          onContentSizeChange={scrollToTop} 
         >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
-            <Image source={{ uri: resimler[resimIndex] }} style={[styles.image, { height: resimYukseklik }]} resizeMode="contain" />
-          
-          </View>
+  {resimler.length > 0 && (
+    <Image
+      source={{ uri: resimler[resimIndex] }}
+      style={[styles.image, { height: resimYukseklik }]}
+      resizeMode="contain" 
+    />
+  )}
+</View>
+
 
           {/* Yorumlar */}
           <View style={styles.commentsContainer}>
@@ -200,7 +204,6 @@ const styles = StyleSheet.create({
   },
   middleContainer: {
     flex: 1,
-    
   },
   topButtonContainer: {
     flexDirection: 'row',
@@ -220,18 +223,14 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     marginTop: 10,
-    borderWidth:1,
-    
   },
   imageContainer: {
     marginBottom: 20,
-    borderWidth:1,
+    alignItems: 'center',
   },
   image: {
-    width: windowWidth,
-    borderWidth:1,
+    width: windowWidth, // Ekran genişliği kadar genişlik
   },
-  
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',

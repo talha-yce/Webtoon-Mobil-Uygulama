@@ -1,9 +1,24 @@
-import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
-import { getAuth,signOut, signInWithEmailAndPassword,createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import AsyncStorge from "@react-native-async-storage/async-storage";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getAuth, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage düzeltildi
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 //kullanıcı giriş işlemleri
+
+
+export const changeTheme = (theme) => {
+  return async (dispatch) => {
+    try {
+      await AsyncStorage.setItem('theme', theme); 
+      dispatch(setTheme(theme)); 
+    } catch (error) {
+      console.error("Tema değiştirme hatası:", error);
+    }
+  };
+};
+
+
+
 export const login = createAsyncThunk('user/login', async ({ email, password }) => {
     try {
       const auth = getAuth();
@@ -17,7 +32,7 @@ export const login = createAsyncThunk('user/login', async ({ email, password }) 
         user: user,
       }
 
-      await AsyncStorge.setItem("userToken",token)
+      await AsyncStorage.setItem("userToken",token)
 
   
       return userData;
@@ -31,7 +46,7 @@ export const login = createAsyncThunk('user/login', async ({ email, password }) 
   //kullanıcı otomatik giriş işlemleri
 export const autoLogin=createAsyncThunk("user/autoLogin",async()=>{
   try {
-    const token=await AsyncStorge.getItem("userToken")
+    const token=await AsyncStorage.getItem("userToken")
     if (token) {
       return token
     } else {
@@ -48,7 +63,7 @@ export const logout=createAsyncThunk("user/logout",async()=>{
 try {
   const auth=getAuth()
   await signOut(auth)
-  await AsyncStorge.removeItem("userToken")
+  await AsyncStorage.removeItem("userToken")
   return null;
 } catch (error) {
   throw error
@@ -75,7 +90,7 @@ export const register = createAsyncThunk("user/register", async ({ name, email, 
     });
 
     await sendEmailVerification(user);
-    await AsyncStorge.setItem("userToken", token); // AsyncStorge yerine AsyncStorage kullanılmalı
+    await AsyncStorage.setItem("userToken", token); // AsyncStorge yerine AsyncStorage kullanılmalı
 
     return token;
   } catch (error) {
@@ -92,6 +107,7 @@ const initialState = {
   token: null,
   user:null,
   error: null,
+  theme: 'lightTheme', 
 };
 
 export const userSlice = createSlice({
@@ -106,7 +122,10 @@ export const userSlice = createSlice({
     },
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
-    }
+    },
+    setTheme: (state, action) => {
+      state.theme = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -180,5 +199,5 @@ export const userSlice = createSlice({
   }
 });
 
-export const { setEmail, setPassword, setIsLoading, setExit } = userSlice.actions;
+export const { setEmail, setPassword, setIsLoading, setTheme } = userSlice.actions;
 export default userSlice.reducer;
