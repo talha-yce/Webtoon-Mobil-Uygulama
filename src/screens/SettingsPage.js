@@ -11,7 +11,7 @@ const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [theme, setTheme] = useState('Açık'); // Default theme
+  const [theme, setTheme] = useState('Açık'); 
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
@@ -44,19 +44,19 @@ const SettingsPage = () => {
 
   const handleLanguageChange = (language) => {
     setContentLanguage(language);
-    setShowLanguageModal(false); // Hide language modal after selection
+    setShowLanguageModal(false); 
     console.log(`Selected language: ${language}`);
   };
 
   const handleThemeChange = (selectedTheme) => {
     setTheme(selectedTheme);
-    setShowThemeModal(false); // Hide theme modal after selection
+    setShowThemeModal(false); 
     console.log(`Selected theme: ${selectedTheme}`);
   };
 
   const handlePasswordReset = async () => {
     try {
-      // Kontrol et: E-posta aynı mı?
+      
       if (emailForPasswordReset === userEmail) {
         await sendPasswordResetEmail(getAuth(), emailForPasswordReset);
         Alert.alert(

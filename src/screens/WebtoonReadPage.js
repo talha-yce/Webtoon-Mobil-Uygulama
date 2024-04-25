@@ -106,9 +106,9 @@ const WebtoonReadPage = () => {
 
         {/* Alt Bölge Konteynırı */}
         <ScrollView
-          ref={scrollViewRef} // ScrollView referansını ata
+          ref={scrollViewRef} 
           style={styles.bottomContainer}
-          onContentSizeChange={scrollToTop} // İçerik değiştiğinde en başa git
+          onContentSizeChange={scrollToTop} 
         >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
@@ -116,7 +116,7 @@ const WebtoonReadPage = () => {
     <Image
       source={{ uri: resimler[resimIndex] }}
       style={[styles.image, { height: resimYukseklik }]}
-      resizeMode="contain" // Resmi ekran genişliğine uygun şekilde boyutlandır
+      resizeMode="contain" 
     />
   )}
 </View>
