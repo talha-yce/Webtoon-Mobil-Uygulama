@@ -6,7 +6,8 @@ import { query, where, getDocs, collection, updateDoc, doc } from 'firebase/fire
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; 
 import * as ImagePicker from 'expo-image-picker';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 const ProfilePage = () => {
   const navigation = useNavigation();
   const [editing, setEditing] = useState(false);
@@ -20,7 +21,7 @@ const ProfilePage = () => {
   const [kaydet, setKaydet] = useState(0); 
   const [like, setLike] = useState(0); 
   const [webtoon, setWebtoon] = useState([]);
-  
+  const theme = useSelector(state => state.user.theme);
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
@@ -91,7 +92,7 @@ const ProfilePage = () => {
   fetchCategories();
 }, []);
 
-  const handleCategorySelect = (webtoonName) => {
+  const handleWebtoonSelect = (webtoonName) => {
     console.log(`Seçilen webtoon: ${webtoonName}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
   };
@@ -216,7 +217,10 @@ const ProfilePage = () => {
   
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.darkStil.backgroundColor }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
@@ -290,7 +294,7 @@ const ProfilePage = () => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {webtoon.map(category => (
                 category.webtoons.map(webtoon => (
-                  <TouchableOpacity key={webtoon.name} onPress={() => handleCategorySelect(webtoon.name)}>
+                  <TouchableOpacity key={webtoon.name} onPress={() => handleWebtoonSelect(webtoon.name)}>
                     <View style={styles.trendingWebtoon}>
                       <Image source={{uri: webtoon.coverUrl}} style={styles.webtoonCover} />
                     </View>
@@ -339,11 +343,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
   },
   subtitle: {
     fontSize: 20,
-    color: 'white',
+    color: '#ffb685',
     position: 'relative',
     left: 37,
     top: -5,

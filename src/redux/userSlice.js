@@ -107,7 +107,7 @@ const initialState = {
   token: null,
   user:null,
   error: null,
-  theme: 'lightTheme', 
+  theme: 'DarkToon', 
 };
 
 export const userSlice = createSlice({
