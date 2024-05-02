@@ -15,7 +15,14 @@ const Bildirim = ({ tarih, icerik }) => {
 const BildirimlerPage = () => {
   const navigation = useNavigation();
   const theme = useSelector(state => state.user.theme);
-  // Bildirimler listesi burada olacak
+
+  // Örnek bildirimler
+  const bildirimler = [
+    { tarih: 'Bugün', icerik: 'Yeni bölüm yayında! - Webtoon adı' },
+    { tarih: 'Dün', icerik: 'Güncelleme: Yeni özellikler eklendi!' },
+    // Buraya istediğiniz kadar örnek bildirim ekleyebilirsiniz
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
     ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
@@ -23,8 +30,7 @@ const BildirimlerPage = () => {
       : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        
-         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
         </TouchableOpacity>
 
@@ -43,19 +49,17 @@ const BildirimlerPage = () => {
 
       {/* Bildirimler */}
       <ScrollView style={styles.scrollView}>
-       <View style={styles.notificationSection}>
-          <Text style={styles.sectionTitle}>Bugün</Text>
-          <Bildirim tarih="Bugün" icerik="Yeni bölüm yayında! - Webtoon adı" />
-        </View>
-        <View style={styles.notificationSection}>
-          <Text style={styles.sectionTitle}>Dün</Text>
-          <Bildirim tarih="Dün" icerik="Güncelleme: Yeni özellikler eklendi!" />
-        </View>
-       
+        {bildirimler.map((bildirim, index) => (
+          <View key={index} style={styles.notificationSection}>
+            <Text style={styles.sectionTitle}>{bildirim.tarih}</Text>
+            <Bildirim tarih={bildirim.tarih} icerik={bildirim.icerik} />
+          </View>
+        ))}
       </ScrollView>
-      {/* alt navigaysyon bölümu*/}
+
+      {/* Alt navigasyon bölümü */}
       <View style={styles.bottomNav}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
@@ -75,7 +79,6 @@ const BildirimlerPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'purple',
     paddingTop: 20,
   },
   header: {
@@ -103,10 +106,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  headerText: {
-    fontSize: 18,
-    color: 'white',
-  },
   scrollView: {
     paddingHorizontal: 20,
     backgroundColor: 'white',
@@ -117,10 +116,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 15,
     paddingTop: 10,
-  },
-  navText: {
-    fontSize: 16,
-    color: 'white',
   },
   settingicon: {
     width: 35,

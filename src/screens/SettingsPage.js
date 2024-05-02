@@ -71,7 +71,7 @@ const SettingsPage = () => {
       } else {
         Alert.alert(
           "Uyarı",
-          "Girdiğiniz e-posta adresi ile kayıtlı bir kullanıcı bulunamadı. Lütfen geçerli bir e-posta adresi girin.",
+          "Girdiğiniz e-posta adresi uyuşmuyor. Lütfen geçerli bir e-posta adresi girin.",
           [{ text: "Tamam" }]
         );
       }

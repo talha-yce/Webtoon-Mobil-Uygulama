@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getDocs, collection } from 'firebase/firestore';
+import { getDocs, collection, query, where, contains } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
-import { useDispatch, useSelector } from 'react-redux';
-import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
+import { useSelector } from 'react-redux';
+import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
+
 const KesfetPage = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [categories, setCategories] = useState([]);
   const theme = useSelector(state => state.user.theme);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -37,14 +39,23 @@ const KesfetPage = () => {
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log('Arama yapıldı');
-    // Firestore'dan arama işlemleri buraya eklenebilir.
+
+    try {
+      const webtoonsSnapshot = await getDocs(query(collection(db, 'webtoons'), where('title', '==', searchText)));
+      const webtoonsData = webtoonsSnapshot.docs.map(doc => doc.data());
+
+      console.log('Arama sonuçları:', webtoonsData);
+     
+    } catch (error) {
+      console.error('Arama yapılırken hata oluştu:', error);
+    }
   };
 
   const handleFilter = () => {
     console.log("Filtreleme sıfırlandı");
-    // Filtreleme işlemleri buraya eklenebilir.
+    
   };
 
   return (
@@ -135,7 +146,6 @@ const KesfetPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'purple',
     paddingTop: 20,
   },
   header: {
