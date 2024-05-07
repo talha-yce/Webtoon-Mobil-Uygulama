@@ -43,6 +43,8 @@ const SignupPage = () => {
             style={styles.TextInputStyle}
             onChangeText={setEmail}
             value={email}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
 
           <TextInput
