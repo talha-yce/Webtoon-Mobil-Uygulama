@@ -10,11 +10,10 @@ const SignupPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState(""); 
+  const [passwordError, setPasswordError] = useState(""); 
   const dispatch = useDispatch();
-  const { isLoading } = useSelector(state => state.user)
-
-
-
+  const { isLoading } = useSelector(state => state.user);
 
   if (isLoading) {
     return <Loading />
@@ -44,6 +43,8 @@ const SignupPage = () => {
             style={styles.TextInputStyle}
             onChangeText={setEmail}
             value={email}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
 
           <TextInput
@@ -54,9 +55,25 @@ const SignupPage = () => {
             value={password}
           />
 
+          
+          <TextInput
+            placeholder='Şifreyi Tekrar Girin'
+            secureTextEntry={true}
+            style={styles.TextInputStyle}
+            onChangeText={setPasswordConfirm}
+            value={passwordConfirm}
+          />
+
           <View style={styles.buttonContainer}>
             <Pressable
-              onPress={() => dispatch(register({ name, email, password }))}
+              onPress={() => {
+                if (password !== passwordConfirm) { 
+                  setPasswordError("Şifreler eşleşmiyor!");
+                } else {
+                  setPasswordError("");
+                  dispatch(register({ name, email, password }));
+                }
+              }}
               style={({ pressed }) => [{
                 backgroundColor: pressed ? "gray" : "#8a1194"
               }, styles.button]}>
@@ -67,6 +84,9 @@ const SignupPage = () => {
               <Text style={{ fontWeight: 'bold' }}>Mevcut bir hesabınız mı var? Login</Text>
             </Pressable>
           </View>
+
+          
+          <Text style={{ color: 'red', marginBottom: 10 }}>{passwordError}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
