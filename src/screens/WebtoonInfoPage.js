@@ -1,59 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet,ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
-import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
+import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';
 const WebtoonInfoPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { webtoon } = route.params;
-
-  // Örnek yorumlar
-  const comments = [
-    { username: 'Kullanıcı1', text: 'Harika bir webtoon!' },
-    { username: 'Kullanıcı2', text: 'Çok keyifli okudum.' },
-    { username: 'Kullanıcı3', text: 'Biraz daha uzun olabilirdi.' },
-  ];
+ // Örnek yorumlar
+ const comments = [
+  { username: 'Kullanıcı1', text: 'Harika bir webtoon!' },
+  { username: 'Kullanıcı2', text: 'Çok keyifli okudum.' },
+  { username: 'Kullanıcı3', text: 'Biraz daha uzun olabilirdi.' },
+];
   const theme = useSelector(state => state.user.theme);
-  
   const [bolumler, setBolumler] = useState([]);
-  
   const [kapakResmi, setKapakResmi] = useState(null);
+  const [begenCount, setBegenCount] = useState(0);
+  const [kaydetCount, setKaydetCount] = useState(0);
+  const [yorumCount, setYorumCount] = useState(0);
 
   useEffect(() => {
-    
+    // Webtoon kapak resmi URL'sini getir
     getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpg`))
-    .then(url => setKapakResmi(url))
-    .catch(error => {
-      
-      getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpeg`))
-        .then(url => setKapakResmi(url))
-        .catch(error => console.error("Kapak resmi alınamadı:", error));
-    });
-    
+      .then(url => setKapakResmi(url))
+      .catch(error => {
+        getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpeg`))
+          .then(url => setKapakResmi(url))
+          .catch(error => console.error("Kapak resmi alınamadı:", error));
+      });
+
+    // Webtoon bölümlerini getir
     listAll(ref(storage, `Webtoons/${webtoon}/Bölümler`))
       .then(dir => {
         const bolumler = dir.prefixes.map(folderRef => folderRef.name);
         setBolumler(bolumler);
       })
       .catch(error => console.error("Bölümler alınamadı:", error));
-  }, [webtoon]);
 
-
-
+      const getWebtoonData = async () => {
+        try {
+          const webtoonDoc = doc(db, 'webtoonlar', webtoon);
+          const webtoonSnapshot = await getDoc(webtoonDoc);
+  
+          if (webtoonSnapshot.exists()) {
+            const webtoonData = webtoonSnapshot.data();
+            const begenCount = webtoonData.begen || 0;
+            const kaydetCount = webtoonData.kaydet || 0;
+            const yorumCount = webtoonData.yorum || 0;
+  
+            setBegenCount(begenCount);
+            setKaydetCount(kaydetCount);
+            setYorumCount(yorumCount);
+          } else {
+            console.log('Webtoon bulunamadı');
+          }
+        } catch (error) {
+          console.error('Webtoon verileri alınamadı:', error);
+        }
+      };
+  
+      getWebtoonData();
+    }, [webtoon]);
 
   const goToWebtoonReadPage = (episode) => {
     navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode });
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.darkStil.backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: theme === 'DarkToon'
+      ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+        ? lightTheme.whiteStil.backgroundColor
+        : darkTheme.darkStil.backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -73,38 +96,34 @@ const WebtoonInfoPage = () => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView}>
-      {/* Orta Bölge */}
-      <View style={styles.middleContent}>
-        <Text style={styles.basliktitle}>{webtoon}</Text>
-        {/* Kapak resmi */}
-        {kapakResmi && <Image source={{ uri: kapakResmi }} style={styles.webtoonImage} />}
-        
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>Konusu</Text>
-          <Text style={styles.infoText}>Webtoonun konusu buraya gelecek.</Text>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <View style={styles.counterContainer}>
-            <Image source={require('../../assets/İmage/HomePage_images/oku.png')} style={styles.counterIcon} />
-            <Text style={styles.counterText}>Oku</Text>
-          </View>
-          <View style={styles.counterContainer}>
-            <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
-            <Text style={styles.counterText}>5</Text>
-          </View>
-          <View style={styles.counterContainer}>
-            <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.counterIcon} />
-            <Text style={styles.counterText}>2</Text>
-          </View>
-          <View style={styles.counterContainer}>
-            <Image source={require('../../assets/İmage/HomePage_images/yorum.png')} style={styles.counterIcon} />
-            <Text style={styles.counterText}>6</Text>
-          </View>
-        </View>
-      </View>
+        {/* Orta Bölge */}
+        <View style={styles.middleContent}>
+          <Text style={styles.basliktitle}>{webtoon}</Text>
+          {/* Kapak resmi */}
+          {kapakResmi && <Image source={{ uri: kapakResmi }} style={styles.webtoonImage} />}
 
-       {/* Bölümler */}
-       <View style={styles.episodesContainer}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoTitle}>Konusu</Text>
+            <Text style={styles.infoText}>Webtoonun konusu buraya gelecek.</Text>
+          </View>
+          <View style={styles.buttonsContainer}>
+            <View style={styles.counterContainer}>
+              <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
+              <Text style={styles.counterText}>{kaydetCount}</Text>
+            </View>
+            <View style={styles.counterContainer}>
+              <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.counterIcon} />
+              <Text style={styles.counterText}>{begenCount}</Text>
+            </View>
+            <View style={styles.counterContainer}>
+              <Image source={require('../../assets/İmage/HomePage_images/yorum.png')} style={styles.counterIcon} />
+              <Text style={styles.counterText}>{yorumCount}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Bölümler */}
+        <View style={styles.episodesContainer}>
           <Text style={styles.episodesTitle}>Bölümler</Text>
           {/* Bölüm butonları */}
           {bolumler.map((bolum, index) => (
@@ -119,20 +138,20 @@ const WebtoonInfoPage = () => {
         </View>
 
 
-      {/* Yorumlar */}
-      <View style={styles.commentsContainer}>
-        <Text style={styles.commentsTitle}>Yorumlar</Text>
-        {/* Yorumları listeleme */}
-        {comments.map((comment, index) => (
-          <View key={index} style={styles.comment}>
-            <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.commentAvatar} />
-            <View style={styles.commentTextContainer}>
-              <Text style={styles.commentUsername}>{comment.username}</Text>
-              <Text style={styles.commentText}>{comment.text}</Text>
+        {/* Yorumlar */}
+        <View style={styles.commentsContainer}>
+          <Text style={styles.commentsTitle}>Yorumlar</Text>
+          {/* Yorumları listeleme */}
+          {comments.map((comment, index) => (
+            <View key={index} style={styles.comment}>
+              <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.commentAvatar} />
+              <View style={styles.commentTextContainer}>
+                <Text style={styles.commentUsername}>{comment.username}</Text>
+                <Text style={styles.commentText}>{comment.text}</Text>
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
       </ScrollView>
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
@@ -176,14 +195,14 @@ const styles = StyleSheet.create({
     height: 30,
   },
   titleContainer: {
-    
+
     alignItems: 'center',
   },
-  
+
   basliktitle: {
     fontSize: 28,
     color: 'black',
-    marginBottom:10,
+    marginBottom: 10,
   },
   title: {
     fontSize: 20,
