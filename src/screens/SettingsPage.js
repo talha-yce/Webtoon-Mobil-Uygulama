@@ -18,7 +18,9 @@ const SettingsPage = () => {
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
-
+  const [showFAQModal, setShowFAQModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showUsageModal, setShowUsageModal] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -110,45 +112,55 @@ const SettingsPage = () => {
         </TouchableOpacity>
       </View>
       {/* Content */}
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollVieworta}>
         {/* ayarMenu */}
-        <View style={styles.ayarMenu}>
-          {renderItem("HESAP:", <Text>{userEmail}</Text>)}
-          {renderItem("TAKMA AD:", <Text>{username}</Text>)}
-          {/* Şifremi unuttum */}
-          {renderItem("Şifremi Unuttum:", 
-            <View>
-              <TouchableOpacity onPress={() => setShowResetPasswordModal(true)}>
-                <Text>Şifremi Unuttum</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {renderItem("SEÇENEKLER:", null)}
-          {renderItem("Uygulama Dili:", 
-            <TouchableOpacity style={styles.optionButton} onPress={() => setShowLanguageModal(true)}>
-              <Text style={styles.optionButtonText}>{contentLanguage}</Text>
-            </TouchableOpacity>
-          )}
-          {renderItem("Tema:", 
-            <TouchableOpacity style={styles.optionButton} onPress={() => setShowThemeModal(true)}>
-              <Text style={styles.optionButtonText}>{theme}</Text>
-            </TouchableOpacity>
-          )}
-          {renderItem("BİLDİRİMLER:", null)}
-          {renderItem("Servis Bildirimi", <Switch />)}
-          {renderItem("Güncel Yeni Bölüm", <Switch />)}
-          
-          {renderItem("HAKKINDA:", null)}
-          {renderItem("Fark Etme:", <TouchableOpacity><Text>SSS</Text></TouchableOpacity>)}
-          {renderItem("Yardım:", <TouchableOpacity><Text>Yardım</Text></TouchableOpacity>)}
-          {renderItem("Kullanım Şekilleri:", <TouchableOpacity><Text>Kullanım Şekilleri</Text></TouchableOpacity>)}
-          {/* Çıkış Yap butonu */}
-          <View style={styles.exitButtonContainer}>
-            <TouchableOpacity style={styles.exitButton} onPress={() => dispatch(logout())}>
-              <Text style={styles.exitButtonText}>Çıkış Yap</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        
+<View style={styles.contentContainer}>
+  <View style={styles.sectionContainer}>
+    <Text style={styles.sectionTitle}>HESAP:</Text>
+    <Text style={styles.sectionContent}>{userEmail}</Text>
+  </View>
+  <View style={styles.sectionContainer}>
+    <Text style={styles.sectionTitle}>TAKMA AD:</Text>
+    <Text style={styles.sectionContent}>{username}</Text>
+  </View>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowResetPasswordModal(true)}>
+    <Text style={styles.sectionTitle}>Şifremi Unuttum:</Text>
+    <Text style={styles.sectionLink}>Şifremi Unuttum</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowLanguageModal(true)}>
+    <Text style={styles.sectionTitle}>Uygulama Dili:</Text>
+    <Text style={styles.sectionLink}>{contentLanguage}</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowThemeModal(true)}>
+    <Text style={styles.sectionTitle}>Tema:</Text>
+    <Text style={styles.sectionLink}>{theme}</Text>
+  </TouchableOpacity>
+  <View style={styles.sectionContainer}>
+    <Text style={styles.sectionTitle}>Servis Bildirimi:</Text>
+    <Switch />
+  </View>
+  <View style={styles.sectionContainer}>
+    <Text style={styles.sectionTitle}>Güncel Yeni Bölüm:</Text>
+    <Switch />
+  </View>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowFAQModal(true)}>
+    <Text style={styles.sectionTitle}>Sık Sorulan Sorular:</Text>
+    <Text style={styles.sectionLink}>SSS</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowHelpModal(true)}>
+    <Text style={styles.sectionTitle}>Yardım:</Text>
+    <Text style={styles.sectionLink}>Yardım</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowUsageModal(true)}>
+    <Text style={styles.sectionTitle}>Kullanım Şekilleri:</Text>
+    <Text style={styles.sectionLink}>Kullanım Şekilleri</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.exitButtonContainer} onPress={() => dispatch(logout())}>
+    <Text style={styles.exitButton}>Çıkış Yap</Text>
+  </TouchableOpacity>
+</View>
+
       </ScrollView>
       {/* alt navigasyon bölümü*/}
       <View style={styles.bottomNav}>
@@ -211,6 +223,94 @@ const SettingsPage = () => {
           </View>
         </View>
       )}
+      {/* Sık Sorulan Sorular Modal */}
+      {showFAQModal && (
+  <View style={styles.faqModal}>
+    <View style={styles.faqModalContent}>
+      <Text style={styles.faqModalTitle}>Sık Sorulan Sorular</Text>
+      <ScrollView>
+        <View>
+          <Text style={styles.question}>1. Uygulamayı nasıl güncelleyebilirim?</Text>
+          <Text style={styles.answer}>
+            Uygulamanızı güncellemek için App Store veya Google Play Store'a gidin. Ardından, "Güncelleme" bölümünden uygulamanızı güncelleyebilirsiniz.
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.question}>2. Nasıl bir webtoon favorilere eklerim?</Text>
+          <Text style={styles.answer}>
+            Bir webtoon'u favorilere eklemek için webtoonun detay sayfasına gidin ve kalp simgesine dokunun. Böylece favorilerinize eklenmiş olacak.
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.question}>3. Webtoonlarda ilerleme nasıl kaydedilir?</Text>
+          <Text style={styles.answer}>
+            Webtoon okurken, ilerlemeniz otomatik olarak kaydedilir. Bir bölümü okuduğunuzda, bir sonraki ziyaretinizde kaldığınız yerden devam edebilirsiniz.
+          </Text>
+        </View>
+        {/* Diğer SSS maddeleri buraya eklenebilir */}
+      </ScrollView>
+      <TouchableOpacity onPress={() => setShowFAQModal(false)}>
+        <Text style={styles.faqModalClose}>Kapat</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+)}
+
+      {/* Yardım Modal */}
+      {showHelpModal && (
+  <View style={styles.helpModal}>
+    <View style={styles.helpModalContent}>
+      <Text style={styles.helpModalTitle}>Yardım</Text>
+      <Text style={styles.description}>
+        Eğer uygulamamızla ilgili bir sorun yaşadığınızda, bir isteğiniz veya geri bildiriminiz varsa lütfen aşağıdaki bilgileri içeren bir e-posta gönderin:
+      </Text>
+      <Text style={styles.subtitles}>E-posta Adresi:</Text>
+      <Text style={styles.email}>destek@uygulamaadi.com</Text>
+      <Text style={styles.subtitles}>Konu:</Text>
+      <Text style={styles.topic}>[Sorun / İstek / Geri Bildirim]</Text>
+      <Text style={styles.subtitles}>Açıklama:</Text>
+      <Text style={styles.description}>
+        Lütfen yaşadığınız sorunu, isteği veya geri bildirimi detaylı bir şekilde açıklayın.
+      </Text>
+      <TouchableOpacity onPress={() => setShowHelpModal(false)}>
+        <Text style={styles.helpModalClose}>Kapat</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+)}
+
+      {/* Kullanım Şekilleri Modal */}
+      {showUsageModal && (
+  <View style={styles.usageModal}>
+    <View style={styles.usageModalContent}>
+      <Text style={styles.usageModalTitle}>Kullanım Şekilleri</Text>
+      <ScrollView>
+        <View>
+          <Text style={styles.step}>Adım 1:</Text>
+          <Text style={styles.description}>
+            Ana sayfada bulunan webtoon listesinden okumak istediğiniz bir webtoon seçin.
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.step}>Adım 2:</Text>
+          <Text style={styles.description}>
+            Seçtiğiniz webtoonun detay sayfasına gidin ve "Oku" düğmesine dokunun.
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.step}>Adım 3:</Text>
+          <Text style={styles.description}>
+            Webtoon okumaya başladığınızda, sayfayı aşağı kaydırarak sonraki bölümlere geçebilirsiniz.
+          </Text>
+        </View>
+        {/* Diğer kullanım şekilleri buraya eklenebilir */}
+      </ScrollView>
+      <TouchableOpacity onPress={() => setShowUsageModal(false)}>
+        <Text style={styles.usageModalClose}>Kapat</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+)}
       {/* Şifre sıfırlama modalı */}
       {showResetPasswordModal && (
         <View style={styles.resetPasswordModal}>
@@ -233,6 +333,7 @@ const SettingsPage = () => {
       )}
     </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
@@ -274,9 +375,44 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  ayarMenu: {
-    flex: 1,
-    backgroundColor: 'white',
+  scrollVieworta:{
+    backgroundColor:'white',
+  },
+ 
+  contentContainer: {
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  sectionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sectionContent: {
+    fontSize: 16,
+  },
+  sectionLink: {
+    fontSize: 16,
+    color: 'blue',
+  },
+  exitButtonContainer: {
+    alignItems: 'flex-end',
+    marginTop: 20,
+  },
+  exitButton: {
+    backgroundColor: 'purple',
+    color: 'white',
+    textAlign: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
   itemContainer: {
     padding: 10,
@@ -286,22 +422,6 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontWeight: 'bold',
     marginBottom: 5,
-  },
-  optionButton: {
-    paddingVertical: 10,
-    paddingLeft: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  optionButtonText: {
-    color: 'black',
-  },
-  footer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  footerText: {
-    color: 'white',
   },
   bildirimicon: {
     width: 35,
@@ -317,23 +437,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingBottom: 15,
     paddingTop: 10,
-  },
-  exitButtonContainer: {
-    alignItems: 'flex-end', 
-    margin: 10,
-    marginRight: 20,
-    justifyContent: 'center',
-  },
-  exitButton: {
-    backgroundColor: 'purple', 
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  exitButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   languageModal: {
     position: 'absolute',
@@ -439,6 +542,156 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'right',
   },
+  faqModal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  faqModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  faqModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  question: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  answer: {
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  faqModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
+  },
+  helpModal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  helpModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  helpModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitles: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  email: {
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  topic: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  helpModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
+  },
+  usageModal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  usageModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  usageModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  usageModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
+  },
+  usageModal: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  usageModalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  usageModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  step: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  usageModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
+  },
 });
+
 
 export default SettingsPage;
