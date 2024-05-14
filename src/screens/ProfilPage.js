@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth } from "firebase/auth";
-import { query, where, getDocs, collection, updateDoc, doc } from 'firebase/firestore';
+import { query, where, getDoc,getDocs, collection, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; 
 import * as ImagePicker from 'expo-image-picker';
@@ -18,28 +18,30 @@ const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [okunan, setOkunan] = useState(0); 
-  const [kaydet, setKaydet] = useState(0); 
-  const [like, setLike] = useState(0); 
-  const [webtoon, setWebtoon] = useState([]);
+  const [kaydet, setKaydet] = useState([]);
+const [like, setLike] = useState([]);
+  const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid; 
   
-        const q = query(collection(db, "users"), where("uid", "==", userId));
-        const querySnapshot = await getDocs(q);
-  
-        querySnapshot.forEach((doc) => {
-          const userData = doc.data();
+        const userDocRef = doc(db, "users", userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
           
           setUsername(userData.name); 
           setQuote(userData.quote); 
           setProfileImage(userData.profileImage);
-          setOkunan(userData.okunan);
-          setKaydet(userData.kaydet); 
-          setLike(userData.like );
-        });
+          setOkunan(userData.okunan || []);
+          setKaydet(userData.kaydet || []);
+          setLike(userData.like || []);
+        } else {
+          console.log("Kullanıcı dökümanı bulunamadı.");
+        }
       } else {
         console.log("Kullanıcı oturum açmamış.");
       }
@@ -48,49 +50,73 @@ const ProfilePage = () => {
     return () => unsubscribe();
   }, []);
 
+
   useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const categoriesSnapshot = await getDocs(collection(db, 'recorded'));
-      const webtoonData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
-        const webtoonsSnapshot = await getDocs(collection(db, `recorded/${doc.id}/webtoons`));
-        const webtoonsData = webtoonsSnapshot.docs.map(async webtoonDoc => {
-          const webtoonName = webtoonDoc.id;
-          let coverUrl = '';
-          try {
-            coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
-          } catch (error) {
-            try {
-              coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
-            } catch (error) {
+    const fetchWebtoons = async () => {
+      try {
+        const user = getAuth().currentUser;
+  
+        if (user) {
+          const userId = user.uid;
+  
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+  
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const savedWebtoonNames = userData.kaydet || []; // Kaydet alanı boş olabilir, bu yüzden varsayılan olarak boş dizi ayarlayın
+            const webtoonsPromises = savedWebtoonNames.map(async (webtoonName) => {
               try {
-                coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
+                const coverUrl = await getCoverUrl(webtoonName);
+                return { name: webtoonName, coverUrl };
               } catch (error) {
-                console.error(`Kapak resmi alınamadı: ${webtoonName}`, error);
+                console.error(`Webtoon getirilirken bir hata oluştu: ${webtoonName}`, error);
+                return null; // Hata oluştuğunda null döndürün
               }
-            }
+            });
+            const fetchedWebtoons = await Promise.all(webtoonsPromises);
+            setWebtoons(fetchedWebtoons.filter(Boolean)); // Boş değerlerin filtrelenmesi
+          } else {
+            console.error(`Kullanıcı belgesi bulunamadı: ${userId}`);
           }
-          console.log(`Webtoon adı: ${webtoonName}, Kapak resmi URL'si: ${coverUrl}`);
-          return {
-            name: webtoonName,
-            coverUrl: coverUrl
-          };
-        });
-        return {
-          id: doc.id,
-          webtoons: await Promise.all(webtoonsData)
-        };
-      }));
-      
-      setWebtoon(webtoonData);
+        } else {
+          console.error("Kullanıcı oturumu açık değil");
+        }
+  
+      } catch (error) {
+        console.error('Webtoonları getirirken hata oluştu:', error);
+      }
+    };
+  
+    fetchWebtoons();
+  }, []);
+  
+  
+  const getCoverUrl = async (webtoonName) => {
+    let coverUrl = '';
+  
+    try {
+      coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
     } catch (error) {
-      console.error('Kategorileri getirirken hata oluştu:', error);
+      try {
+        coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
+      } catch (error) {
+        try {
+          coverUrl = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
+        } catch (error) {
+          console.error(`Kapak resmi alınamadı: ${webtoonName}`, error);
+        }
+      }
     }
+  
+    return coverUrl;
   };
   
   
-  fetchCategories();
-}, []);
+
+  
+  
+  
 
   const handleWebtoonSelect = (webtoonName) => {
     console.log(`Seçilen webtoon: ${webtoonName}`);
@@ -111,21 +137,16 @@ const ProfilePage = () => {
         if (user) {
           const userId = user.uid;
   
-          const q = query(collection(db, "users"), where("uid", "==", userId));
-          const querySnapshot = await getDocs(q);
-  
-          querySnapshot.forEach(async (doc) => {
-            const docRef = doc.ref;
-            await updateDoc(docRef, {
-              name: newname,
-              quote: newQuote
-            });
-  
-            Alert.alert("Kullanıcı verileri güncellendi.");
-            setUsername(newname);
-            setQuote(newQuote);
-            setEditing(false);
+          const userRef = doc(db, "users", userId);
+          await updateDoc(userRef, {
+            name: newname,
+            quote: newQuote
           });
+  
+          Alert.alert("Kullanıcı verileri güncellendi.");
+          setUsername(newname);
+          setQuote(newQuote);
+          setEditing(false);
         } else {
           console.log("Kullanıcı oturum açmamış.");
         }
@@ -138,6 +159,7 @@ const ProfilePage = () => {
       setEditing(true);
     }
   };
+  
 
   const handleQuoteChange = (text) => {
     if (text.length > 50) {
@@ -168,16 +190,10 @@ const ProfilePage = () => {
       const user = getAuth().currentUser;
       if (user) {
         const userId = user.uid;
-        const q = query(collection(db, "users"), where("uid", "==", userId));
-        const querySnapshot = await getDocs(q);
-  
-        querySnapshot.forEach(async (doc) => {
-          const docRef = doc.ref;
-          await updateDoc(docRef, {
-            profileImage: imageUrl
-          });
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+          profileImage: imageUrl
         });
-  
         console.log("Firestore'daki profil resmi URL'si güncellendi.");
         setProfileImage(imageUrl);
       } else {
@@ -262,15 +278,15 @@ const ProfilePage = () => {
             <View style={styles.profileCounters}>
             <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/okunan.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>{okunan}</Text>
+                <Text style={styles.counterText}>{okunan.length}</Text>
               </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>{kaydet}</Text>
+                <Text style={styles.counterText}>{kaydet.length}</Text>
               </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>{like}</Text>
+                <Text style={styles.counterText}>{like.length}</Text>
               </View>
             </View>
             <TextInput
@@ -289,21 +305,19 @@ const ProfilePage = () => {
         </View>
 
         <View style={styles.section}>
-          <View style={styles.contentSection}>
-            <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {webtoon.map(category => (
-                category.webtoons.map(webtoon => (
-                  <TouchableOpacity key={webtoon.name} onPress={() => handleWebtoonSelect(webtoon.name)}>
-                    <View style={styles.trendingWebtoon}>
-                      <Image source={{uri: webtoon.coverUrl}} style={styles.webtoonCover} />
-                    </View>
-                  </TouchableOpacity>
-                ))
-              ))}
-            </ScrollView>
-          </View>
-        </View>
+      <View style={styles.contentSection}>
+        <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {webtoons.map((webtoon) => (
+            <TouchableOpacity key={webtoon.name} onPress={() => handleWebtoonSelect(webtoon.name)}>
+              <View style={styles.trendingWebtoon}>
+                <Image source={{ uri: webtoon.coverUrl }} style={styles.webtoonCover} />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </View>
       </ScrollView>
 
       {/* alt navigaysyon bölümu*/}

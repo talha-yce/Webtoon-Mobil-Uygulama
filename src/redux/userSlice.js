@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getAuth, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage düzeltildi
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc,setDoc,doc } from "firebase/firestore";
 import { db } from '../../firebaseConfig';
 //kullanıcı giriş işlemleri
 
@@ -80,13 +80,13 @@ export const register = createAsyncThunk("user/register", async ({ name, email, 
     const token = user.stsTokenManager.accessToken;
 
     // Firestore'da yeni bir belge eklemek için addDoc fonksiyonunu kullan
-    await addDoc(collection(db, "users"), {
+    await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       name: name,
       email: email,
-      kaydet: 0,
-      like: 0,
-      okunan: 0
+      kaydet: [],
+      like: [],
+      okunan: [],
     });
 
     await sendEmailVerification(user);
