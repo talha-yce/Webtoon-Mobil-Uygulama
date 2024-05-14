@@ -1,27 +1,72 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
-import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
+import { storage, db } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import { useDispatch, useSelector } from 'react-redux';
-import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
+import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
+import { doc, getDoc, query, collection, updateDoc, orderBy, addDoc, onSnapshot } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
 const windowWidth = Dimensions.get('window').width;
 
 const WebtoonReadPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  
+
   const { webtoon, episode } = route.params;
   const theme = useSelector(state => state.user.theme);
-  // Örnek yorumlar
-  const comments = [
-    { username: 'Kullanıcı1', text: 'Harika bir webtoon!' },
-    { username: 'Kullanıcı2', text: 'Çok keyifli okudum.' },
-    { username: 'Kullanıcı3', text: 'Biraz daha uzun olabilirdi.' },
-  ];
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState([]); // Initialize comments state
+  const [shouldScrollToTop, setShouldScrollToTop] = useState(true);
 
   const [resimler, setResimler] = useState([]);
   const [resimYukseklik, setResimYukseklik] = useState(0);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const q = query(
+          collection(db, 'webtoonlar', webtoon, 'episodes',episode,'comments'),
+          orderBy('timestamp', 'desc')
+        );
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const commentsData = [];
+          querySnapshot.forEach(async (doce) => {
+            try {
+              const commentData = doce.data();
+              const userDocref = doc(db, 'users', commentData.userId);
+              const userDoc = await getDoc(userDocref);
+
+              if (userDoc.exists()) {
+                const userProfile = userDoc.data().profileImage;
+
+                commentsData.push({
+                  ...commentData,
+                  id: doce.id,
+                  profileImage: userProfile
+                });
+              }
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+            }
+          });
+
+          setComments(commentsData);
+        });
+
+        return () => {
+          unsubscribe();
+        };
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    fetchComments();
+  }, [webtoon]);
 
   useEffect(() => {
     const getBolumResimler = async () => {
@@ -54,28 +99,115 @@ const WebtoonReadPage = () => {
   const handleIleri = () => {
     if (resimIndex < resimler.length - 1) {
       setResimIndex(resimIndex + 1);
-      scrollToTop(); 
+      setShouldScrollToTop(true);
+        scrollToTop();
+      
+      
     }
   };
 
   const handleGeri = () => {
     if (resimIndex > 0) {
       setResimIndex(resimIndex - 1);
-      scrollToTop(); 
+      setShouldScrollToTop(true);
+scrollToTop();
+      
+      
+    }
+  };
+  const scrollViewRef = useRef();
+
+  const scrollToTop = () => {
+    if (shouldScrollToTop) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  };
+  
+
+  const handleAddComment = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSendComment = async () => {
+    setShouldScrollToTop(false);  
+    if (commentText.trim() === '') {
+      alert('Lütfen bir yorum girin.');
+      return;
+    }
+
+    try {
+      const user = getAuth().currentUser;
+
+      if (user) {
+        const userId = user.uid;
+
+        // Kullanıcı belgesini Firestore'dan al
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnapshot = await getDoc(userDocRef);
+
+        if (userDocSnapshot.exists()) {
+          // Kullanıcı adını belgeden al
+          const userName = userDocSnapshot.data().name;
+
+          const commentData = {
+            userId: userId,
+            userName: userName,
+            text: commentText.trim(),
+            timestamp: new Date(),
+          };
+
+          // Yorumu veritabanına ekleyin
+          await addCommentToDatabase(commentData);
+
+          // Modalı kapatın ve yorum metnini sıfırlayın
+          setIsModalVisible(false);
+          setCommentText('');
+          
+        } else {
+          console.log('Kullanıcı belgesi bulunamadı.');
+        }
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    } catch (error) {
+      console.error("Yorum eklenirken bir hata oluştu:", error);
     }
   };
 
-  const scrollViewRef = useRef();
-  
-  const scrollToTop = () => {
-    scrollViewRef.current.scrollTo({ y: 0, animated: true });
+  const addCommentToDatabase = async (commentData) => {
+    try {
+      // Webtoon belgesini bul
+      const webtoonDocRef = doc(db, 'webtoonlar', webtoon,'episodes',episode);
+      const webtoonDocSnap = await getDoc(webtoonDocRef);
+
+      if (webtoonDocSnap.exists()) {
+        const webtoonId = webtoonDocSnap.id;
+        console.log('Webtoon ID:', webtoonId);
+
+        // Comments alt koleksiyonunu bul ve yeni döküman ekle
+        const commentRef = collection(webtoonDocRef, 'comments');
+        await addDoc(commentRef, commentData);
+        console.log('Yorum başarıyla eklendi.');
+      } else {
+        console.error('Webtoon bulunamadı.');
+      }
+    } catch (error) {
+      console.error('Yorum eklenirken bir hata oluştu:', error);
+    }
+  };
+
+  const handleWebtoonSelect = (webtoon) => {
+    console.log(`Seçilen webtoon: ${webtoon}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.darkStil.backgroundColor }]}>
+    <View style={[styles.container, {
+      backgroundColor: theme === 'DarkToon'
+        ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+          ? lightTheme.whiteStil.backgroundColor
+          : darkTheme.darkStil.backgroundColor
+    }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
@@ -102,7 +234,9 @@ const WebtoonReadPage = () => {
           <TouchableOpacity style={styles.button} onPress={handleGeri}>
             <Text style={styles.buttonText}>Geri</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleWebtoonSelect(webtoon)}>
           <Text style={styles.title}>{webtoon}</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleIleri}>
             <Text style={styles.buttonText}>İleri</Text>
           </TouchableOpacity>
@@ -110,41 +244,74 @@ const WebtoonReadPage = () => {
 
         {/* Alt Bölge Konteynırı */}
         <ScrollView
-          ref={scrollViewRef} 
+          ref={scrollViewRef}
           style={styles.bottomContainer}
-          onContentSizeChange={scrollToTop} 
+          onContentSizeChange={scrollToTop}
         >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
-  {resimler.length > 0 && (
-    <Image
-      source={{ uri: resimler[resimIndex] }}
-      style={[styles.image, { height: resimYukseklik }]}
-      resizeMode="contain" 
-    />
-  )}
-</View>
-
+            {resimler.length > 0 && (
+              <Image
+                source={{ uri: resimler[resimIndex] }}
+                style={[styles.image, { height: resimYukseklik }]}
+                resizeMode="contain"
+              />
+            )}
+          </View>
 
           {/* Yorumlar */}
-          <View style={styles.commentsContainer}>
-            <Text style={styles.commentsTitle}>Yorumlar</Text>
-            {/* Yorumları listeleme */}
-            {comments.map((comment, index) => (
-              <View key={index} style={styles.comment}>
-                <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.commentAvatar} />
-                <View style={styles.commentTextContainer}>
-                  <Text style={styles.commentUsername}>{comment.username}</Text>
-                  <Text style={styles.commentText}>{comment.text}</Text>
-                </View>
+        <View style={styles.commentsContainer}>
+          <Text style={styles.commentsTitle}>Yorumlar</Text>
+          <TouchableOpacity onPress={handleAddComment}>
+            <Text style={styles.addButton}>Yorum Ekle</Text>
+          </TouchableOpacity>
+
+          {/* Yorumları listeleme */}
+          {comments.map((comment) => (
+            <View key={comment.id} style={styles.comment}>
+              <Image source={{ uri: comment.profileImage || require('../../assets/İmage/HomePage_images/profil.png') }} style={styles.commentAvatar} />
+              <View style={styles.commentTextContainer}>
+                <Text style={styles.commentUsername}>{comment.userName}</Text>
+                <Text style={styles.commentText}>{comment.text}</Text>
+                <Text style={styles.commentTimestamp}>{comment.timestamp?.toDate().toLocaleString()}</Text>
               </View>
-            ))}
-          </View>
+            </View>
+          ))}
+        </View>
+
         </ScrollView>
       </View>
 
-      {/* alt navigasyon bölümü*/}
-      <View style={styles.bottomNav}>
+      {/* Yorum ekleme modalı */}
+<Modal
+  visible={isModalVisible}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setIsModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      {/* Kapatma düğmesi */}
+      <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
+        <Text style={styles.closeButtonText}>X</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={styles.commentInput}
+        multiline={true}
+        placeholder="Yorumunuzu buraya yazın..."
+        onChangeText={setCommentText}
+        value={commentText}
+      />
+      <TouchableOpacity onPress={handleSendComment}>
+        <Text style={styles.sendButton}>Gönder</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+ {/* Bottom Navigation */}
+ <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
         </TouchableOpacity>
@@ -160,7 +327,7 @@ const WebtoonReadPage = () => {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -218,7 +385,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: 'white',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 25,
   },
   buttonText: {
     color: 'black',
@@ -226,10 +393,10 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flex: 1,
-    marginTop: 10,
+    marginTop:1,
   },
   imageContainer: {
-    marginBottom: 20,
+    marginBottom: 1,
     alignItems: 'center',
   },
   image: {
@@ -276,6 +443,88 @@ const styles = StyleSheet.create({
   },
   commentText: {
     fontSize: 14,
+    color: 'black',
+  },
+  commentsContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  commentsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 10,
+  },
+  comment: {
+    flexDirection: 'row',
+    marginBottom: 15,
+  },
+  commentAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  commentTextContainer: {
+    flex: 1,
+  },
+  commentUsername: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  commentText: {
+    fontSize: 14,
+    color: 'black',
+  },
+  commentTimestamp: {
+    fontSize: 12,
+    color: 'gray',
+  },
+  addButton: {
+    fontSize: 18,
+    color: 'blue',
+    textDecorationLine: 'underline',
+    marginBottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  commentInput: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    minHeight: 100,
+  },
+  sendButton: {
+    fontSize: 16,
+    color: 'blue',
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 23,
+    height: 23,
+    borderRadius: 5,
+    backgroundColor:'purple',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
     color: 'black',
   },
 });

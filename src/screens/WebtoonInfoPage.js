@@ -1,29 +1,313 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet,Modal,TextInput, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, query, collection, updateDoc, orderBy,addDoc, onSnapshot,increment } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { getAuth } from "firebase/auth";
 const WebtoonInfoPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { webtoon } = route.params;
- // Örnek yorumlar
- const comments = [
-  { username: 'Kullanıcı1', text: 'Harika bir webtoon!' },
-  { username: 'Kullanıcı2', text: 'Çok keyifli okudum.' },
-  { username: 'Kullanıcı3', text: 'Biraz daha uzun olabilirdi.' },
-];
+  const [webtoonLiked, setWebtoonLiked] = useState(false); 
+  const [webtoonRecorded, setWebtoonRecorded] = useState(false); 
+  const [comments, setComments] = useState([]);
   const theme = useSelector(state => state.user.theme);
   const [bolumler, setBolumler] = useState([]);
   const [kapakResmi, setKapakResmi] = useState(null);
   const [begenCount, setBegenCount] = useState(0);
   const [kaydetCount, setKaydetCount] = useState(0);
   const [yorumCount, setYorumCount] = useState(0);
+  const [konu, setKonu] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [likeButtonEnabled, setLikeButtonEnabled] = useState(true);
+  const [recordButtonEnabled, setRecordButtonEnabled] = useState(true);
+  const [warningVisible, setWarningVisible] = useState(false);
+
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const q = query(
+          collection(db, 'webtoonlar', webtoon, 'comments'),
+          orderBy('timestamp', 'desc')
+        );
+    
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const commentsData = [];
+          querySnapshot.forEach(async (doce) => {
+            try {
+              const commentData = doce.data();
+              const userDocref =  doc(db, 'users', commentData.userId);
+              const userDoc = await getDoc(userDocref);
+             
+    
+              if (userDoc.exists()) {
+                const userProfile = userDoc.data().profileImage;
+                
+    
+                commentsData.push({
+                  ...commentData,
+                  id: doce.id,
+                  profileImage: userProfile
+                });
+              } else {
+                
+              }
+            } catch (error) {
+              
+            }
+          });
+          
+          setComments(commentsData);
+        });
+    
+        return () => {
+          
+          unsubscribe();
+        };
+      } catch (error) {
+       
+      }
+    };
+    
+
+    fetchComments();
+  }, [webtoon]);
+
+
+
+ 
+  
+
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
+      if (user) {
+        const userId = user.uid;
+  
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const likeArray = userSnap.data().like || [];
+          setWebtoonLiked(likeArray.includes(webtoon));
+        } else {
+          setWebtoonLiked(false);
+        }
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    });
+  
+    return unsubscribe;
+  }, [webtoon]);
+
+
+  useEffect(() => {
+    const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
+      if (user) {
+        const userId = user.uid;
+  
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const kaydetArray = userSnap.data().kaydet || [];
+          setWebtoonRecorded(kaydetArray.includes(webtoon));
+        } else {
+          setWebtoonRecorded(false);
+        }
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    });
+  
+    return unsubscribe;
+  }, [webtoon]);
+  
+  const toggleLiked = async (webtoonName) => {
+    if (!likeButtonEnabled) {
+      
+      setWarningVisible(true);
+      return;
+    }
+    const user = getAuth().currentUser;
+  
+    if (user) {
+      try {
+        const userId = user.uid;
+  
+        
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+  
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const likeArray = userData.like || [];
+  
+          
+          const webtoonDocRef = doc(db, 'webtoonlar', webtoonName);
+          const webtoonDocSnap = await getDoc(webtoonDocRef);
+  
+          if (webtoonDocSnap.exists()) {
+            const webtoonData = webtoonDocSnap.data();
+            const currentBegenCount = webtoonData.begen || 0;
+  
+            if (webtoonLiked) {
+              
+              setWebtoonLiked(false);
+              setBegenCount(begenCount - 1);
+              await updateDoc(userDocRef, {
+                like: likeArray.filter(webtoon => webtoon !== webtoonName)
+              });
+  
+              await updateDoc(webtoonDocRef, {
+                begen: currentBegenCount - 1
+              });
+  
+              console.log("Webtoon unliked:", webtoonName);
+            } else {
+              
+              setWebtoonLiked(true);
+              setBegenCount(begenCount + 1);
+              await updateDoc(userDocRef, {
+                like: [...likeArray, webtoonName]
+              });
+  
+              
+              await updateDoc(webtoonDocRef, {
+                begen: currentBegenCount + 1
+              });
+  
+              console.log("Webtoon liked:", webtoonName);
+            }
+          } else {
+            console.error("Webtoon not found:", webtoonName);
+          }
+        } else {
+          console.error("User document not found:", userId);
+        }
+      } catch (error) {
+        console.error("Hata oluştu:", error);
+      }
+      setLikeButtonEnabled(false);
+    } else {
+      console.log("Kullanıcı oturum açmamış.");
+    }
+    setTimeout(() => {
+      setLikeButtonEnabled(true);
+    }, 2000);
+  };
+  
+  const toggleRecord = async (webtoonName) => {
+    if (!recordButtonEnabled) {
+      
+      setWarningVisible(true);
+      return;
+    }
+    const user = getAuth().currentUser;
+  
+    if (user) {
+      try {
+        const userId = user.uid;
+  
+        
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+  
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const kaydetArray = userData.kaydet || [];
+  
+          
+          const webtoonDocRef = doc(db, 'webtoonlar', webtoonName);
+          const webtoonDocSnap = await getDoc(webtoonDocRef);
+  
+          if (webtoonDocSnap.exists()) {
+            const webtoonData = webtoonDocSnap.data();
+            const currentKaydetCount = webtoonData.kaydet || 0;
+  
+            if (webtoonRecorded) {
+             
+              setWebtoonRecorded(false);
+              setKaydetCount(kaydetCount - 1);
+              await updateDoc(userDocRef, {
+                kaydet: kaydetArray.filter(webtoon => webtoon !== webtoonName)
+              });
+  
+              
+              await updateDoc(webtoonDocRef, {
+                kaydet: currentKaydetCount - 1
+              });
+  
+              console.log("Webtoon kaydetme:", webtoonName);
+            } else {
+             
+              setWebtoonRecorded(true);
+              setKaydetCount(kaydetCount + 1);
+              await updateDoc(userDocRef, {
+                kaydet: [...kaydetArray, webtoonName]
+              });
+  
+              
+              await updateDoc(webtoonDocRef, {
+                kaydet: currentKaydetCount + 1
+              });
+  
+              console.log("Webtoon kaydet:", webtoonName);
+            }
+          } else {
+            console.error("Webtoon not found:", webtoonName);
+          }
+        } else {
+          console.error("User document not found:", userId);
+        }
+      } catch (error) {
+        console.error("Hata oluştu:", error);
+      }
+      setRecordButtonEnabled(false);
+    } else {
+      console.log("Kullanıcı oturum açmamış.");
+    }
+    setTimeout(() => {
+      setRecordButtonEnabled(true);
+    }, 2000);
+  };
+  
+  
+
+useEffect(() => {
+    const getWebtoonData = async () => {
+      try {
+        const webtoonDoc = doc(db, 'webtoonlar', webtoon);
+        const webtoonSnapshot = await getDoc(webtoonDoc);
+
+        if (webtoonSnapshot.exists()) {
+          const webtoonData = webtoonSnapshot.data();
+          const begenCount = webtoonData.begen || 0;
+          const kaydetCount = webtoonData.kaydet || 0;
+          const yorumCount = webtoonData.yorum || 0;
+          const konu=webtoonData.konu;
+          setKonu(konu);
+          setBegenCount(begenCount);
+          setKaydetCount(kaydetCount);
+          setYorumCount(yorumCount);
+        } else {
+          console.log('Webtoon bulunamadı');
+        }
+      } catch (error) {
+        console.error('Webtoon verileri alınamadı:', error);
+      }
+    };
+
+    getWebtoonData();
+  }, [webtoon]);
+  
 
   useEffect(() => {
     // Webtoon kapak resmi URL'sini getir
@@ -39,38 +323,99 @@ const WebtoonInfoPage = () => {
     listAll(ref(storage, `Webtoons/${webtoon}/Bölümler`))
       .then(dir => {
         const bolumler = dir.prefixes.map(folderRef => folderRef.name);
-        setBolumler(bolumler);
+        setBolumler(bolumler.reverse());
       })
       .catch(error => console.error("Bölümler alınamadı:", error));
-
-      const getWebtoonData = async () => {
-        try {
-          const webtoonDoc = doc(db, 'webtoonlar', webtoon);
-          const webtoonSnapshot = await getDoc(webtoonDoc);
-  
-          if (webtoonSnapshot.exists()) {
-            const webtoonData = webtoonSnapshot.data();
-            const begenCount = webtoonData.begen || 0;
-            const kaydetCount = webtoonData.kaydet || 0;
-            const yorumCount = webtoonData.yorum || 0;
-  
-            setBegenCount(begenCount);
-            setKaydetCount(kaydetCount);
-            setYorumCount(yorumCount);
-          } else {
-            console.log('Webtoon bulunamadı');
-          }
-        } catch (error) {
-          console.error('Webtoon verileri alınamadı:', error);
-        }
-      };
-  
-      getWebtoonData();
     }, [webtoon]);
+    
 
   const goToWebtoonReadPage = (episode) => {
     navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode });
   };
+
+ 
+
+  const handleAddComment = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSendComment = async () => {
+    if (commentText.trim() === '') {
+      alert('Lütfen bir yorum girin.');
+      return;
+    }
+  
+    try {
+      const user = getAuth().currentUser;
+  
+      if (user) {
+        const userId = user.uid;
+  
+        // Kullanıcı belgesini Firestore'dan al
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnapshot = await getDoc(userDocRef);
+  
+        if (userDocSnapshot.exists()) {
+          // Kullanıcı adını belgeden al
+          const userName = userDocSnapshot.data().name;
+  
+          const commentData = {
+            userId: userId,
+            userName: userName,
+            text: commentText.trim(),
+            timestamp: new Date(),
+          };
+  
+          // Yorumu veritabanına ekleyin
+          await addCommentToDatabase(commentData);
+  
+          // Modalı kapatın ve yorum metnini sıfırlayın
+          setIsModalVisible(false);
+          setCommentText('');
+        } else {
+          console.log('Kullanıcı belgesi bulunamadı.');
+        }
+      } else {
+        console.log("Kullanıcı oturum açmamış.");
+      }
+    } catch (error) {
+      console.error("Yorum eklenirken bir hata oluştu:", error);
+    }
+  };
+
+  const addCommentToDatabase = async (commentData) => {
+    try {
+      // Webtoon belgesini bul
+      const webtoonDocRef = doc(db, 'webtoonlar', webtoon);
+      const webtoonDocSnap = await getDoc(webtoonDocRef);
+  
+      if (webtoonDocSnap.exists()) {
+        const webtoonId = webtoonDocSnap.id;
+        console.log('Webtoon ID:', webtoonId);
+  
+        // Comments alt koleksiyonunu bul ve yeni döküman ekle
+        const commentRef = collection(webtoonDocRef, 'comments');
+        await addDoc(commentRef, commentData);
+        console.log('Yorum başarıyla eklendi.');
+  
+        // Webtoon belgesindeki yorum sayısını arttır
+        await updateDoc(webtoonDocRef, {
+          yorum: increment(1) // Mevcut yorum sayısını 1 artır
+        });
+        setYorumCount(prevCount => prevCount + 1);
+        console.log('Webtoon yorum sayısı güncellendi.');
+      } else {
+        console.error('Webtoon bulunamadı.');
+      }
+    } catch (error) {
+      console.error('Yorum eklenirken bir hata oluştu:', error);
+    }
+  };
+  
+
+const handleStopButtonPress = () => {
+  setWarningVisible(false);
+};
 
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon'
@@ -104,17 +449,23 @@ const WebtoonInfoPage = () => {
 
           <View style={styles.infoContainer}>
             <Text style={styles.infoTitle}>Konusu</Text>
-            <Text style={styles.infoText}>Webtoonun konusu buraya gelecek.</Text>
+            <Text style={styles.infoText}>{konu}</Text>
           </View>
           <View style={styles.buttonsContainer}>
             <View style={styles.counterContainer}>
-              <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
+            <TouchableOpacity onPress={() => toggleRecord(webtoon)}>
+              <Image source={webtoonRecorded ? require('../../assets/İmage/HomePage_images/kaydet.png'):require('../../assets/İmage/HomePage_images/pasif_kaydet.png')} style={styles.counterIcon} />
+              </TouchableOpacity>
               <Text style={styles.counterText}>{kaydetCount}</Text>
+              
             </View>
             <View style={styles.counterContainer}>
-              <Image source={require('../../assets/İmage/HomePage_images/like.png')} style={styles.counterIcon} />
+            <TouchableOpacity onPress={() => toggleLiked(webtoon)}>
+              <Image source={webtoonLiked ? require('../../assets/İmage/HomePage_images/like.png') : require('../../assets/İmage/HomePage_images/pasif_like.png')} style={styles.counterIcon} />
+              </TouchableOpacity>
               <Text style={styles.counterText}>{begenCount}</Text>
             </View>
+
             <View style={styles.counterContainer}>
               <Image source={require('../../assets/İmage/HomePage_images/yorum.png')} style={styles.counterIcon} />
               <Text style={styles.counterText}>{yorumCount}</Text>
@@ -126,7 +477,7 @@ const WebtoonInfoPage = () => {
         <View style={styles.episodesContainer}>
           <Text style={styles.episodesTitle}>Bölümler</Text>
           {/* Bölüm butonları */}
-          {bolumler.map((bolum, index) => (
+            {bolumler.map((bolum, index) => (
             <TouchableOpacity
               key={index}
               style={styles.episodeButton}
@@ -135,24 +486,75 @@ const WebtoonInfoPage = () => {
               <Text style={styles.episodeButtonText}>{bolum}</Text>
             </TouchableOpacity>
           ))}
-        </View>
 
+        </View>
 
         {/* Yorumlar */}
         <View style={styles.commentsContainer}>
           <Text style={styles.commentsTitle}>Yorumlar</Text>
+          <TouchableOpacity onPress={handleAddComment}>
+            <Text style={styles.addButton}>Yorum Ekle</Text>
+          </TouchableOpacity>
+
           {/* Yorumları listeleme */}
-          {comments.map((comment, index) => (
-            <View key={index} style={styles.comment}>
-              <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.commentAvatar} />
+          {comments.map((comment) => (
+            <View key={comment.id} style={styles.comment}>
+              <Image source={{ uri: comment.profileImage || require('../../assets/İmage/HomePage_images/profil.png') }} style={styles.commentAvatar} />
               <View style={styles.commentTextContainer}>
-                <Text style={styles.commentUsername}>{comment.username}</Text>
+                <Text style={styles.commentUsername}>{comment.userName}</Text>
                 <Text style={styles.commentText}>{comment.text}</Text>
+                <Text style={styles.commentTimestamp}>{comment.timestamp?.toDate().toLocaleString()}</Text>
               </View>
             </View>
           ))}
         </View>
       </ScrollView>
+
+{/* Yorum ekleme modalı */}
+<Modal
+  visible={isModalVisible}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setIsModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      {/* Kapatma düğmesi */}
+      <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
+        <Text style={styles.closeButtonText}>X</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={styles.commentInput}
+        multiline={true}
+        placeholder="Yorumunuzu buraya yazın..."
+        onChangeText={setCommentText}
+        value={commentText}
+      />
+      <TouchableOpacity onPress={handleSendComment}>
+        <Text style={styles.sendButton}>Gönder</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+{/* Uyarı modalı */}
+<Modal
+        visible={warningVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setWarningVisible(false)}
+      >
+        <View style={styles.modaluyarıContainer}>
+          <View style={styles.modaluyarıContent}>
+            <Text style={styles.warningText}>Bu hızınıza bir DUR dememiz gerekiyor!</Text>
+            {/* Dur butonu */}
+          <TouchableOpacity onPress={handleStopButtonPress}>
+            <Text style={styles.stopButton}>DURACAĞIM</Text>
+          </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -246,6 +648,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     color: 'black',
+
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -262,6 +665,8 @@ const styles = StyleSheet.create({
   },
   counterText: {
     color: 'black',
+    fontSize:16,
+    fontWeight:'bold',
   },
   episodesContainer: {
     marginTop: 20,
@@ -316,6 +721,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'black',
   },
+  commentTimestamp: {
+    fontSize: 12,
+    color: 'gray',
+  },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -331,6 +740,76 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: 'white',
   },
+  addButton: {
+    fontSize: 18,
+    color: 'blue',
+    textDecorationLine: 'underline',
+    marginBottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  commentInput: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    minHeight: 100,
+  },
+  sendButton: {
+    fontSize: 16,
+    color: 'blue',
+    textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 23,
+    height: 23,
+    borderRadius: 5,
+    backgroundColor:'purple',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: 'black',
+  },
+  modaluyarıContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modaluyarıContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  warningText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  stopButton: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'purple',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+
 });
 
 export default WebtoonInfoPage;
