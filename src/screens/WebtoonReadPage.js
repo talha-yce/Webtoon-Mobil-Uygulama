@@ -196,6 +196,11 @@ scrollToTop();
     }
   };
 
+  const handleWebtoonSelect = (webtoon) => {
+    console.log(`Seçilen webtoon: ${webtoon}`);
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
+  };
+
   return (
     <View style={[styles.container, {
       backgroundColor: theme === 'DarkToon'
@@ -229,7 +234,9 @@ scrollToTop();
           <TouchableOpacity style={styles.button} onPress={handleGeri}>
             <Text style={styles.buttonText}>Geri</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleWebtoonSelect(webtoon)}>
           <Text style={styles.title}>{webtoon}</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleIleri}>
             <Text style={styles.buttonText}>İleri</Text>
           </TouchableOpacity>
