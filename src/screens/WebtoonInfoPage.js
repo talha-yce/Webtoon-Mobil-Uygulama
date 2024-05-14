@@ -128,36 +128,61 @@ const [commentText, setCommentText] = useState('');
   
   const toggleLiked = async (webtoonName) => {
     const user = getAuth().currentUser;
-    
+  
     if (user) {
       try {
         const userId = user.uid;
   
+        // Reference to the user's document
         const userDocRef = doc(db, 'users', userId);
         const userDocSnap = await getDoc(userDocRef);
   
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          
           const likeArray = userData.like || [];
   
-          if (webtoonLiked) {
-            setWebtoonLiked(false)
-            setBegenCount(begenCount-1)
-            await updateDoc(userDocRef, {
-              
-              like: likeArray.filter(webtoon => webtoon !== webtoonName)
-            });
-            console.log("Webtoon unliked:", webtoonName);
+          // Reference to the webtoon document
+          const webtoonDocRef = doc(db, 'webtoonlar', webtoonName);
+          const webtoonDocSnap = await getDoc(webtoonDocRef);
+  
+          if (webtoonDocSnap.exists()) {
+            const webtoonData = webtoonDocSnap.data();
+            const currentBegenCount = webtoonData.begen || 0;
+  
+            if (webtoonLiked) {
+              // Remove the webtoon from the user's like array and decrease the begen count
+              setWebtoonLiked(false);
+              setBegenCount(begenCount - 1);
+              await updateDoc(userDocRef, {
+                like: likeArray.filter(webtoon => webtoon !== webtoonName)
+              });
+  
+              // Update the webtoon's begen count
+              await updateDoc(webtoonDocRef, {
+                begen: currentBegenCount - 1
+              });
+  
+              console.log("Webtoon unliked:", webtoonName);
+            } else {
+              // Add the webtoon to the user's like array and increase the begen count
+              setWebtoonLiked(true);
+              setBegenCount(begenCount + 1);
+              await updateDoc(userDocRef, {
+                like: [...likeArray, webtoonName]
+              });
+  
+              // Update the webtoon's begen count
+              await updateDoc(webtoonDocRef, {
+                begen: currentBegenCount + 1
+              });
+  
+              console.log("Webtoon liked:", webtoonName);
+            }
           } else {
-            setWebtoonLiked(true)
-            setBegenCount(begenCount+1)
-            await updateDoc(userDocRef, {
-              
-              like: [...likeArray, webtoonName]
-            });
-            console.log("Webtoon liked:", webtoonName);
+            console.error("Webtoon not found:", webtoonName);
           }
+        } else {
+          console.error("User document not found:", userId);
         }
       } catch (error) {
         console.error("Hata oluştu:", error);
@@ -167,6 +192,74 @@ const [commentText, setCommentText] = useState('');
     }
   };
   
+  const toggleRecord = async (webtoonName) => {
+    const user = getAuth().currentUser;
+  
+    if (user) {
+      try {
+        const userId = user.uid;
+  
+        // Reference to the user's document
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+  
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const kaydetArray = userData.kaydet || [];
+  
+          // Reference to the webtoon document
+          const webtoonDocRef = doc(db, 'webtoonlar', webtoonName);
+          const webtoonDocSnap = await getDoc(webtoonDocRef);
+  
+          if (webtoonDocSnap.exists()) {
+            const webtoonData = webtoonDocSnap.data();
+            const currentKaydetCount = webtoonData.kaydet || 0;
+  
+            if (webtoonRecorded) {
+              // Remove the webtoon from the user's kaydet array and decrease the kaydet count
+              setWebtoonRecorded(false);
+              setKaydetCount(kaydetCount - 1);
+              await updateDoc(userDocRef, {
+                kaydet: kaydetArray.filter(webtoon => webtoon !== webtoonName)
+              });
+  
+              // Update the webtoon's kaydet count
+              await updateDoc(webtoonDocRef, {
+                kaydet: currentKaydetCount - 1
+              });
+  
+              console.log("Webtoon kaydetme:", webtoonName);
+            } else {
+              // Add the webtoon to the user's kaydet array and increase the kaydet count
+              setWebtoonRecorded(true);
+              setKaydetCount(kaydetCount + 1);
+              await updateDoc(userDocRef, {
+                kaydet: [...kaydetArray, webtoonName]
+              });
+  
+              // Update the webtoon's kaydet count
+              await updateDoc(webtoonDocRef, {
+                kaydet: currentKaydetCount + 1
+              });
+  
+              console.log("Webtoon kaydet:", webtoonName);
+            }
+          } else {
+            console.error("Webtoon not found:", webtoonName);
+          }
+        } else {
+          console.error("User document not found:", userId);
+        }
+      } catch (error) {
+        console.error("Hata oluştu:", error);
+      }
+    } else {
+      console.log("Kullanıcı oturum açmamış.");
+    }
+  };
+  
+  
+
 useEffect(() => {
     const getWebtoonData = async () => {
       try {
@@ -219,9 +312,7 @@ useEffect(() => {
     navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode });
   };
 
-  const toggleRecord = () => {
-    setWebtoonRecorded(!webtoonRecorded);
-  };
+ 
 
   const handleAddComment = () => {
     setIsModalVisible(true);
@@ -338,7 +429,7 @@ useEffect(() => {
           </View>
           <View style={styles.buttonsContainer}>
             <View style={styles.counterContainer}>
-            <TouchableOpacity onPress={toggleRecord}>
+            <TouchableOpacity onPress={() => toggleRecord(webtoon)}>
               <Image source={webtoonRecorded ? require('../../assets/İmage/HomePage_images/kaydet.png'):require('../../assets/İmage/HomePage_images/pasif_kaydet.png')} style={styles.counterIcon} />
               </TouchableOpacity>
               <Text style={styles.counterText}>{kaydetCount}</Text>

@@ -99,9 +99,9 @@ const WebtoonReadPage = () => {
   const handleIleri = () => {
     if (resimIndex < resimler.length - 1) {
       setResimIndex(resimIndex + 1);
-      if (shouldScrollToTop) {
+      setShouldScrollToTop(true);
         scrollToTop();
-      }
+      
       
     }
   };
@@ -109,17 +109,12 @@ const WebtoonReadPage = () => {
   const handleGeri = () => {
     if (resimIndex > 0) {
       setResimIndex(resimIndex - 1);
-      if (shouldScrollToTop) {
+      setShouldScrollToTop(true);
 scrollToTop();
-      }
+      
       
     }
   };
- 
-  
-  
-  
-
   const scrollViewRef = useRef();
 
   const scrollToTop = () => {
@@ -134,6 +129,7 @@ scrollToTop();
   };
 
   const handleSendComment = async () => {
+    setShouldScrollToTop(false);  
     if (commentText.trim() === '') {
       alert('Lütfen bir yorum girin.');
       return;
@@ -166,7 +162,7 @@ scrollToTop();
           // Modalı kapatın ve yorum metnini sıfırlayın
           setIsModalVisible(false);
           setCommentText('');
-          setShouldScrollToTop(false);
+          
         } else {
           console.log('Kullanıcı belgesi bulunamadı.');
         }
@@ -382,7 +378,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: 'white',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 25,
   },
   buttonText: {
     color: 'black',
@@ -390,10 +386,10 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     flex: 1,
-    marginTop: 10,
+    marginTop:1,
   },
   imageContainer: {
-    marginBottom: 20,
+    marginBottom: 1,
     alignItems: 'center',
   },
   image: {
