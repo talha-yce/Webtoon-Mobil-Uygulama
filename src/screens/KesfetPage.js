@@ -53,10 +53,7 @@ const KesfetPage = () => {
     }
   };
 
-  const handleFilter = () => {
-    console.log("Filtreleme sıfırlandı");
-    
-  };
+ 
 
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
@@ -98,11 +95,7 @@ const KesfetPage = () => {
             </TouchableOpacity>
           </View>
           
-          <View style={styles.filterButtonContainer}>
-            <TouchableOpacity style={styles.filterButton} onPress={handleFilter}>
-              <Image source={require('../../assets/İmage/HomePage_images/filtre.png')} style={styles.filterIcon} />
-            </TouchableOpacity>
-          </View>
+         
         </View>
       </View>
 

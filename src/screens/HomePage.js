@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet,RefreshControl } from 'react-native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
@@ -9,8 +9,18 @@ const HomePage = () => {
   const navigation = useNavigation();
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
-    const fetchWebtoonData = async () => {
+    fetchWebtoonData();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWebtoonData();
+    setRefreshing(false);
+  };
+  const fetchWebtoonData = async () => {
       try {
         const webtoonsRef = ref(storage, 'Webtoons');
         const webtoonsList = await listAll(webtoonsRef);
@@ -53,10 +63,6 @@ const HomePage = () => {
         console.error("Webtoon verileri alınamadı:", error);
       }
     };
-  
-    fetchWebtoonData();
-  }, []);
-  
   const handleWebtoonSelect = (webtoonName) => {
     console.log(`Seçilen webtoon: ${webtoonName}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
@@ -85,7 +91,8 @@ const HomePage = () => {
           <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Yeni</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>

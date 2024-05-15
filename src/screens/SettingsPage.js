@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert,RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, changeTheme } from '../redux/userSlice';
@@ -23,10 +23,20 @@ const SettingsPage = () => {
   const [showUsageModal, setShowUsageModal] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
+  const [refreshing, setRefreshing] = useState(false);
   const theme = useSelector(state => state.user.theme);
 
   useEffect(() => {
+    vericek();
+    }, []);
+
+    const onRefresh = async () => {
+      setRefreshing(true);
+      await vericek();
+      setRefreshing(false);
+    };
+
+const vericek=async()=>{
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid;
@@ -46,7 +56,7 @@ const SettingsPage = () => {
 
     // Cleanup
     return () => unsubscribe();
-  }, []);
+  }
 
   const handleLanguageChange = (language) => {
     setContentLanguage(language);
@@ -83,13 +93,6 @@ const SettingsPage = () => {
     }
   };
 
-  const renderItem = (title, content) => (
-    <View style={styles.itemContainer}>
-      <Text style={styles.itemTitle}>{title}</Text>
-      <View>{content}</View>
-    </View>
-  );
-
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
     ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
@@ -112,7 +115,8 @@ const SettingsPage = () => {
         </TouchableOpacity>
       </View>
       {/* Content */}
-      <ScrollView style={styles.scrollVieworta}>
+      <ScrollView style={styles.scrollVieworta} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* ayarMenu */}
         
 <View style={styles.contentContainer}>
