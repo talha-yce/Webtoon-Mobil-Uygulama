@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getDocs, collection, query, where, contains } from 'firebase/firestore';
+import { getDocs, collection, query,getDoc,doc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
 import { useSelector } from 'react-redux';
 import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
@@ -9,51 +9,64 @@ import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
 const KesfetPage = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
-  const [categories, setCategories] = useState([]);
+  const [webtoonsData, setWebtoonsData] = useState([]);
   const theme = useSelector(state => state.user.theme);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categoriesSnapshot = await getDocs(collection(db, 'categories'));
-        const categoriesData = await Promise.all(categoriesSnapshot.docs.map(async doc => {
-          const webtoonsSnapshot = await getDocs(collection(db, `categories/${doc.id}/webtoons`));
-          const webtoonsData = webtoonsSnapshot.docs.map(webtoonDoc => webtoonDoc.id);
-          return {
-            id: doc.id,
-            webtoons: webtoonsData
-          };
-        }));
-        
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Kategorileri getirirken hata oluştu:', error);
-      }
-    };
-
-    fetchCategories();
+    fetchWebtoons();
   }, []);
+  
+  const fetchWebtoons = async () => {
+    try {
+      const webtoonsSnapshot = await getDocs(collection(db, 'webtoonlar'));
+      const webtoonsData = webtoonsSnapshot.docs.map(webtoonDoc => {
+        const webtoonId = webtoonDoc.id;
+        const webtoonData = webtoonDoc.data();
+        return {
+          adı: webtoonId,
+          tur: webtoonData.tur || []
+        };
+      });
+      setWebtoonsData(webtoonsData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Webtoonları getirirken hata oluştu:', error);
+    }
+  };
+  
 
-  const handleCategorySelect = (webtoon) => {
+  const handleWebtoonSelect = (webtoon) => {
     console.log(`Seçilen webtoon: ${webtoon}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
   const handleSearch = async () => {
-    console.log('Arama yapıldı');
-
     try {
-      const webtoonsSnapshot = await getDocs(query(collection(db, 'webtoons'), where('title', '==', searchText)));
-      const webtoonsData = webtoonsSnapshot.docs.map(doc => doc.data());
-
-      console.log('Arama sonuçları:', webtoonsData);
+      if (searchText.trim() === '') {
+        fetchWebtoons();
+        return;
+      }
+      const webtoonDoc = await getDoc(doc(db, 'webtoonlar', searchText));
+      if (webtoonDoc.exists()) {
+        const webtoonData = webtoonDoc.data();
+  
+        const searchedWebtoons = [{
+          adı: searchText,
+          tur: webtoonData.tur || []
+        }];
+  
+        setWebtoonsData(searchedWebtoons);
+      } else {
+        setWebtoonsData([]);
+        
+      }
      
     } catch (error) {
       console.error('Arama yapılırken hata oluştu:', error);
     }
   };
+  
 
- 
 
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
@@ -100,23 +113,38 @@ const KesfetPage = () => {
       </View>
 
       <ScrollView style={styles.scrollView}>
-        {categories.map(category => (
-          <View key={category.id} style={styles.categoryContainer}>
-            <Text style={styles.categoryTitle}>{category.id}</Text>
-            <View style={styles.webtoonList}>
-              {category.webtoons.map(webtoon => (
-                <TouchableOpacity 
-                  key={webtoon} 
-                  style={styles.webtoonItem} 
-                  onPress={() => handleCategorySelect(webtoon)}
-                >
-                  <Text style={styles.webtoonText}>{webtoon}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+        {loading ? ( // Yükleme durumunu kontrol et
+          <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+        ) : (
+          webtoonsData.length > 0 ? (
+            webtoonsData.map(webtoon => (
+              <TouchableOpacity key={webtoon.adı} onPress={() => handleWebtoonSelect(webtoon.adı)}>
+                <View style={styles.webtoonContainer}>
+          <Text style={styles.webtoonTitle}>{webtoon.adı}</Text>
+          <View style={styles.turContainer}>
+            {webtoon.tur.slice(0, 4).map((tur, index) => (
+              <View key={index} style={styles.turBox}>
+                <Text style={styles.turText}>{tur}</Text>
+              </View>
+            ))}
+            {webtoon.tur.length > 4 && (
+              <View style={styles.moreTurBox}>
+                <Text style={styles.moreTurText}>+{webtoon.tur.length - 4} daha</Text>
+              </View>
+            )}
           </View>
-        ))}
+        </View>
+        </TouchableOpacity>
+            ))
+          ) : (
+            <View style={styles.webtoonContainer}>
+              <Text style={styles.webtoonTitle}>Aradığınız webtoon bulunamadı.</Text>
+            </View>
+          )
+        )}
       </ScrollView>
+
+      
       
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -262,6 +290,45 @@ const styles = StyleSheet.create({
   scrollView: {
     paddingHorizontal: 20,
     backgroundColor: 'white',
+  },
+  webtoonContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    borderRadius: 10,
+  },
+  webtoonTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  turContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  turBox: {
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  turText: {
+    color: 'white',
+  },
+  moreTurBox: {
+    backgroundColor: 'gray',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  moreTurText: {
+    color: 'white',
   },
 });
 

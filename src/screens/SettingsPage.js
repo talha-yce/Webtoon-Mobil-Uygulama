@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert,RefreshControl } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Switch, TextInput, Alert,RefreshControl,Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, changeTheme } from '../redux/userSlice';
@@ -13,7 +13,7 @@ const SettingsPage = () => {
   const [contentLanguage, setContentLanguage] = useState('Türkçe');
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  
+  const [showLogoutConfirmationModal, setShowLogoutConfirmationModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
@@ -119,49 +119,37 @@ const vericek=async()=>{
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* ayarMenu */}
         
-<View style={styles.contentContainer}>
+        <View style={styles.contentContainer}>
   <View style={styles.sectionContainer}>
-    <Text style={styles.sectionTitle}>HESAP:</Text>
-    <Text style={styles.sectionContent}>{userEmail}</Text>
+    <Text style={styles.sectionTitle}>Hesap Bilgileri</Text>
+    <View style={styles.sectionContent}>
+      <Text style={styles.sectionText}>E-posta: {userEmail}</Text>
+      <Text style={styles.sectionText}>Kullanıcı Adı: {username}</Text>
+    </View>
   </View>
-  <View style={styles.sectionContainer}>
-    <Text style={styles.sectionTitle}>TAKMA AD:</Text>
-    <Text style={styles.sectionContent}>{username}</Text>
-  </View>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowResetPasswordModal(true)}>
-    <Text style={styles.sectionTitle}>Şifremi Unuttum:</Text>
-    <Text style={styles.sectionLink}>Şifremi Unuttum</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowResetPasswordModal(true)}>
+    <Text style={styles.sectionButtonText}>Şifremi Unuttum</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowLanguageModal(true)}>
-    <Text style={styles.sectionTitle}>Uygulama Dili:</Text>
-    <Text style={styles.sectionLink}>{contentLanguage}</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowLanguageModal(true)}>
+    <Text style={styles.sectionButtonText}>Uygulama Dili: {contentLanguage}</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowThemeModal(true)}>
-    <Text style={styles.sectionTitle}>Tema:</Text>
-    <Text style={styles.sectionLink}>{theme}</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowThemeModal(true)}>
+    <Text style={styles.sectionButtonText}>Tema: {theme}</Text>
   </TouchableOpacity>
-  <View style={styles.sectionContainer}>
-    <Text style={styles.sectionTitle}>Servis Bildirimi:</Text>
-    <Switch />
-  </View>
-  <View style={styles.sectionContainer}>
-    <Text style={styles.sectionTitle}>Güncel Yeni Bölüm:</Text>
-    <Switch />
-  </View>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowFAQModal(true)}>
-    <Text style={styles.sectionTitle}>Sık Sorulan Sorular:</Text>
-    <Text style={styles.sectionLink}>SSS</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowFAQModal(true)}>
+    <Text style={styles.sectionButtonText}>Sık Sorulan Sorular</Text>
+    <Text style={styles.sectionDescription}>Sıkça sorulan soruları buradan inceleyebilirsiniz.</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowHelpModal(true)}>
-    <Text style={styles.sectionTitle}>Yardım:</Text>
-    <Text style={styles.sectionLink}>Yardım</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowHelpModal(true)}>
+    <Text style={styles.sectionButtonText}>Yardım</Text>
+    <Text style={styles.sectionDescription}>Yardım almak veya geri bildirimde bulunmak için bu seçeneği kullanabilirsiniz.</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionContainer} onPress={() => setShowUsageModal(true)}>
-    <Text style={styles.sectionTitle}>Kullanım Şekilleri:</Text>
-    <Text style={styles.sectionLink}>Kullanım Şekilleri</Text>
+  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowUsageModal(true)}>
+    <Text style={styles.sectionButtonText}>Kullanım Şekilleri</Text>
+    <Text style={styles.sectionDescription}>Uygulamanın kullanımı hakkında daha fazla bilgi edinin.</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.exitButtonContainer} onPress={() => dispatch(logout())}>
-    <Text style={styles.exitButton}>Çıkış Yap</Text>
+  <TouchableOpacity style={styles.exitButton} onPress={() => setShowLogoutConfirmationModal(true)}>
+    <Text style={styles.exitButtonText}>Çıkış Yap</Text>
   </TouchableOpacity>
 </View>
 
@@ -282,6 +270,21 @@ const vericek=async()=>{
     </View>
   </View>
 )}
+{/* Çıkış yap modal */}
+<Modal visible={showLogoutConfirmationModal} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Şuan Çıkış Yapmak İstiyorsunuz. Emin misiniz?</Text>
+            <TouchableOpacity style={styles.button} onPress={() => {
+              dispatch(logout());}}>
+              <Text style={styles.buttonText}>Yine Görüşeceğiz</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => setShowLogoutConfirmationModal(false)}>
+              <Text style={styles.buttonText}>Gitmiyorum, Buradayım</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Kullanım Şekilleri Modal */}
       {showUsageModal && (
@@ -388,35 +391,50 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   sectionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingVertical: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginBottom: 15,
+    padding: 15,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   sectionContent: {
-    fontSize: 16,
+    marginTop: 5,
   },
-  sectionLink: {
+  sectionText: {
     fontSize: 16,
-    color: 'blue',
+    marginBottom: 5,
   },
-  exitButtonContainer: {
-    alignItems: 'flex-end',
-    marginTop: 20,
+  sectionButton: {
+    backgroundColor: 'purple',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+  },
+  sectionButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  sectionDescription: {
+    fontSize: 16,
+    color: 'black',
+    marginTop: 5,
   },
   exitButton: {
-    backgroundColor: 'purple',
-    color: 'white',
-    textAlign: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    backgroundColor: '#ffb685',
     borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+  },
+  exitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   itemContainer: {
     padding: 10,
@@ -651,12 +669,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  usageModalClose: {
-    fontSize: 18,
-    color: 'blue',
-    marginTop: 10,
-    textAlign: 'right',
-  },
   usageModal: {
     position: 'absolute',
     top: 0,
@@ -694,6 +706,36 @@ const styles = StyleSheet.create({
     color: 'blue',
     marginTop: 10,
     textAlign: 'right',
+  },
+  button: {
+    width: '100%',
+    padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: 300,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
 

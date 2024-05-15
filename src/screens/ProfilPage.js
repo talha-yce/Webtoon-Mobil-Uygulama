@@ -278,10 +278,6 @@ const [like, setLike] = useState([]);
               editable={editing}
             />
             <View style={styles.profileCounters}>
-            <View style={styles.counterContainer}>
-                <Image source={require('../../assets/İmage/HomePage_images/okunan.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>{okunan.length}</Text>
-              </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
                 <Text style={styles.counterText}>{kaydet.length}</Text>
@@ -436,6 +432,8 @@ const styles = StyleSheet.create({
   },
   counterText: {
     color: 'black',
+    fontWeight:'bold',
+    fontSize:16,
   },
   quoteText: {
     fontStyle: 'italic',

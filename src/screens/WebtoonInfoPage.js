@@ -519,11 +519,6 @@ const handleStopButtonPress = () => {
 >
   <View style={styles.modalContainer}>
     <View style={styles.modalContent}>
-      {/* Kapatma düğmesi */}
-      <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>X</Text>
-      </TouchableOpacity>
-
       <TextInput
         style={styles.commentInput}
         multiline={true}
@@ -533,6 +528,9 @@ const handleStopButtonPress = () => {
       />
       <TouchableOpacity onPress={handleSendComment}>
         <Text style={styles.sendButton}>Gönder</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+        <Text style={styles.usageModalClose}>Kapat</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -808,6 +806,12 @@ const styles = StyleSheet.create({
     color: 'purple',
     marginTop: 10,
     textAlign: 'center',
+  },
+  usageModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
   },
 
 });

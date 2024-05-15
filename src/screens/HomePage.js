@@ -49,12 +49,13 @@ const HomePage = () => {
           const bolumler = bolumlerDir.prefixes.map(folderRef => folderRef.name);
           const sonBolum = bolumler[bolumler.length - 1];
           const ikinciSonBolum = bolumler.length > 1 ? bolumler[bolumler.length - 2] : null;
-  
+          const ucuncuSonBolum = bolumler.length > 2 ? bolumler[bolumler.length - 3] : null;
           webtoonData.push({
             webtoonName: webtoonName,
             kapakURL: kapakURL,
             sonBolum: sonBolum,
-            ikinciSonBolum: ikinciSonBolum
+            ikinciSonBolum: ikinciSonBolum,
+            ucuncuSonBolum:ucuncuSonBolum,
           });
         }
 
@@ -113,6 +114,11 @@ const HomePage = () => {
                       {webtoon.ikinciSonBolum && (
                         <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
                           <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
+                        </TouchableOpacity>
+                      )}
+                      {webtoon.ucuncuSonBolum && (
+                        <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
+                          <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
                         </TouchableOpacity>
                       )}
                     </View>
@@ -255,7 +261,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
   },
   webtoonTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     margin: 10,
   },
@@ -266,7 +272,7 @@ const styles = StyleSheet.create({
   webtoonButton: {
     backgroundColor: 'blue',
     borderRadius: 5,
-    marginTop: 10,
+    margin: 10,
     width:75, 
     height: 20, 
     alignItems:'center',
