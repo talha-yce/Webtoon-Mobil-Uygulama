@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView, Dimensions,RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
@@ -13,7 +13,7 @@ const windowWidth = Dimensions.get('window').width;
 const WebtoonReadPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
-
+  const [refreshing, setRefreshing] = useState(false);
   const { webtoon, episode } = route.params;
   const theme = useSelector(state => state.user.theme);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,7 +25,20 @@ const WebtoonReadPage = () => {
   const [resimYukseklik, setResimYukseklik] = useState(0);
 
   useEffect(() => {
-    const fetchComments = async () => {
+    fetchComments();
+    getBolumResimler();
+    sorgu();
+  }, [webtoon, episode]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchComments();
+    await getBolumResimler();
+    await sorgu();
+    setRefreshing(false);
+  };
+
+const fetchComments = async () => {
       try {
         const q = query(
           collection(db, 'webtoonlar', webtoon, 'episodes',episode,'comments'),
@@ -64,11 +77,7 @@ const WebtoonReadPage = () => {
         console.error("Error fetching comments:", error);
       }
     };
-
-    fetchComments();
-  }, [webtoon]);
-
-  useEffect(() => {
+    
     const getBolumResimler = async () => {
       try {
         const resimURLs = [];
@@ -82,17 +91,14 @@ const WebtoonReadPage = () => {
         console.error("Bölüm resimleri alınamadı:", error);
       }
     };
-    getBolumResimler();
-  }, [webtoon, episode]);
-
-  useEffect(() => {
+  
+  const sorgu = async () => {
     if (resimler.length > 0) {
       Image.getSize(resimler[0], (width, height) => {
         const oran = height / width;
         setResimYukseklik(windowWidth * oran);
       });
-    }
-  }, [resimler]);
+    }}
 
   const [resimIndex, setResimIndex] = useState(0);
 
@@ -247,6 +253,8 @@ scrollToTop();
           ref={scrollViewRef}
           style={styles.bottomContainer}
           onContentSizeChange={scrollToTop}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           {/* Resimler Konteynırı */}
           <View style={styles.imageContainer}>
@@ -291,11 +299,6 @@ scrollToTop();
 >
   <View style={styles.modalContainer}>
     <View style={styles.modalContent}>
-      {/* Kapatma düğmesi */}
-      <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>X</Text>
-      </TouchableOpacity>
-
       <TextInput
         style={styles.commentInput}
         multiline={true}
@@ -305,6 +308,9 @@ scrollToTop();
       />
       <TouchableOpacity onPress={handleSendComment}>
         <Text style={styles.sendButton}>Gönder</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+        <Text style={styles.usageModalClose}>Kapat</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -526,6 +532,12 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontSize: 20,
     color: 'black',
+  },
+  usageModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
   },
 });
 

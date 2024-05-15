@@ -11,12 +11,39 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState(""); 
-  const [passwordError, setPasswordError] = useState(""); 
+
+  const [passwordError, setPasswordError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
   const { isLoading } = useSelector(state => state.user);
 
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const handleSignup = () => {
+    if (!validateEmail(email)) {
+      setEmailError("Geçerli bir e-posta adresi girin!");
+      return;
+    } else {
+      setEmailError("");
+    }
+
+    if (password !== passwordConfirm) { 
+      setPasswordError("Şifreler eşleşmiyor!");
+      return;
+    } else {
+      setPasswordError("");
+    }
+
+    dispatch(register({ name, email, password }));
+  };
+
+
+
   if (isLoading) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
@@ -46,6 +73,7 @@ const SignupPage = () => {
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
           <TextInput
             placeholder='Şifre'
@@ -55,7 +83,7 @@ const SignupPage = () => {
             value={password}
           />
 
-          
+
           <TextInput
             placeholder='Şifreyi Tekrar Girin'
             secureTextEntry={true}
@@ -64,16 +92,13 @@ const SignupPage = () => {
             value={passwordConfirm}
           />
 
+
+          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+
           <View style={styles.buttonContainer}>
             <Pressable
-              onPress={() => {
-                if (password !== passwordConfirm) { 
-                  setPasswordError("Şifreler eşleşmiyor!");
-                } else {
-                  setPasswordError("");
-                  dispatch(register({ name, email, password }));
-                }
-              }}
+              onPress={handleSignup}
+
               style={({ pressed }) => [{
                 backgroundColor: pressed ? "gray" : "#8a1194"
               }, styles.button]}>
@@ -147,6 +172,10 @@ const styles = StyleSheet.create({
   image: {
     width: 300,
     height: 300,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet,RefreshControl } from 'react-native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
@@ -9,8 +9,18 @@ const HomePage = () => {
   const navigation = useNavigation();
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
-    const fetchWebtoonData = async () => {
+    fetchWebtoonData();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWebtoonData();
+    setRefreshing(false);
+  };
+  const fetchWebtoonData = async () => {
       try {
         const webtoonsRef = ref(storage, 'Webtoons');
         const webtoonsList = await listAll(webtoonsRef);
@@ -39,12 +49,13 @@ const HomePage = () => {
           const bolumler = bolumlerDir.prefixes.map(folderRef => folderRef.name);
           const sonBolum = bolumler[bolumler.length - 1];
           const ikinciSonBolum = bolumler.length > 1 ? bolumler[bolumler.length - 2] : null;
-  
+          const ucuncuSonBolum = bolumler.length > 2 ? bolumler[bolumler.length - 3] : null;
           webtoonData.push({
             webtoonName: webtoonName,
             kapakURL: kapakURL,
             sonBolum: sonBolum,
-            ikinciSonBolum: ikinciSonBolum
+            ikinciSonBolum: ikinciSonBolum,
+            ucuncuSonBolum:ucuncuSonBolum,
           });
         }
 
@@ -53,10 +64,6 @@ const HomePage = () => {
         console.error("Webtoon verileri alınamadı:", error);
       }
     };
-  
-    fetchWebtoonData();
-  }, []);
-  
   const handleWebtoonSelect = (webtoonName) => {
     console.log(`Seçilen webtoon: ${webtoonName}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
@@ -81,11 +88,12 @@ const HomePage = () => {
             <Text style={styles.subtitle}>TON</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
-          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        <TouchableOpacity>
+          <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Yeni</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
@@ -106,6 +114,11 @@ const HomePage = () => {
                       {webtoon.ikinciSonBolum && (
                         <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
                           <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
+                        </TouchableOpacity>
+                      )}
+                      {webtoon.ucuncuSonBolum && (
+                        <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
+                          <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
                         </TouchableOpacity>
                       )}
                     </View>
@@ -248,7 +261,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
   },
   webtoonTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     margin: 10,
   },
@@ -259,7 +272,7 @@ const styles = StyleSheet.create({
   webtoonButton: {
     backgroundColor: 'blue',
     borderRadius: 5,
-    marginTop: 10,
+    margin: 10,
     width:75, 
     height: 20, 
     alignItems:'center',

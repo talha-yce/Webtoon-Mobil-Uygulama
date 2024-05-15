@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, TextInput, Alert,RefreshControl  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth } from "firebase/auth";
 import { query, where, getDoc,getDocs, collection, updateDoc, doc } from 'firebase/firestore';
@@ -22,26 +22,62 @@ const ProfilePage = () => {
 const [like, setLike] = useState([]);
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
+  const [refreshing, setRefreshing] = useState(false);
+  const fetchData = async () => {
+    try {
+    const user = getAuth().currentUser;
+    if (user) {
+      const userId = user.uid; 
+      const userDocRef = doc(db, "users", userId);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setUsername(userData.name); 
+        setQuote(userData.quote); 
+        setProfileImage(userData.profileImage);
+        setOkunan(userData.okunan || []);
+        setKaydet(userData.kaydet || []);
+        setLike(userData.like || []);
+      }
+    }
+
+    // Webtoonları getir
+    if (user) {
+      const userId = user.uid;
+
+      const userDocRef = doc(db, 'users', userId);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const savedWebtoonNames = userData.kaydet || []; // Kaydet alanı boş olabilir, bu yüzden varsayılan olarak boş dizi ayarlayın
+        const webtoonsPromises = savedWebtoonNames.map(async (webtoonName) => {
+          try {
+            const coverUrl = await getCoverUrl(webtoonName);
+            return { name: webtoonName, coverUrl };
+          } catch (error) {
+            console.error(`Webtoon getirilirken bir hata oluştu: ${webtoonName}`, error);
+            return null; // Hata oluştuğunda null döndürün
+          }
+        });
+        const fetchedWebtoons = await Promise.all(webtoonsPromises);
+        setWebtoons(fetchedWebtoons.filter(Boolean)); // Boş değerlerin filtrelenmesi
+      } else {
+        console.error(`Kullanıcı belgesi bulunamadı: ${userId}`);
+      }
+    } else {
+      console.error("Kullanıcı oturumu açık değil");
+    }
+
+  } catch (error) {
+    console.error('Webtoonları getirirken hata oluştu:', error);
+  }
+  }
+
   useEffect(() => {
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
-        const userId = user.uid; 
-  
-        const userDocRef = doc(db, "users", userId);
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          
-          setUsername(userData.name); 
-          setQuote(userData.quote); 
-          setProfileImage(userData.profileImage);
-          setOkunan(userData.okunan || []);
-          setKaydet(userData.kaydet || []);
-          setLike(userData.like || []);
-        } else {
-          console.log("Kullanıcı dökümanı bulunamadı.");
-        }
+        fetchData();
       } else {
         console.log("Kullanıcı oturum açmamış.");
       }
@@ -49,48 +85,12 @@ const [like, setLike] = useState([]);
   
     return () => unsubscribe();
   }, []);
-
-
-  useEffect(() => {
-    const fetchWebtoons = async () => {
-      try {
-        const user = getAuth().currentUser;
   
-        if (user) {
-          const userId = user.uid;
-  
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
-  
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            const savedWebtoonNames = userData.kaydet || []; // Kaydet alanı boş olabilir, bu yüzden varsayılan olarak boş dizi ayarlayın
-            const webtoonsPromises = savedWebtoonNames.map(async (webtoonName) => {
-              try {
-                const coverUrl = await getCoverUrl(webtoonName);
-                return { name: webtoonName, coverUrl };
-              } catch (error) {
-                console.error(`Webtoon getirilirken bir hata oluştu: ${webtoonName}`, error);
-                return null; // Hata oluştuğunda null döndürün
-              }
-            });
-            const fetchedWebtoons = await Promise.all(webtoonsPromises);
-            setWebtoons(fetchedWebtoons.filter(Boolean)); // Boş değerlerin filtrelenmesi
-          } else {
-            console.error(`Kullanıcı belgesi bulunamadı: ${userId}`);
-          }
-        } else {
-          console.error("Kullanıcı oturumu açık değil");
-        }
-  
-      } catch (error) {
-        console.error('Webtoonları getirirken hata oluştu:', error);
-      }
-    };
-  
-    fetchWebtoons();
-  }, []);
-  
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData(); 
+    setRefreshing(false);
+  };
   
   const getCoverUrl = async (webtoonName) => {
     let coverUrl = '';
@@ -140,7 +140,7 @@ const [like, setLike] = useState([]);
           const userRef = doc(db, "users", userId);
           await updateDoc(userRef, {
             name: newname,
-            quote: newQuote
+            quote: newQuote || " "
           });
   
           Alert.alert("Kullanıcı verileri güncellendi.");
@@ -250,12 +250,14 @@ const [like, setLike] = useState([]);
           </View>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
-          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        <TouchableOpacity>
+          <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  }>
         <View style={styles.section}>
           <View style={styles.profileSection}>
           <TouchableOpacity onPress={() => {
@@ -276,10 +278,6 @@ const [like, setLike] = useState([]);
               editable={editing}
             />
             <View style={styles.profileCounters}>
-            <View style={styles.counterContainer}>
-                <Image source={require('../../assets/İmage/HomePage_images/okunan.png')} style={styles.counterIcon} />
-                <Text style={styles.counterText}>{okunan.length}</Text>
-              </View>
               <View style={styles.counterContainer}>
                 <Image source={require('../../assets/İmage/HomePage_images/kaydet.png')} style={styles.counterIcon} />
                 <Text style={styles.counterText}>{kaydet.length}</Text>
@@ -434,6 +432,8 @@ const styles = StyleSheet.create({
   },
   counterText: {
     color: 'black',
+    fontWeight:'bold',
+    fontSize:16,
   },
   quoteText: {
     fontStyle: 'italic',

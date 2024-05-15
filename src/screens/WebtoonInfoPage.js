@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet,Modal,TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet,Modal,TextInput, ScrollView,RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
@@ -28,64 +28,71 @@ const WebtoonInfoPage = () => {
   const [likeButtonEnabled, setLikeButtonEnabled] = useState(true);
   const [recordButtonEnabled, setRecordButtonEnabled] = useState(true);
   const [warningVisible, setWarningVisible] = useState(false);
-
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const q = query(
-          collection(db, 'webtoonlar', webtoon, 'comments'),
-          orderBy('timestamp', 'desc')
-        );
-    
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-          const commentsData = [];
-          querySnapshot.forEach(async (doce) => {
-            try {
-              const commentData = doce.data();
-              const userDocref =  doc(db, 'users', commentData.userId);
-              const userDoc = await getDoc(userDocref);
-             
-    
-              if (userDoc.exists()) {
-                const userProfile = userDoc.data().profileImage;
-                
-    
-                commentsData.push({
-                  ...commentData,
-                  id: doce.id,
-                  profileImage: userProfile
-                });
-              } else {
-                
-              }
-            } catch (error) {
-              
-            }
-          });
-          
-          setComments(commentsData);
-        });
-    
-        return () => {
-          
-          unsubscribe();
-        };
-      } catch (error) {
-       
-      }
-    };
-    
-
     fetchComments();
+    likegetir();
+    kaydetgetir();
+    getWebtoonData();
+    kapakresimgetir();
   }, [webtoon]);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchComments();
+    await likegetir();
+    await kaydetgetir();
+    await getWebtoonData();
+    await kapakresimgetir();
+    setRefreshing(false);
+  };
 
-
- 
+  const fetchComments = async () => {
+    try {
+      const q = query(
+        collection(db, 'webtoonlar', webtoon, 'comments'),
+        orderBy('timestamp', 'desc')
+      );
   
-
-  useEffect(() => {
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const commentsData = [];
+        querySnapshot.forEach(async (doce) => {
+          try {
+            const commentData = doce.data();
+            const userDocref =  doc(db, 'users', commentData.userId);
+            const userDoc = await getDoc(userDocref);
+           
+  
+            if (userDoc.exists()) {
+              const userProfile = userDoc.data().profileImage;
+              
+  
+              commentsData.push({
+                ...commentData,
+                id: doce.id,
+                profileImage: userProfile
+              });
+            } else {
+              
+            }
+          } catch (error) {
+            
+          }
+        });
+        
+        setComments(commentsData);
+      });
+  
+      return () => {
+        
+        unsubscribe();
+      };
+    } catch (error) {
+     
+    }
+  };
+  const likegetir=async()=>{
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid;
@@ -105,10 +112,8 @@ const WebtoonInfoPage = () => {
     });
   
     return unsubscribe;
-  }, [webtoon]);
-
-
-  useEffect(() => {
+  }
+ const kaydetgetir=async()=>{
     const unsubscribe = getAuth().onAuthStateChanged(async (user) => {
       if (user) {
         const userId = user.uid;
@@ -128,7 +133,8 @@ const WebtoonInfoPage = () => {
     });
   
     return unsubscribe;
-  }, [webtoon]);
+  }
+ 
   
   const toggleLiked = async (webtoonName) => {
     if (!likeButtonEnabled) {
@@ -278,11 +284,8 @@ const WebtoonInfoPage = () => {
       setRecordButtonEnabled(true);
     }, 2000);
   };
-  
-  
 
-useEffect(() => {
-    const getWebtoonData = async () => {
+  const getWebtoonData = async () => {
       try {
         const webtoonDoc = doc(db, 'webtoonlar', webtoon);
         const webtoonSnapshot = await getDoc(webtoonDoc);
@@ -305,28 +308,24 @@ useEffect(() => {
       }
     };
 
-    getWebtoonData();
-  }, [webtoon]);
+    const kapakresimgetir=async()=>{
+      // Webtoon kapak resmi URL'sini getir
+      getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpg`))
+        .then(url => setKapakResmi(url))
+        .catch(error => {
+          getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpeg`))
+            .then(url => setKapakResmi(url))
+            .catch(error => console.error("Kapak resmi alınamadı:", error));
+        });
   
-
-  useEffect(() => {
-    // Webtoon kapak resmi URL'sini getir
-    getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpg`))
-      .then(url => setKapakResmi(url))
-      .catch(error => {
-        getDownloadURL(ref(storage, `Webtoons/${webtoon}/Kapak/${webtoon}.jpeg`))
-          .then(url => setKapakResmi(url))
-          .catch(error => console.error("Kapak resmi alınamadı:", error));
-      });
-
-    // Webtoon bölümlerini getir
-    listAll(ref(storage, `Webtoons/${webtoon}/Bölümler`))
-      .then(dir => {
-        const bolumler = dir.prefixes.map(folderRef => folderRef.name);
-        setBolumler(bolumler.reverse());
-      })
-      .catch(error => console.error("Bölümler alınamadı:", error));
-    }, [webtoon]);
+      // Webtoon bölümlerini getir
+      listAll(ref(storage, `Webtoons/${webtoon}/Bölümler`))
+        .then(dir => {
+          const bolumler = dir.prefixes.map(folderRef => folderRef.name);
+          setBolumler(bolumler.reverse());
+        })
+        .catch(error => console.error("Bölümler alınamadı:", error));
+      }
     
 
   const goToWebtoonReadPage = (episode) => {
@@ -436,11 +435,12 @@ const handleStopButtonPress = () => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
-          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        <TouchableOpacity>
+          <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Orta Bölge */}
         <View style={styles.middleContent}>
           <Text style={styles.basliktitle}>{webtoon}</Text>
@@ -519,11 +519,6 @@ const handleStopButtonPress = () => {
 >
   <View style={styles.modalContainer}>
     <View style={styles.modalContent}>
-      {/* Kapatma düğmesi */}
-      <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>X</Text>
-      </TouchableOpacity>
-
       <TextInput
         style={styles.commentInput}
         multiline={true}
@@ -533,6 +528,9 @@ const handleStopButtonPress = () => {
       />
       <TouchableOpacity onPress={handleSendComment}>
         <Text style={styles.sendButton}>Gönder</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+        <Text style={styles.usageModalClose}>Kapat</Text>
       </TouchableOpacity>
     </View>
   </View>
@@ -808,6 +806,12 @@ const styles = StyleSheet.create({
     color: 'purple',
     marginTop: 10,
     textAlign: 'center',
+  },
+  usageModalClose: {
+    fontSize: 18,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'right',
   },
 
 });
