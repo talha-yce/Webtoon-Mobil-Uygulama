@@ -11,6 +11,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState(""); 
+
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
@@ -38,6 +39,8 @@ const SignupPage = () => {
 
     dispatch(register({ name, email, password }));
   };
+
+
 
   if (isLoading) {
     return <Loading />;
@@ -80,6 +83,7 @@ const SignupPage = () => {
             value={password}
           />
 
+
           <TextInput
             placeholder='Şifreyi Tekrar Girin'
             secureTextEntry={true}
@@ -88,11 +92,13 @@ const SignupPage = () => {
             value={passwordConfirm}
           />
 
+
           {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
           <View style={styles.buttonContainer}>
             <Pressable
               onPress={handleSignup}
+
               style={({ pressed }) => [{
                 backgroundColor: pressed ? "gray" : "#8a1194"
               }, styles.button]}>
@@ -103,6 +109,9 @@ const SignupPage = () => {
               <Text style={{ fontWeight: 'bold' }}>Mevcut bir hesabınız mı var? Login</Text>
             </Pressable>
           </View>
+
+          
+          <Text style={{ color: 'red', marginBottom: 10 }}>{passwordError}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
