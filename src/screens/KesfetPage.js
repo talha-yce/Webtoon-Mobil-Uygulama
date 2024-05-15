@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView,RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getDocs, collection, query,getDoc,doc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
@@ -12,10 +12,17 @@ const KesfetPage = () => {
   const [webtoonsData, setWebtoonsData] = useState([]);
   const theme = useSelector(state => state.user.theme);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     fetchWebtoons();
   }, []);
-  
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWebtoons();
+    setRefreshing(false);
+  };
+
   const fetchWebtoons = async () => {
     try {
       const webtoonsSnapshot = await getDocs(collection(db, 'webtoonlar'));
@@ -112,7 +119,8 @@ const KesfetPage = () => {
         </View>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {loading ? ( // Yükleme durumunu kontrol et
           <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
         ) : (
@@ -329,6 +337,12 @@ const styles = StyleSheet.create({
   },
   moreTurText: {
     color: 'white',
+  },
+  loadingText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: 'gray',
   },
 });
 
