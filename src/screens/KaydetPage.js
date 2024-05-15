@@ -68,8 +68,8 @@ const KaydetPage = () => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
-          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        <TouchableOpacity>
+          <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
       <View style={styles.searchContainer}>

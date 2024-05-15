@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { HomePage, SettingsPage, BildirimlerPage, ProfilPage, KaydetPage, KesifPage,WebtoonInfoPage,WebtoonReadPage } from "../screens";
+import { HomePage, SettingsPage, ProfilPage, KaydetPage, KesifPage,WebtoonInfoPage,WebtoonReadPage } from "../screens";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +18,6 @@ const UserStack = () => {
     >
       <Tab.Screen name="Home" component={HomePage} />
       <Tab.Screen name="Settings" component={SettingsPage} />
-      <Tab.Screen name="Bildirimler" component={BildirimlerPage} />
       <Tab.Screen name="Profil" component={ProfilPage} />
       <Tab.Screen name="Kaydet" component={KaydetPage} />
       <Tab.Screen name="Kesfet" component={KesifPage} />
