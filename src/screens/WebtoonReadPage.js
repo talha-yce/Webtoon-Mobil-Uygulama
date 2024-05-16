@@ -228,8 +228,8 @@ scrollToTop();
           </View>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Bildirimler')}>
-          <Image source={require('../../assets/İmage/HomePage_images/bildirim.png')} style={styles.bildirimicon} />
+        <TouchableOpacity>
+          <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
 
@@ -400,6 +400,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     marginTop:1,
+    backgroundColor:'white',
   },
   imageContainer: {
     marginBottom: 1,
