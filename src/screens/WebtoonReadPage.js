@@ -234,24 +234,35 @@ scrollToTop();
       </View>
 
       {/* Orta Bölüm */}
-      <View style={styles.middleContainer}>
+      <View style={[styles.middleContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}>
         {/* Üst Buton Konteynırı */}
-        <View style={styles.topButtonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleGeri}>
-            <Text style={styles.buttonText}>Geri</Text>
+        <View style={[styles.topButtonContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
+          
+          <TouchableOpacity  onPress={handleGeri}>
+          <Image source={require('../../assets/İmage/HomePage_images/back.png')} style={styles.yonIcon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleWebtoonSelect(webtoon)}>
-          <Text style={styles.title}>{webtoon}</Text>
+          <Text style={styles.titlewebtoon}>{webtoon}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleIleri}>
-            <Text style={styles.buttonText}>İleri</Text>
+          <TouchableOpacity  onPress={handleIleri}>
+          <Image source={require('../../assets/İmage/HomePage_images/next.png')} style={styles.yonIcon} />
           </TouchableOpacity>
         </View>
+        
 
         {/* Alt Bölge Konteynırı */}
         <ScrollView
           ref={scrollViewRef}
-          style={styles.bottomContainer}
+          style={[styles.bottomContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}
           onContentSizeChange={scrollToTop}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -267,8 +278,29 @@ scrollToTop();
             )}
           </View>
 
+          <View style={[styles.topButtonContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
+          
+          <TouchableOpacity  onPress={handleGeri}>
+          <Image source={require('../../assets/İmage/HomePage_images/back.png')} style={styles.yonIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleWebtoonSelect(webtoon)}>
+          <Text style={styles.titlewebtoon}>{webtoon}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity  onPress={handleIleri}>
+          <Image source={require('../../assets/İmage/HomePage_images/next.png')} style={styles.yonIcon} />
+          </TouchableOpacity>
+        </View>
+
+        
+
           {/* Yorumlar */}
-        <View style={styles.commentsContainer}>
+        <View style={[styles.commentsContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <Text style={styles.commentsTitle}>Yorumlar</Text>
           <TouchableOpacity onPress={handleAddComment}>
             <Text style={styles.addButton}>Yorum Ekle</Text>
@@ -286,8 +318,7 @@ scrollToTop();
             </View>
           ))}
         </View>
-
-        </ScrollView>
+      </ScrollView>
       </View>
 
       {/* Yorum ekleme modalı */}
@@ -354,6 +385,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     color: '#ffb685',
+    
   },
   subtitle: {
     fontSize: 20,
@@ -385,13 +417,22 @@ const styles = StyleSheet.create({
   topButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: 5,
+    marginRight: 5,
+    borderWidth:1,
+    borderColor:'lightgray',
+    borderRadius:25,
+    paddingLeft:5,
+    paddingRight:5,
+    marginTop:5,
   },
-  button: {
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 25,
+ 
+  titlewebtoon: {
+    fontSize: 22,
+    color: '#ffb685',
+    fontWeight:'bold',
+    marginTop:10,
+    marginBottom:10,
   },
   buttonText: {
     color: 'black',
@@ -407,7 +448,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: windowWidth, // Ekran genişliği kadar genişlik
+    width: windowWidth, 
   },
   bottomNav: {
     flexDirection: 'row',
@@ -423,16 +464,30 @@ const styles = StyleSheet.create({
   commentsContainer: {
     marginTop: 20,
     paddingHorizontal: 20,
+    borderColor:'lightgray',
+    borderRadius:15,
+    borderWidth:1,
+    marginBottom:10,
+  },
+  yonIcon: {
+    width: 30,
+    height: 30,
+    marginTop:5,
+    marginBottom:5,
   },
   commentsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
+    marginTop:10,
   },
   comment: {
     flexDirection: 'row',
     marginBottom: 15,
+    borderWidth:1,
+    borderColor:'gray',
+    borderRadius:25,
   },
   commentAvatar: {
     width: 50,
@@ -452,20 +507,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'black',
   },
-  commentsContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  commentsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 10,
-  },
-  comment: {
-    flexDirection: 'row',
-    marginBottom: 15,
-  },
+ 
+
   commentAvatar: {
     width: 50,
     height: 50,
@@ -491,8 +534,9 @@ const styles = StyleSheet.create({
   addButton: {
     fontSize: 18,
     color: 'blue',
-    textDecorationLine: 'underline',
+    fontWeight:'bold',
     marginBottom: 10,
+    marginTop:10,
   },
   modalContainer: {
     flex: 1,

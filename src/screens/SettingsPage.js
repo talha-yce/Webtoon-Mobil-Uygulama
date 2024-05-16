@@ -111,7 +111,10 @@ const vericek=async()=>{
         </TouchableOpacity>
       </View>
       {/* Content */}
-      <ScrollView style={styles.scrollVieworta} refreshControl={
+      <ScrollView style={[styles.container, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* ayarMenu */}
         
@@ -169,13 +172,13 @@ const vericek=async()=>{
           <View style={styles.themeModalContent}>
             <Text style={styles.themeModalTitle}>Uygulama Teması Seçin</Text>
             <TouchableOpacity onPress={() => handleThemeChange('lightTheme')}>
-              <Text style={styles.themeOption}>lightTheme</Text>
+              <Text style={styles.themeOption}>Açık Tema</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleThemeChange('darkTheme')}>
-              <Text style={styles.themeOption}>darkTheme</Text>
+              <Text style={styles.themeOption}>Dark Tema</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleThemeChange('DarkToon')}>
-              <Text style={styles.themeOption}>DarkToon</Text>
+              <Text style={styles.themeOption}>DarkToon Tema</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowThemeModal(false)}>
               <Text style={styles.themeModalClose}>Kapat</Text>
@@ -476,13 +479,13 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   themeModalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   themeOption: {
-    fontSize: 16,
-    marginBottom: 5,
+    fontSize: 20,
+    marginBottom: 10,
   },
   themeModalClose: {
     fontSize: 18,
@@ -507,7 +510,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   resetPasswordModalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
   },
@@ -517,6 +520,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
+    fontSize:16,
   },
   resetPasswordButton: {
     backgroundColor: 'purple',
@@ -525,6 +529,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     marginBottom: 10,
+    fontSize:18,
   },
   resetPasswordModalClose: {
     fontSize: 18,
@@ -550,18 +555,18 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
   },
   faqModalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
   question: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
   },
   answer: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 15,
   },
   faqModalClose: {
@@ -588,26 +593,26 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
   },
   helpModalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
   subtitles: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
   },
   email: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 10,
   },
   topic: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 5,
   },
   description: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 15,
   },
   helpModalClose: {
@@ -655,19 +660,15 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
   },
   usageModalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
   step: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-  },
-  description: {
-    fontSize: 14,
-    marginBottom: 15,
   },
   usageModalClose: {
     fontSize: 18,

@@ -98,10 +98,16 @@ const KesfetPage = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}>
         <View style={styles.searchTextContainer}>
           <TextInput
-            style={styles.searchInput}
+           style={[styles.searchInput, { backgroundColor: theme === 'DarkToon' 
+           ? DarkToonTheme.greyStil.backgroundColor: theme === 'lightTheme'
+             ? lightTheme.greyStil.backgroundColor
+             : darkTheme.greyStil.backgroundColor }]}
             placeholder="Webtoon Ara..."
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
@@ -119,7 +125,10 @@ const KesfetPage = () => {
         </View>
       </View>
 
-      <ScrollView style={styles.scrollView} refreshControl={
+      <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {loading ? ( // Yükleme durumunu kontrol et
           <View style={styles.loadingContainer}>
@@ -130,7 +139,10 @@ const KesfetPage = () => {
           webtoonsData.length > 0 ? (
             webtoonsData.map(webtoon => (
               <TouchableOpacity key={webtoon.adı} onPress={() => handleWebtoonSelect(webtoon.adı)}>
-                <View style={styles.webtoonContainer}>
+                <View style={[styles.webtoonContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <Text style={styles.webtoonTitle}>{webtoon.adı}</Text>
           <View style={styles.turContainer}>
             {webtoon.tur.slice(0, 4).map((tur, index) => (
@@ -223,15 +235,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 25,
     paddingBottom: 15,
+    borderColor:'lightgray',
+    borderWidth:0.5,
+    
   },
   searchTextContainer: {
     flex: 1,
   },
   searchInput: {
     marginTop:10,
-    backgroundColor: 'lightgray',
+    backgroundColor: 'gray',
     borderRadius: 5,
     paddingHorizontal: 10,
+    color:'black',
+    fontWeight:'bold'
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -243,21 +260,14 @@ const styles = StyleSheet.create({
   filterButtonContainer: {
   },
   searchButton: {
-    backgroundColor: 'white',
+    
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     width: 40,
     height: 40,
   },
-  filterButton: {
-    backgroundColor: 'white',
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
-    height: 40,
-  },
+ 
   searchIcon: {
     width: 30,
     height: 30,
@@ -301,14 +311,18 @@ const styles = StyleSheet.create({
   scrollView: {
     paddingHorizontal: 20,
     backgroundColor: 'white',
+   
   },
   webtoonContainer: {
-    marginBottom: 20,
+    marginTop: 10,
+    marginBottom:10,
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'lightgray',
+    borderColor: 'gray',
     borderRadius: 10,
+    backgroundColor:'white',
+
   },
   webtoonTitle: {
     fontSize: 18,

@@ -23,8 +23,10 @@ const [like, setLike] = useState([]);
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const fetchData = async () => {
     try {
+      setLoading(true);
     const user = getAuth().currentUser;
     if (user) {
       const userId = user.uid; 
@@ -50,18 +52,19 @@ const [like, setLike] = useState([]);
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        const savedWebtoonNames = userData.kaydet || []; // Kaydet alanı boş olabilir, bu yüzden varsayılan olarak boş dizi ayarlayın
+        const savedWebtoonNames = userData.kaydet || []; 
         const webtoonsPromises = savedWebtoonNames.map(async (webtoonName) => {
           try {
             const coverUrl = await getCoverUrl(webtoonName);
             return { name: webtoonName, coverUrl };
           } catch (error) {
             console.error(`Webtoon getirilirken bir hata oluştu: ${webtoonName}`, error);
-            return null; // Hata oluştuğunda null döndürün
+            return null; 
           }
         });
         const fetchedWebtoons = await Promise.all(webtoonsPromises);
-        setWebtoons(fetchedWebtoons.filter(Boolean)); // Boş değerlerin filtrelenmesi
+        setWebtoons(fetchedWebtoons.filter(Boolean));
+        setLoading(false); 
       } else {
         console.error(`Kullanıcı belgesi bulunamadı: ${userId}`);
       }
@@ -255,10 +258,16 @@ const [like, setLike] = useState([]);
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} refreshControl={
+      <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
   }>
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <View style={styles.profileSection}>
           <TouchableOpacity onPress={() => {
               if (editing) {
@@ -302,9 +311,19 @@ const [like, setLike] = useState([]);
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
       <View style={styles.contentSection}>
         <Text style={styles.contentTitle}>Kaydettiğin Webtoonlar</Text>
+        {loading ? (
+    <View style={styles.loadingContainer}>
+      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+    </View>
+  ) : (
+        
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {webtoons.map((webtoon) => (
             <TouchableOpacity key={webtoon.name} onPress={() => handleWebtoonSelect(webtoon.name)}>
@@ -314,7 +333,7 @@ const [like, setLike] = useState([]);
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+  )}</View>
     </View>
       </ScrollView>
 
@@ -387,6 +406,9 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 30,
+    borderRadius: 20,
+    borderWidth:1,
+    borderColor:'gray'
   },
   sectionTitle: {
     fontSize: 24,
@@ -396,7 +418,7 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     alignItems: 'center',
-    backgroundColor: 'white',
+    
     padding: 15,
     borderRadius: 20,
     marginBottom: 20,
@@ -457,7 +479,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   contentSection: {
-    backgroundColor: 'white',
+    
     padding: 15,
     borderRadius: 20,
     marginBottom: 20,
@@ -499,6 +521,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     marginRight: 10,
     borderRadius: 10,
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  loadingImage: {
+    width: 50,
+    height: 50,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

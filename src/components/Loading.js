@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
+import { View, StyleSheet, Text,Image } from "react-native";
 
 const Loading = () => {
     return (
         <View style={styles.container}>
-            <ActivityIndicator size={'large'} color={'#ffb085'} />
+            <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
             <Text style={styles.loadingText} >
                 Loading...
             </Text>
@@ -29,6 +29,12 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: '#ffb085',
     },
+    loadingImage: {
+        width: 50,
+        height: 50,
+        alignSelf: 'center',
+        marginTop: 10,
+      },
 });
 
 export default Loading;

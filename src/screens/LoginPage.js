@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setIsLoading } from '../redux/userSlice';
 import { login, autoLogin} from '../redux/userSlice';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -13,7 +14,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [resetButtonEnabled, setResetButtonEnabled] = useState(false); 
-
+const theme = useSelector(state => state.user.theme);
   const { isLoading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -55,7 +56,10 @@ const LoginPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView contentContainerStyle={[styles.scrollViewContent, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}>
         <View style={styles.imageContainer}>
           <Image
             source={require('../../assets/İmage/icon1.png')}
@@ -63,7 +67,10 @@ const LoginPage = () => {
           />
         </View>
 
-        <View style={styles.bilgiContainer}>
+        <View style={[styles.bilgiContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <TextInput
             placeholder='Email'
             style={styles.TextInputStyle}
@@ -118,7 +125,10 @@ const LoginPage = () => {
           onRequestClose={handleModalClose}
         >
           <View style={styles.modalContainer}>
-            <View style={styles.modal}>
+            <View style={[styles.modal, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
               <TouchableOpacity onPress={handleModalClose} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>×</Text>
               </TouchableOpacity>
@@ -157,10 +167,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   bilgiContainer: {
     flex: 1,
     alignItems: 'center',
+    width: '80%',
+   borderRadius:15,
+    marginLeft: 40,
+    justifyContent: 'center',
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -202,6 +217,7 @@ const styles = StyleSheet.create({
   image_alt: {
     width: 300,
     height: 300,
+    borderRadius:15,
   },
   modalContainer: {
     flex: 1,

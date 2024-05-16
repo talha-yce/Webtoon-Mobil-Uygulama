@@ -439,10 +439,16 @@ const handleStopButtonPress = () => {
           <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView} refreshControl={
+      <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {/* Orta Bölge */}
-        <View style={styles.middleContent}>
+        <View style={[styles.middleContent, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <Text style={styles.basliktitle}>{webtoon}</Text>
           {/* Kapak resmi */}
           {kapakResmi && <Image source={{ uri: kapakResmi }} style={styles.webtoonImage} />}
@@ -474,7 +480,10 @@ const handleStopButtonPress = () => {
         </View>
 
         {/* Bölümler */}
-        <View style={styles.episodesContainer}>
+        <View style={[styles.episodesContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <Text style={styles.episodesTitle}>Bölümler</Text>
           {/* Bölüm butonları */}
             {bolumler.map((bolum, index) => (
@@ -490,7 +499,10 @@ const handleStopButtonPress = () => {
         </View>
 
         {/* Yorumlar */}
-        <View style={styles.commentsContainer}>
+        <View style={[styles.commentsContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
           <Text style={styles.commentsTitle}>Yorumlar</Text>
           <TouchableOpacity onPress={handleAddComment}>
             <Text style={styles.addButton}>Yorum Ekle</Text>
@@ -602,6 +614,7 @@ const styles = StyleSheet.create({
   basliktitle: {
     fontSize: 28,
     color: 'black',
+    fontWeight:'bold',
     marginBottom: 10,
   },
   title: {
@@ -626,6 +639,11 @@ const styles = StyleSheet.create({
   middleContent: {
     alignItems: 'center',
     paddingTop: 20,
+    borderWidth:1,
+    borderColor:'lightgray',
+    borderRadius:15,
+    borderWidth:1,
+    marginTop:10,
   },
   webtoonImage: {
     width: 150,
@@ -636,6 +654,10 @@ const styles = StyleSheet.create({
   infoContainer: {
     paddingHorizontal: 20,
     marginBottom: 20,
+    borderColor:'gray',
+    borderRadius:15,
+    borderWidth:1,
+    alignItems:'center'
   },
   infoTitle: {
     fontSize: 18,
@@ -646,6 +668,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     color: 'black',
+    textAlign:'center',
 
   },
   buttonsContainer: {
@@ -665,16 +688,21 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize:16,
     fontWeight:'bold',
+    marginBottom:10,
   },
   episodesContainer: {
     marginTop: 20,
     paddingHorizontal: 20,
+    borderColor:'lightgray',
+    borderRadius:15,
+    borderWidth:1,
   },
   episodesTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
+    marginTop:10,
   },
   episodeButton: {
     backgroundColor: 'purple',
@@ -690,16 +718,24 @@ const styles = StyleSheet.create({
   commentsContainer: {
     marginTop: 20,
     paddingHorizontal: 20,
+    borderColor:'lightgray',
+    borderRadius:15,
+    borderWidth:1,
+    marginBottom:10,
   },
   commentsTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
+    marginTop:10,
   },
   comment: {
     flexDirection: 'row',
     marginBottom: 15,
+    borderWidth:1,
+    borderColor:'gray',
+    borderRadius:25,
   },
   commentAvatar: {
     width: 50,
@@ -741,8 +777,9 @@ const styles = StyleSheet.create({
   addButton: {
     fontSize: 18,
     color: 'blue',
-    textDecorationLine: 'underline',
+    fontWeight:'bold',
     marginBottom: 10,
+    marginTop:10,
   },
   modalContainer: {
     flex: 1,

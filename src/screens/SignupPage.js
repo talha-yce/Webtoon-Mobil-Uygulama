@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../redux/userSlice';
 import { Loading } from '../components';
+import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 
 const SignupPage = () => {
   const navigation = useNavigation();
@@ -11,7 +12,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState(""); 
-
+  const theme = useSelector(state => state.user.theme);
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
@@ -48,7 +49,10 @@ const SignupPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+       <ScrollView contentContainerStyle={[styles.scrollViewContent, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}>
         <View style={styles.imageContainer}>
           <Image
             source={require('../../assets/İmage/3.jpeg')}
@@ -56,8 +60,11 @@ const SignupPage = () => {
           />
         </View>
 
-        <View style={styles.bilgiContainer}>
-          <Text style={{ width: '100%', fontWeight: 'bold', textAlign: 'left', fontSize: 28, marginLeft: '10%' }}>Sign up</Text>
+        <View style={[styles.bilgiContainer, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
+          <Text style={{ width: '100%', fontWeight: 'bold', textAlign: 'left', fontSize: 28, marginLeft: '10%',marginBottom:10, }}>Sign up</Text>
           <TextInput
             placeholder='Ad Soyad'
             style={styles.TextInputStyle}
@@ -104,12 +111,13 @@ const SignupPage = () => {
               }, styles.button]}>
               <Text style={styles.buttonText}>Kaydet</Text>
             </Pressable>
+          </View>
+</View>
+<View style={styles.altnote}>
             <Pressable
               onPress={() => navigation.navigate('Login')}>
-              <Text style={{ fontWeight: 'bold' }}>Mevcut bir hesabınız mı var? Login</Text>
+              <Text style={styles.altnotetext}>Mevcut bir hesabınız mı var? Login</Text>
             </Pressable>
-          </View>
-
           
           <Text style={{ color: 'red', marginBottom: 10 }}>{passwordError}</Text>
         </View>
@@ -129,13 +137,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  image: {
+    width: 300,
+    height: 300,
+    borderRadius:15,
+  },
+  altnote: {
+    flex:1,
+    justifyContent: 'flex-end',
+    alignItems: 'center', 
+  },
+  altnotetext: {
+    fontWeight:'bold',
+    fontSize:16,
+  },
   bilgiContainer: {
-    width: '100%',
-    flex: 3,
+    flex: 1,
     alignItems: 'center',
+    width: '80%',
+   borderRadius:15,
+   justifyContent: 'center',
   },
   buttonContainer: {
-    flex: 2,
+    
     justifyContent: 'space-between',
     width: '100%',
     alignItems: 'center',
@@ -169,10 +193,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
   },
-  image: {
-    width: 300,
-    height: 300,
-  },
+ 
   errorText: {
     color: 'red',
     marginBottom: 10,

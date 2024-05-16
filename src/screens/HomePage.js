@@ -99,11 +99,18 @@ const HomePage = () => {
           <Text style={styles.bildirimicon} />
         </TouchableOpacity>
       </View>
-      <ScrollView style={styles.scrollView} refreshControl={
+      <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 
      
 <View style={styles.section}>
+<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
   <Text style={styles.sectionTitle}>Yeni</Text>
   {loading ? (
     <View style={styles.loadingContainer}>
@@ -142,11 +149,15 @@ const HomePage = () => {
         </TouchableOpacity>
       ))}
     </ScrollView>
-  )}
+  )}</View>
 </View>
 
 
 <View style={styles.section}>
+<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
   <Text style={styles.sectionTitle}>Sana Özel</Text>
   {loading ? (
     <View style={styles.loadingContainer}>
@@ -163,11 +174,15 @@ const HomePage = () => {
         </TouchableOpacity>
       ))}
     </ScrollView>
-  )}
+  )}</View>
 </View>
 
 
 <View style={styles.section}>
+<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.greyStil.backgroundColor }]}>
   <Text style={styles.sectionTitle}>Trend</Text>
   {loading ? (
     <View style={styles.loadingContainer}>
@@ -184,7 +199,7 @@ const HomePage = () => {
         </TouchableOpacity>
       ))}
     </ScrollView>
-  )}
+  )}</View>
 </View>
 
 
@@ -367,6 +382,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  contentSection: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 5,
+    marginTop:5,
+    borderWidth:1,
   },
 });
 
