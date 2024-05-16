@@ -14,7 +14,7 @@ const SettingsPage = () => {
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [showLogoutConfirmationModal, setShowLogoutConfirmationModal] = useState(false);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
+ 
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [emailForPasswordReset, setEmailForPasswordReset] = useState('');
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
@@ -58,11 +58,7 @@ const vericek=async()=>{
     return () => unsubscribe();
   }
 
-  const handleLanguageChange = (language) => {
-    setContentLanguage(language);
-    setShowLanguageModal(false); 
-    console.log(`Selected language: ${language}`);
-  };
+
 
   const handleThemeChange = (selectedTheme) => {
     dispatch(changeTheme(selectedTheme));
@@ -130,9 +126,7 @@ const vericek=async()=>{
   <TouchableOpacity style={styles.sectionButton} onPress={() => setShowResetPasswordModal(true)}>
     <Text style={styles.sectionButtonText}>Şifremi Unuttum</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowLanguageModal(true)}>
-    <Text style={styles.sectionButtonText}>Uygulama Dili: {contentLanguage}</Text>
-  </TouchableOpacity>
+  
   <TouchableOpacity style={styles.sectionButton} onPress={() => setShowThemeModal(true)}>
     <Text style={styles.sectionButtonText}>Tema: {theme}</Text>
   </TouchableOpacity>
@@ -169,32 +163,6 @@ const vericek=async()=>{
           <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
         </TouchableOpacity>
       </View>
-      {/* Dil seçim modal */}
-      {showLanguageModal && (
-        <View style={styles.languageModal}>
-          <View style={styles.languageModalContent}>
-            <Text style={styles.languageModalTitle}>Uygulama Dili Seçin</Text>
-            <TouchableOpacity onPress={() => handleLanguageChange('Türkçe')}>
-              <Text style={styles.languageOption}>Türkçe</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleLanguageChange('English')}>
-              <Text style={styles.languageOption}>English</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleLanguageChange('Deutsch')}>
-              <Text style={styles.languageOption}>Deutsch</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleLanguageChange('한국어')}>
-              <Text style={styles.languageOption}>한국어</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleLanguageChange('日本語')}>
-              <Text style={styles.languageOption}>日本語</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
-              <Text style={styles.languageModalClose}>Kapat</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
       {/* Tema seçim modal */}
       {showThemeModal && (
         <View style={styles.themeModal}>

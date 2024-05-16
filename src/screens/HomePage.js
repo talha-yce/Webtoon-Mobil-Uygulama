@@ -10,6 +10,8 @@ const HomePage = () => {
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     fetchWebtoonData();
@@ -22,6 +24,7 @@ const HomePage = () => {
   };
   const fetchWebtoonData = async () => {
       try {
+        setLoading(true);
         const webtoonsRef = ref(storage, 'Webtoons');
         const webtoonsList = await listAll(webtoonsRef);
   
@@ -33,12 +36,15 @@ const HomePage = () => {
           let kapakURL = null;
           try {
             kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
+            
           } catch (error) {
             try {
               kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
+              
             } catch (error) {
               try {
                 kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
+                
               } catch (error) {
                 console.error("Kapak resmi alınamadı:", error);
               }
@@ -60,6 +66,7 @@ const HomePage = () => {
         }
 
         setWebtoons(webtoonData);
+        setLoading(false);
       } catch (error) {
         console.error("Webtoon verileri alınamadı:", error);
       }
@@ -94,68 +101,92 @@ const HomePage = () => {
       </View>
       <ScrollView style={styles.scrollView} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Yeni</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-            {webtoons.map((webtoon, index) => (
-              <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
-                <View style={styles.newWebtoon}>
-                  <View style={styles.newWebtoonLeft}>
-                    <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageyeni} />
-                  </View>
-                  <View style={styles.newWebtoonRight}>
-                    <Text style={styles.webtoonTitle}>{webtoon.webtoonName}</Text>
-                    <View style={styles.webtoonButtons}>
-                      {webtoon.sonBolum && (
-                        <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.sonBolum,webtoon.webtoonName)} style={[styles.webtoonButton, { marginBottom: 5 }]}>
-                          <Text style={styles.buttonText}>{webtoon.sonBolum}</Text>
-                        </TouchableOpacity>
-                      )}
-                      {webtoon.ikinciSonBolum && (
-                        <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
-                          <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
-                        </TouchableOpacity>
-                      )}
-                      {webtoon.ucuncuSonBolum && (
-                        <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
-                          <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
 
-        {/* Sana Özel */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sana Özel</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {webtoons.slice(0, 8).map((webtoon, index) => (
-              <TouchableOpacity key={index} onPress={() =>handleWebtoonSelect(webtoon.webtoonName)}>
-                <View style={styles.personalWebtoon}>
-                  <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageozel} />
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+     
+<View style={styles.section}>
+  <Text style={styles.sectionTitle}>Yeni</Text>
+  {loading ? (
+    <View style={styles.loadingContainer}>
+      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+    </View>
+  ) : (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+      {webtoons.map((webtoon, index) => (
+        <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
+          <View style={styles.newWebtoon}>
+            <View style={styles.newWebtoonLeft}>
+              <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageyeni} />
+            </View>
+            <View style={styles.newWebtoonRight}>
+              <Text style={styles.webtoonTitle}>{webtoon.webtoonName}</Text>
+              <View style={styles.webtoonButtons}>
+                {webtoon.sonBolum && (
+                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.sonBolum,webtoon.webtoonName)} style={[styles.webtoonButton, { marginBottom: 5 }]}>
+                    <Text style={styles.buttonText}>{webtoon.sonBolum}</Text>
+                  </TouchableOpacity>
+                )}
+                {webtoon.ikinciSonBolum && (
+                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
+                    <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
+                  </TouchableOpacity>
+                )}
+                {webtoon.ucuncuSonBolum && (
+                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
+                    <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  )}
+</View>
 
-        {/* Trend */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Trend</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {webtoons.slice(0, 6).map((webtoon, index) => (
-              <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
-                <View style={styles.trendingWebtoon}>
-                  <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImagetrend} />
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+
+<View style={styles.section}>
+  <Text style={styles.sectionTitle}>Sana Özel</Text>
+  {loading ? (
+    <View style={styles.loadingContainer}>
+      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+    </View>
+  ) : (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {webtoons.slice(0, 8).map((webtoon, index) => (
+        <TouchableOpacity key={index} onPress={() =>handleWebtoonSelect(webtoon.webtoonName)}>
+          <View style={styles.personalWebtoon}>
+            <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageozel} />
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  )}
+</View>
+
+
+<View style={styles.section}>
+  <Text style={styles.sectionTitle}>Trend</Text>
+  {loading ? (
+    <View style={styles.loadingContainer}>
+      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+    </View>
+  ) : (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {webtoons.slice(0, 6).map((webtoon, index) => (
+        <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
+          <View style={styles.trendingWebtoon}>
+            <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImagetrend} />
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  )}
+</View>
+
 
       </ScrollView>
 
@@ -319,6 +350,23 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderBottomRightRadius: 10,
     backgroundColor: 'lightgray',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  loadingImage: {
+    width: 50,
+    height: 50,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

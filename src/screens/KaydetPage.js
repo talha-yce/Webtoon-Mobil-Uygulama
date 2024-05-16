@@ -166,7 +166,10 @@ const KaydetPage = () => {
       <ScrollView style={styles.scrollView} refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {loading ? ( 
+          <View style={styles.loadingContainer}>
+          <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
           <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+        </View>
         ) : (
           webtoonsData.length > 0 ? (
             webtoonsData.map(webtoon => (
@@ -383,10 +386,21 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: 'gray',
+    marginTop: 10,
+  },
+  loadingImage: {
+    width: 50,
+    height: 50,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
