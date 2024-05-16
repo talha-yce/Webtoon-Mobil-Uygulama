@@ -38,37 +38,37 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 
 
 ## Ekran Görüntüleri
-1. ![Login](screenshots/login.png)
+1. ![Login](screenshots/Login_Screen.jpeg)
    - Giriş ekranı, kullanıcıların hesaplarına erişmek için kullanılan ilk adımdır. Aynı zamanda şifrelerini unutan kullanıcıların şifre sıfırlama isteğini "Şifremi Unuttum" butonu ile gerçekleştirebilir.
 
-2. ![Signup](screenshots/signup.png)
+2. ![Signup](screenshots/Sign_up_Screen.jpeg)
    - Kayıt ekranı, yeni kullanıcıların hesap oluşturduğu yerdir.
 
-3. ![Ana Sayfa](screenshots/ana_sayfa.png)
+3. ![Ana Sayfa](screenshots/Homepage_Screen.jpeg)
    - Ana sayfa, kullanıcının favori webtoon'larına erişebileceği bir genel bakış sunar. Yeni webtoonlar kişel webtoonlar ve trend webtoonlar burada listelenir.
 
-4. ![Keşfet](screenshots/kesfet.png)
+4. ![Keşfet](screenshots/Discover_Screen.jpeg)
    - Keşfet ekranı, kullanıcının yeni webtoon'lar keşfetmesine olanak sağlar. İsterse kullanıcılar arama özelliği ile istedikleri webtoonu arayabilir.
 
-5. ![Kaydedilenler](screenshots/kaydedilenler.png)
+5. ![Kaydedilenler](screenshots/Saved_Screen.jpeg)
    - Kaydedilenler ekranı, kullanıcının favori webtoon'larını sakladığı yerdir.
 
-6. ![Profil](screenshots/profil.png)
+6. ![Profil](screenshots/Profile_Screen.jpeg)
    - Profil ekranı, kullanıcının hesap bilgilerini yönetebileceği bir alandır. Profil resmi, kullanıcı adı ve hakkımda kısmı burada sergilenir ve güncellenir. Favori kaydedilen webtoonların bir kısmıda listelenir.
 
-7. ![Webtoon Bilgi](screenshots/webtoon_bilgi.png)
+7. ![Webtoon Bilgi](screenshots/Webtoon_Information_Screen.jpeg)
    - Webtoon bilgi ekranı, kullanıcının belirli bir webtoon hakkında detaylı bilgilere erişebileceği yerdir. Kapak resmi, konusu, beğenilme ve kaydedilme sayısı, bölümler ve webtoona yapılan yorumlar bu sayfada yer alır.
 
-8. ![Webtoon Okuma](screenshots/webtoon_okuma.png)
+8. ![Webtoon Okuma](screenshots/Webtoon_Reading_Screen.jpeg)
    - Webtoon okuma ekranı, kullanıcının webtoon'ları rahatça okuyabileceği bir arayüzdür. Webtoon bölümlerini okuyabilir ve okuduğu bölüme yorum yapabilir.
 
-9. ![Ayarlar](screenshots/ayarlar.png)
+9. ![Ayarlar](screenshots/Settings_Screen.jpeg)
    - Ayarlar ekranı, uygulama tercihlerini ve ayarlarını yönetmek için kullanılır. Şifremi unuttum ile şifre sıfırlama isteği. Tema değiştirme ile "Açık Tema", "Koyu Tema" ve "DarkTon" temaları arasında değişebilir. Resimler "DarkTon" tema altında gösterilmiştir.
 
-10. ![Ana Sayfa Yüklenme Ekranı](screenshots/ana_sayfa_yuklenme.png)
+10. ![Ana Sayfa Yüklenme Ekranı](screenshots/Homepage_loading_Screen.jpeg)
     - Ana sayfa yüklenme ekranı, kullanıcının ana sayfanın yüklenmesini beklediği sırada görülen ekranı temsil eder. Webtoon Bilgileri alınır iken kullanılan arayüz.
 
-11. ![Keşfet Yüklenme Ekranı](screenshots/kesfet_yuklenme.png)
+11. ![Keşfet Yüklenme Ekranı](screenshots/Discover_Loading_Screen.jpeg)
     - Keşfet yüklenme ekranı, kullanıcının keşfet sayfasının yüklenmesini beklediği sırada görülen ekranı temsil eder.
 
 ## Katkıda Bulunma
