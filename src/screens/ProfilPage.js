@@ -6,7 +6,7 @@ import { query, where, getDoc,getDocs, collection, updateDoc, doc } from 'fireba
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; 
 import * as ImagePicker from 'expo-image-picker';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 const ProfilePage = () => {
   const navigation = useNavigation();

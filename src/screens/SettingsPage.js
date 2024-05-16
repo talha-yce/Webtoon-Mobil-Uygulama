@@ -126,25 +126,44 @@ const vericek=async()=>{
       <Text style={styles.sectionText}>Kullanıcı Adı: {username}</Text>
     </View>
   </View>
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowResetPasswordModal(true)}>
+  <TouchableOpacity style={[styles.sectionButton, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} onPress={() => setShowResetPasswordModal(true)}>
     <Text style={styles.sectionButtonText}>Şifremi Unuttum</Text>
   </TouchableOpacity>
   
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowThemeModal(true)}>
+  <TouchableOpacity style={[styles.sectionButton, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} onPress={() => setShowThemeModal(true)}>
     <Text style={styles.sectionButtonText}>Tema: {theme}</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowFAQModal(true)}>
+
+  <TouchableOpacity style={[styles.sectionButton, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} onPress={() => setShowFAQModal(true)}>
     <Text style={styles.sectionButtonText}>Sık Sorulan Sorular</Text>
     <Text style={styles.sectionDescription}>Sıkça sorulan soruları buradan inceleyebilirsiniz.</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowHelpModal(true)}>
+
+  <TouchableOpacity style={[styles.sectionButton, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} onPress={() => setShowHelpModal(true)}>
     <Text style={styles.sectionButtonText}>Yardım</Text>
     <Text style={styles.sectionDescription}>Yardım almak veya geri bildirimde bulunmak için bu seçeneği kullanabilirsiniz.</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.sectionButton} onPress={() => setShowUsageModal(true)}>
+
+  <TouchableOpacity style={[styles.sectionButton, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]} onPress={() => setShowUsageModal(true)}>
     <Text style={styles.sectionButtonText}>Kullanım Şekilleri</Text>
     <Text style={styles.sectionDescription}>Uygulamanın kullanımı hakkında daha fazla bilgi edinin.</Text>
   </TouchableOpacity>
+
   <TouchableOpacity style={styles.exitButton} onPress={() => setShowLogoutConfirmationModal(true)}>
     <Text style={styles.exitButtonText}>Çıkış Yap</Text>
   </TouchableOpacity>
@@ -199,15 +218,15 @@ const vericek=async()=>{
           </Text>
         </View>
         <View>
-          <Text style={styles.question}>2. Nasıl bir webtoon favorilere eklerim?</Text>
+          <Text style={styles.question}>2. Nasıl bir webtoon kaydedilenlere eklerim?</Text>
           <Text style={styles.answer}>
-            Bir webtoon'u favorilere eklemek için webtoonun detay sayfasına gidin ve kalp simgesine dokunun. Böylece favorilerinize eklenmiş olacak.
+            Bir webtoon'u kaydedilenlere eklemek için webtoonun detay sayfasına gidin ve kaydet simgesine dokunun. Böylece kaydedilenlere eklenmiş olacak.
           </Text>
         </View>
         <View>
-          <Text style={styles.question}>3. Webtoonlarda ilerleme nasıl kaydedilir?</Text>
+          <Text style={styles.question}>3. Profil resmi, kullanıcı adı ve alıntı metin nasıl değiştirilir?</Text>
           <Text style={styles.answer}>
-            Webtoon okurken, ilerlemeniz otomatik olarak kaydedilir. Bir bölümü okuduğunuzda, bir sonraki ziyaretinizde kaldığınız yerden devam edebilirsiniz.
+            Profil sayfasına gidiniz. Daha sonra "Profili Düzenle" düğmesine basınız. Profil resminin üstüne basarak profil resmi seçebilir, kullanıc adı ve alıntı metnini istediğiniz gibi değiştirebilirsiniz. Son olarak "Bilgileri Kaydet" düğmesine basarak bilgileri kaydedebiilirsiniz.
           </Text>
         </View>
         {/* Diğer SSS maddeleri buraya eklenebilir */}
@@ -228,7 +247,7 @@ const vericek=async()=>{
         Eğer uygulamamızla ilgili bir sorun yaşadığınızda, bir isteğiniz veya geri bildiriminiz varsa lütfen aşağıdaki bilgileri içeren bir e-posta gönderin:
       </Text>
       <Text style={styles.subtitles}>E-posta Adresi:</Text>
-      <Text style={styles.email}>destek@uygulamaadi.com</Text>
+      <Text style={styles.email}>info@darkton.com</Text>
       <Text style={styles.subtitles}>Konu:</Text>
       <Text style={styles.topic}>[Sorun / İstek / Geri Bildirim]</Text>
       <Text style={styles.subtitles}>Açıklama:</Text>
@@ -272,13 +291,19 @@ const vericek=async()=>{
         <View>
           <Text style={styles.step}>Adım 2:</Text>
           <Text style={styles.description}>
-            Seçtiğiniz webtoonun detay sayfasına gidin ve "Oku" düğmesine dokunun.
+            Seçtiğiniz webtoonun detay sayfasına gidin ve okumak istediğiniz bölümün düğmesine dokunun.
           </Text>
         </View>
         <View>
           <Text style={styles.step}>Adım 3:</Text>
           <Text style={styles.description}>
-            Webtoon okumaya başladığınızda, sayfayı aşağı kaydırarak sonraki bölümlere geçebilirsiniz.
+            Webtoon okumaya başladığınızda, sayfadaki ileri ve geri butonları ile sonraki resimlere geçebilirsiniz.
+          </Text>
+        </View>
+        <View>
+          <Text style={styles.step}>Adım 4:</Text>
+          <Text style={styles.description}>
+           Sonraki bölüm butonuna basarak bir sonraki bölüme gidebilirsiniz.
           </Text>
         </View>
         {/* Diğer kullanım şekilleri buraya eklenebilir */}
@@ -384,9 +409,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
+    borderWidth:1,
+    borderColor:'gray',
   },
   sectionButtonText: {
-    color: '#fff',
+    color: 'black',
     fontSize: 18,
     fontWeight: 'bold',
   },

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView,RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import { getDocs, collection, query,getDoc,doc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
 import { useSelector } from 'react-redux';
@@ -16,12 +16,21 @@ const KesfetPage = () => {
 
   useEffect(() => {
     fetchWebtoons();
-  }, []);
+  }, [webtoonsData]);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchWebtoons();
     setRefreshing(false);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setWebtoonsData([]);
+      };
+    }, [])
+  );
 
   const fetchWebtoons = async () => {
     try {

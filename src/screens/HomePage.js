@@ -121,7 +121,10 @@ const HomePage = () => {
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
       {webtoons.map((webtoon, index) => (
         <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
-          <View style={styles.newWebtoon}>
+          <View style={[styles.newWebtoon, { backgroundColor: theme === 'DarkToon' 
+    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
+      ? lightTheme.whiteStil.backgroundColor
+      : darkTheme.koyugrayStil.backgroundColor }]}>
             <View style={styles.newWebtoonLeft}>
               <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageyeni} />
             </View>
@@ -165,7 +168,7 @@ const HomePage = () => {
       <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
     </View>
   ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
       {webtoons.slice(0, 8).map((webtoon, index) => (
         <TouchableOpacity key={index} onPress={() =>handleWebtoonSelect(webtoon.webtoonName)}>
           <View style={styles.personalWebtoon}>
@@ -190,7 +193,7 @@ const HomePage = () => {
       <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
     </View>
   ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
       {webtoons.slice(0, 6).map((webtoon, index) => (
         <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
           <View style={styles.trendingWebtoon}>
@@ -291,6 +294,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     marginRight: 10,
     borderRadius: 10,
+    borderWidth:1,
+    borderColor:'gray',
   },
   newWebtoonLeft: {
     width: 150, 
