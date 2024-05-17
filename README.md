@@ -39,49 +39,52 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 
 ## Ekran Görüntüleri
 
+## Ekran Görüntüleri
+
 1. Giriş Ekranı
-   <img src="screenshots/Login_Screen.jpeg" alt="Login" width="50%">
+   <img src="screenshots/Login_Screen.jpeg" alt="Login" width="25%">
    - Giriş ekranı, kullanıcıların hesaplarına erişmek için kullanılan ilk adımdır. Aynı zamanda şifrelerini unutan kullanıcıların şifre sıfırlama isteğini "Şifremi Unuttum" butonu ile gerçekleştirebilir.
 
 2. Kayıt Ekranı
-   <img src="screenshots/Sign_up_Screen.jpeg" alt="Signup" width="50%">
+   <img src="screenshots/Sign_up_Screen.jpeg" alt="Signup" width="25%">
    - Kayıt ekranı, yeni kullanıcıların hesap oluşturduğu yerdir.
 
 3. Ana Sayfa
-   <img src="screenshots/Homepage_Screen.jpeg" alt="Ana Sayfa" width="50%">
+   <img src="screenshots/Homepage_Screen.jpeg" alt="Ana Sayfa" width="25%">
    - Ana sayfa, kullanıcının favori webtoon'larına erişebileceği bir genel bakış sunar. Yeni webtoonlar kişel webtoonlar ve trend webtoonlar burada listelenir.
 
 4. Keşfet Ekranı
-   <img src="screenshots/Discover_Screen.jpeg" alt="Keşfet" width="50%">
+   <img src="screenshots/Discover_Screen.jpeg" alt="Keşfet" width="25%">
    - Keşfet ekranı, kullanıcının yeni webtoon'lar keşfetmesine olanak sağlar. İsterse kullanıcılar arama özelliği ile istedikleri webtoonu arayabilir.
 
 5. Kaydedilenler Ekranı
-   <img src="screenshots/Saved_Screen.jpeg" alt="Kaydedilenler" width="50%">
+   <img src="screenshots/Saved_Screen.jpeg" alt="Kaydedilenler" width="25%">
    - Kaydedilenler ekranı, kullanıcının favori webtoon'larını sakladığı yerdir.
 
 6. Profil Ekranı
-   <img src="screenshots/Profile_Screen.jpeg" alt="Profil" width="50%">
+   <img src="screenshots/Profile_Screen.jpeg" alt="Profil" width="25%">
    - Profil ekranı, kullanıcının hesap bilgilerini yönetebileceği bir alandır. Profil resmi, kullanıcı adı ve hakkımda kısmı burada sergilenir ve güncellenir. Favori kaydedilen webtoonların bir kısmıda listelenir.
 
 7. Webtoon Bilgi Ekranı
-   <img src="screenshots/Webtoon_Information_Screen.jpeg" alt="Webtoon Bilgi" width="50%">
+   <img src="screenshots/Webtoon_Information_Screen.jpeg" alt="Webtoon Bilgi" width="25%">
    - Webtoon bilgi ekranı, kullanıcının belirli bir webtoon hakkında detaylı bilgilere erişebileceği yerdir. Kapak resmi, konusu, beğenilme ve kaydedilme sayısı, bölümler ve webtoona yapılan yorumlar bu sayfada yer alır.
 
 8. Webtoon Okuma Ekranı
-   <img src="screenshots/Webtoon_Reading_Screen.jpeg" alt="Webtoon Okuma" width="50%">
+   <img src="screenshots/Webtoon_Reading_Screen.jpeg" alt="Webtoon Okuma" width="25%">
    - Webtoon okuma ekranı, kullanıcının webtoon'ları rahatça okuyabileceği bir arayüzdür. Webtoon bölümlerini okuyabilir ve okuduğu bölüme yorum yapabilir.
 
 9. Ayarlar Ekranı
-   <img src="screenshots/Settings_Screen.jpeg" alt="Ayarlar" width="50%">
+   <img src="screenshots/Settings_Screen.jpeg" alt="Ayarlar" width="25%">
    - Ayarlar ekranı, uygulama tercihlerini ve ayarlarını yönetmek için kullanılır. Şifremi unuttum ile şifre sıfırlama isteği. Tema değiştirme ile "Açık Tema", "Koyu Tema" ve "DarkTon" temaları arasında değişebilir. Resimler "DarkTon" tema altında gösterilmiştir.
 
 10. Ana Sayfa Yüklenme Ekranı
-    <img src="screenshots/Homepage_loading_Screen.jpeg" alt="Ana Sayfa Yüklenme Ekranı" width="50%">
+    <img src="screenshots/Homepage_loading_Screen.jpeg" alt="Ana Sayfa Yüklenme Ekranı" width="25%">
     - Ana sayfa yüklenme ekranı, kullanıcının ana sayfanın yüklenmesini beklediği sırada görülen ekranı temsil eder. Webtoon Bilgileri alınır iken kullanılan arayüz.
 
 11. Keşfet Yüklenme Ekranı
-    <img src="screenshots/Discover_Loading_Screen.jpeg" alt="Keşfet Yüklenme Ekranı" width="50%">
+    <img src="screenshots/Discover_Loading_Screen.jpeg" alt="Keşfet Yüklenme Ekranı" width="25%">
     - Keşfet yüklenme ekranı, kullanıcının keşfet sayfasının yüklenmesini beklediği sırada görülen ekranı temsil eder.
+
 
 
 ## Katkıda Bulunma
