@@ -38,38 +38,97 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 
 
 ## Ekran Görüntüleri
-1. ![Login](screenshots/Login_Screen.jpeg)
-   - Giriş ekranı, kullanıcıların hesaplarına erişmek için kullanılan ilk adımdır. Aynı zamanda şifrelerini unutan kullanıcıların şifre sıfırlama isteğini "Şifremi Unuttum" butonu ile gerçekleştirebilir.
 
-2. ![Signup](screenshots/Sign_up_Screen.jpeg)
-   - Kayıt ekranı, yeni kullanıcıların hesap oluşturduğu yerdir.
+1. Giriş Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Login_Screen.jpeg" alt="Login" width="25%"></td>
+       <td>Giriş ekranı, kullanıcıların hesaplarına erişmek için kullanılan ilk adımdır. Aynı zamanda şifrelerini unutan kullanıcıların şifre sıfırlama isteğini "Şifremi Unuttum" butonu ile gerçekleştirebilir.</td>
+     </tr>
+   </table>
 
-3. ![Ana Sayfa](screenshots/Homepage_Screen.jpeg)
-   - Ana sayfa, kullanıcının favori webtoon'larına erişebileceği bir genel bakış sunar. Yeni webtoonlar kişel webtoonlar ve trend webtoonlar burada listelenir.
+2. Kayıt Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Sign_up_Screen.jpeg" alt="Signup" width="25%"></td>
+       <td>Kayıt ekranı, yeni kullanıcıların hesap oluşturduğu yerdir.</td>
+     </tr>
+   </table>
 
-4. ![Keşfet](screenshots/Discover_Screen.jpeg)
-   - Keşfet ekranı, kullanıcının yeni webtoon'lar keşfetmesine olanak sağlar. İsterse kullanıcılar arama özelliği ile istedikleri webtoonu arayabilir.
+3. Ana Sayfa
+   <table>
+     <tr>
+       <td><img src="screenshots/Homepage_Screen.jpeg" alt="Ana Sayfa" width="25%"></td>
+       <td>Ana sayfa, kullanıcının favori webtoon'larına erişebileceği bir genel bakış sunar. Yeni webtoonlar, kişisel webtoonlar ve trend webtoonlar burada listelenir.</td>
+     </tr>
+   </table>
 
-5. ![Kaydedilenler](screenshots/Saved_Screen.jpeg)
-   - Kaydedilenler ekranı, kullanıcının favori webtoon'larını sakladığı yerdir.
+4. Keşfet Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Discover_Screen.jpeg" alt="Keşfet" width="25%"></td>
+       <td>Keşfet ekranı, kullanıcının yeni webtoon'lar keşfetmesine olanak sağlar. İsterse kullanıcılar arama özelliği ile istedikleri webtoonu arayabilir.</td>
+     </tr>
+   </table>
 
-6. ![Profil](screenshots/Profile_Screen.jpeg)
-   - Profil ekranı, kullanıcının hesap bilgilerini yönetebileceği bir alandır. Profil resmi, kullanıcı adı ve hakkımda kısmı burada sergilenir ve güncellenir. Favori kaydedilen webtoonların bir kısmıda listelenir.
+5. Kaydedilenler Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Saved_Screen.jpeg" alt="Kaydedilenler" width="25%"></td>
+       <td>Kaydedilenler ekranı, kullanıcının favori webtoon'larını sakladığı yerdir.</td>
+     </tr>
+   </table>
 
-7. ![Webtoon Bilgi](screenshots/Webtoon_Information_Screen.jpeg)
-   - Webtoon bilgi ekranı, kullanıcının belirli bir webtoon hakkında detaylı bilgilere erişebileceği yerdir. Kapak resmi, konusu, beğenilme ve kaydedilme sayısı, bölümler ve webtoona yapılan yorumlar bu sayfada yer alır.
+6. Profil Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Profile_Screen.jpeg" alt="Profil" width="25%"></td>
+       <td>Profil ekranı, kullanıcının hesap bilgilerini yönetebileceği bir alandır. Profil resmi, kullanıcı adı ve hakkımda kısmı burada sergilenir ve güncellenir. Favori kaydedilen webtoonların bir kısmı da listelenir.</td>
+     </tr>
+   </table>
 
-8. ![Webtoon Okuma](screenshots/Webtoon_Reading_Screen.jpeg)
-   - Webtoon okuma ekranı, kullanıcının webtoon'ları rahatça okuyabileceği bir arayüzdür. Webtoon bölümlerini okuyabilir ve okuduğu bölüme yorum yapabilir.
+7. Webtoon Bilgi Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Webtoon_Information_Screen.jpeg" alt="Webtoon Bilgi" width="25%"></td>
+       <td>Webtoon bilgi ekranı, kullanıcının belirli bir webtoon hakkında detaylı bilgilere erişebileceği yerdir. Kapak resmi, konusu, beğenilme ve kaydedilme sayısı, bölümler ve webtoona yapılan yorumlar bu sayfada yer alır.</td>
+     </tr>
+   </table>
 
-9. ![Ayarlar](screenshots/Settings_Screen.jpeg)
-   - Ayarlar ekranı, uygulama tercihlerini ve ayarlarını yönetmek için kullanılır. Şifremi unuttum ile şifre sıfırlama isteği. Tema değiştirme ile "Açık Tema", "Koyu Tema" ve "DarkTon" temaları arasında değişebilir. Resimler "DarkTon" tema altında gösterilmiştir.
+8. Webtoon Okuma Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Webtoon_Reading_Screen.jpeg" alt="Webtoon Okuma" width="25%"></td>
+       <td>Webtoon okuma ekranı, kullanıcının webtoon'ları rahatça okuyabileceği bir arayüzdür. Webtoon bölümlerini okuyabilir ve okuduğu bölüme yorum yapabilir.</td>
+     </tr>
+   </table>
 
-10. ![Ana Sayfa Yüklenme Ekranı](screenshots/Homepage_loading_Screen.jpeg)
-    - Ana sayfa yüklenme ekranı, kullanıcının ana sayfanın yüklenmesini beklediği sırada görülen ekranı temsil eder. Webtoon Bilgileri alınır iken kullanılan arayüz.
+9. Ayarlar Ekranı
+   <table>
+     <tr>
+       <td><img src="screenshots/Settings_Screen.jpeg" alt="Ayarlar" width="25%"></td>
+       <td>Ayarlar ekranı, uygulama tercihlerini ve ayarlarını yönetmek için kullanılır. Şifremi unuttum ile şifre sıfırlama isteği. Tema değiştirme ile "Açık Tema", "Koyu Tema" ve "DarkTon" temaları arasında değişebilir. Resimler "DarkTon" tema altında gösterilmiştir.</td>
+     </tr>
+   </table>
 
-11. ![Keşfet Yüklenme Ekranı](screenshots/Discover_Loading_Screen.jpeg)
-    - Keşfet yüklenme ekranı, kullanıcının keşfet sayfasının yüklenmesini beklediği sırada görülen ekranı temsil eder.
+10. Ana Sayfa Yüklenme Ekranı
+    <table>
+      <tr>
+        <td><img src="screenshots/Homepage_loading_Screen.jpeg" alt="Ana Sayfa Yüklenme Ekranı" width="25%"></td>
+        <td>Ana sayfa yüklenme ekranı, kullanıcının ana sayfanın yüklenmesini beklediği sırada görülen ekranı temsil eder. Webtoon Bilgileri alınırken kullanılan arayüz.</td>
+      </tr>
+    </table>
+
+11. Keşfet Yüklenme Ekranı
+    <table>
+      <tr>
+        <td><img src="screenshots/Discover_Loading_Screen.jpeg" alt="Keşfet Yüklenme Ekranı" width="25%"></td>
+        <td>Keşfet yüklenme ekranı, kullanıcının keşfet sayfasının yüklenmesini beklediği sırada görülen ekranı temsil eder.</td>
+      </tr>
+    </table>
+
+
+
 
 ## Katkıda Bulunma
 Bu projeye katkı yapmak isterseniz, aşağıdaki adımları izleyebilirsiniz.
