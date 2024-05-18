@@ -1,6 +1,6 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet,Modal,TextInput, ScrollView,RefreshControl } from 'react-native';
-import { useNavigation, useRoute,useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useRoute, } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import * as ImagePicker from 'expo-image-picker';
@@ -48,16 +48,7 @@ const WebtoonInfoPage = () => {
     setRefreshing(false);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setBolumler([]);
-        setComments([]);
-        setKapakResmi(null);
-        setKonu(0);
-      };
-    }, [])
-  );
+
 
   const fetchComments = async () => {
     try {

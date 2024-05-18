@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef,useCallback  } from 'react';
+import React, { useState, useEffect, useRef,  } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView, Dimensions,RefreshControl } from 'react-native';
-import { useNavigation, useRoute,useFocusEffect  } from '@react-navigation/native';
+import { useNavigation, useRoute,  } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
 import { useDispatch, useSelector } from 'react-redux';
@@ -38,14 +38,7 @@ const WebtoonReadPage = () => {
     setRefreshing(false);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setResimler([]);
-        setComments([]);
-      };
-    }, [])
-  );
+ 
 
 const fetchComments = async () => {
       try {
