@@ -18,7 +18,7 @@ const WebtoonReadPage = () => {
   const theme = useSelector(state => state.user.theme);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState([]); // Initialize comments state
+  const [comments, setComments] = useState([]); 
   const [shouldScrollToTop, setShouldScrollToTop] = useState(true);
 
   const [resimler, setResimler] = useState([]);

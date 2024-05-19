@@ -1,231 +1,281 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet,RefreshControl } from 'react-native';
-import { getDownloadURL, ref, listAll } from 'firebase/storage';
-import { storage } from '../../firebaseConfig';
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
+import { getDownloadURL, ref, listAll, } from 'firebase/storage';
+import { storage,db } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
+import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
+import { getAuth } from "firebase/auth";
+import { getDoc, doc } from 'firebase/firestore';
+
 const HomePage = () => {
   const navigation = useNavigation();
   const [webtoons, setWebtoons] = useState([]);
   const theme = useSelector(state => state.user.theme);
+
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [username, setUsername] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
+    fetchData();
     fetchWebtoonData();
+    
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
+    await fetchData();
     await fetchWebtoonData();
+   
     setRefreshing(false);
   };
+
+  const fetchData = async () => {
+    try {
+    const user = getAuth().currentUser;
+    if (user) {
+      const userId = user.uid; 
+      const userDocRef = doc(db, "users", userId);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setUsername(userData.name); 
+        setProfileImage(userData.profileImage);
+      }
+    }
+  }catch (error) {
+      console.error('Kullanıcı bilgileri getirirken hata oluştu:', error);
+    }
+    }
+
   const fetchWebtoonData = async () => {
-      try {
-        setLoading(true);
-        const webtoonsRef = ref(storage, 'Webtoons');
-        const webtoonsList = await listAll(webtoonsRef);
-  
-        const firstTenWebtoons = webtoonsList.prefixes.slice(0, 10);
-        const webtoonData = [];
-  
-        for (const webtoonRef of firstTenWebtoons) {
-          const webtoonName = webtoonRef.name;
-          let kapakURL = null;
+    try {
+      setLoading(true);
+      const webtoonsRef = ref(storage, 'Webtoons');
+      const webtoonsList = await listAll(webtoonsRef);
+
+      const firstTenWebtoons = webtoonsList.prefixes.slice(0, 10);
+      const webtoonData = [];
+
+      for (const webtoonRef of firstTenWebtoons) {
+        const webtoonName = webtoonRef.name;
+        let kapakURL = null;
+        try {
+          kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
+        } catch (error) {
           try {
-            kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpg`));
-            
+            kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
           } catch (error) {
             try {
-              kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.jpeg`));
-              
+              kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
             } catch (error) {
-              try {
-                kapakURL = await getDownloadURL(ref(storage, `Webtoons/${webtoonName}/Kapak/${webtoonName}.png`));
-                
-              } catch (error) {
-                console.error("Kapak resmi alınamadı:", error);
-              }
+              console.error("Kapak resmi alınamadı:", error);
             }
           }
-          
-          const bolumlerDir = await listAll(ref(storage, `Webtoons/${webtoonName}/Bölümler`));
-          const bolumler = bolumlerDir.prefixes.map(folderRef => folderRef.name);
-          const sonBolum = bolumler[bolumler.length - 1];
-          const ikinciSonBolum = bolumler.length > 1 ? bolumler[bolumler.length - 2] : null;
-          const ucuncuSonBolum = bolumler.length > 2 ? bolumler[bolumler.length - 3] : null;
-          webtoonData.push({
-            webtoonName: webtoonName,
-            kapakURL: kapakURL,
-            sonBolum: sonBolum,
-            ikinciSonBolum: ikinciSonBolum,
-            ucuncuSonBolum:ucuncuSonBolum,
-          });
         }
 
-        setWebtoons(webtoonData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Webtoon verileri alınamadı:", error);
+        const bolumlerDir = await listAll(ref(storage, `Webtoons/${webtoonName}/Bölümler`));
+        const bolumler = bolumlerDir.prefixes.map(folderRef => folderRef.name);
+        const sonBolum = bolumler[bolumler.length - 1];
+        const ikinciSonBolum = bolumler.length > 1 ? bolumler[bolumler.length - 2] : null;
+        const ucuncuSonBolum = bolumler.length > 2 ? bolumler[bolumler.length - 3] : null;
+        webtoonData.push({
+          webtoonName: webtoonName,
+          kapakURL: kapakURL,
+          sonBolum: sonBolum,
+          ikinciSonBolum: ikinciSonBolum,
+          ucuncuSonBolum: ucuncuSonBolum,
+        });
       }
-    };
+
+      setWebtoons(webtoonData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Webtoon verileri alınamadı:", error);
+    }
+  };
+
   const handleWebtoonSelect = (webtoonName) => {
     console.log(`Seçilen webtoon: ${webtoonName}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
   };
-  const goToWebtoonReadPage = (episode,webtoon) => {
+
+  const goToWebtoonReadPage = (episode, webtoon) => {
     navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode });
   };
 
+  const getGreetingMessage = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour < 6) {
+      return 'Gece kuşu musun? İyi Geceler!';
+    } else if (currentHour < 9) {
+      return 'Keyifli okumalar.';
+    } else if (currentHour < 12) {
+      return 'Webtoon zamanı.';
+    } else if (currentHour < 14) {
+      return 'Yeni bölümler seni bekliyor.';
+    } else if (currentHour < 17) {
+      return 'Ara ver ve biraz oku.';
+    } else if (currentHour < 19) {
+      return 'Hikayelere devam.';
+    } else if (currentHour < 21) {
+      return 'Rahatla ve oku.';
+    } else {
+      return 'Güzel rüyalar.';
+    }
+  };
+  
+  
+
   return (
     <View style={[styles.container, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.purpleStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.darkStil.backgroundColor }]}>
+      ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+        ? lightTheme.whiteStil.backgroundColor
+        : darkTheme.darkStil.backgroundColor }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
-        </TouchableOpacity>
-        <View style={styles.logoyazi}>
-          <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>DARK</Text>
-            <Text style={styles.subtitle}>TON</Text>
+        <View style={styles.profileContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { username: username, profileImage: profileImage })}>
+            <Image source={{ uri: profileImage }} style={styles.profilePicture} />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.greeting}>{getGreetingMessage()}</Text>
+            <Text style={styles.username}>{username}</Text>
           </View>
         </View>
-        <TouchableOpacity>
-          <Text style={styles.bildirimicon} />
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/settings_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/settings.png') : require('../../assets/İmage/HomePage_images/settings_beyaz.png')} style={styles.settingicon} />
+ </TouchableOpacity>
       </View>
+      
       <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.koyugrayStil.backgroundColor }]} refreshControl={
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        ? DarkToonTheme.toonStil.backgroundColor : theme === 'lightTheme'
+          ? lightTheme.whiteStil.backgroundColor
+          : darkTheme.koyugrayStil.backgroundColor }]} 
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 
-     
-<View style={styles.section}>
-<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.greyStil.backgroundColor }]}>
-  <Text style={styles.sectionTitle}>Yeni</Text>
-  {loading ? (
-    <View style={styles.loadingContainer}>
-      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
-      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
-    </View>
-  ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-      {webtoons.map((webtoon, index) => (
-        <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
-          <View style={[styles.newWebtoon, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.koyugrayStil.backgroundColor }]}>
-            <View style={styles.newWebtoonLeft}>
-              <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageyeni} />
-            </View>
-            <View style={styles.newWebtoonRight}>
-              <Text style={styles.webtoonTitle}>{webtoon.webtoonName}</Text>
-              <View style={styles.webtoonButtons}>
-                {webtoon.sonBolum && (
-                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.sonBolum,webtoon.webtoonName)} style={[styles.webtoonButton, { marginBottom: 5 }]}>
-                    <Text style={styles.buttonText}>{webtoon.sonBolum}</Text>
-                  </TouchableOpacity>
-                )}
-                {webtoon.ikinciSonBolum && (
-                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
-                    <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
-                  </TouchableOpacity>
-                )}
-                {webtoon.ucuncuSonBolum && (
-                  <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum,webtoon.webtoonName)} style={styles.webtoonButton}>
-                    <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
-                  </TouchableOpacity>
-                )}
+        <View style={styles.section}>
+          <View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+            ? DarkToonTheme.whiteStil.backgroundColor : theme === 'lightTheme'
+              ? lightTheme.whiteStil.backgroundColor
+              : darkTheme.greyStil.backgroundColor }]}>
+            <Text style={styles.sectionTitle}>Yeni</Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+                <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
               </View>
-            </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+                {webtoons.map((webtoon, index) => (
+                  <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
+                    <View style={[styles.newWebtoon, { backgroundColor: theme === 'DarkToon' 
+                      ? DarkToonTheme.toonStil.backgroundColor : theme === 'lightTheme'
+                        ? lightTheme.whiteStil.backgroundColor
+                        : darkTheme.koyugrayStil.backgroundColor }]}>
+                      <View style={styles.newWebtoonLeft}>
+                        <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageyeni} />
+                      </View>
+                      <View style={styles.newWebtoonRight}>
+                        <Text style={styles.webtoonTitle}>{webtoon.webtoonName}</Text>
+                        <View style={styles.webtoonButtons}>
+                          {webtoon.sonBolum && (
+                            <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.sonBolum, webtoon.webtoonName)} style={[styles.webtoonButton, { marginBottom: 5 }]}>
+                              <Text style={styles.buttonText}>{webtoon.sonBolum}</Text>
+                            </TouchableOpacity>
+                          )}
+                          {webtoon.ikinciSonBolum && (
+                            <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ikinciSonBolum, webtoon.webtoonName)} style={styles.webtoonButton}>
+                              <Text style={styles.buttonText}>{webtoon.ikinciSonBolum}</Text>
+                            </TouchableOpacity>
+                          )}
+                          {webtoon.ucuncuSonBolum && (
+                            <TouchableOpacity onPress={() => goToWebtoonReadPage(webtoon.ucuncuSonBolum, webtoon.webtoonName)} style={styles.webtoonButton}>
+                              <Text style={styles.buttonText}>{webtoon.ucuncuSonBolum}</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  )}</View>
-</View>
+        </View>
 
-
-<View style={styles.section}>
-<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.greyStil.backgroundColor }]}>
-  <Text style={styles.sectionTitle}>Sana Özel</Text>
-  {loading ? (
-    <View style={styles.loadingContainer}>
-      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
-      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
-    </View>
-  ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-      {webtoons.slice(0, 8).map((webtoon, index) => (
-        <TouchableOpacity key={index} onPress={() =>handleWebtoonSelect(webtoon.webtoonName)}>
-          <View style={styles.personalWebtoon}>
-            <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageozel} />
+        <View style={styles.section}>
+          <View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+            ? DarkToonTheme.whiteStil.backgroundColor : theme === 'lightTheme'
+              ? lightTheme.whiteStil.backgroundColor
+              : darkTheme.greyStil.backgroundColor }]}>
+            <Text style={styles.sectionTitle}>Sana Özel</Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+                <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+                {webtoons.slice(0, 8).map((webtoon, index) => (
+                  <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
+                    <View style={styles.personalWebtoon}>
+                      <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImageozel} />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  )}</View>
-</View>
+        </View>
 
-
-<View style={styles.section}>
-<View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
-    ? DarkToonTheme.whiteStil.backgroundColor: theme === 'lightTheme'
-      ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.greyStil.backgroundColor }]}>
-  <Text style={styles.sectionTitle}>Trend</Text>
-  {loading ? (
-    <View style={styles.loadingContainer}>
-      <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
-      <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
-    </View>
-  ) : (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-      {webtoons.slice(0, 6).map((webtoon, index) => (
-        <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
-          <View style={styles.trendingWebtoon}>
-            <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImagetrend} />
+        <View style={styles.section}>
+          <View style={[styles.contentSection, { backgroundColor: theme === 'DarkToon' 
+            ? DarkToonTheme.whiteStil.backgroundColor : theme === 'lightTheme'
+              ? lightTheme.whiteStil.backgroundColor
+              : darkTheme.greyStil.backgroundColor }]}>
+            <Text style={styles.sectionTitle}>Trend</Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Image source={require('../../assets/İmage/HomePage_images/loading.gif')} style={styles.loadingImage} />
+                <Text style={styles.loadingText}>Veriler yükleniyor...</Text>
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
+                {webtoons.slice(0, 6).map((webtoon, index) => (
+                  <TouchableOpacity key={index} onPress={() => handleWebtoonSelect(webtoon.webtoonName)}>
+                    <View style={styles.trendingWebtoon}>
+                      <Image source={{ uri: webtoon.kapakURL }} style={styles.webtoonImagetrend} />
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  )}</View>
-</View>
-
-
+        </View>
       </ScrollView>
 
       {/* Alt navigasyon */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
-          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
+      <View style={[styles.bottomNav, { backgroundColor: theme === 'DarkToon' 
+ ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+ ? lightTheme.whiteStil.backgroundColor
+ : darkTheme.darkStil.backgroundColor }]}>
+ <TouchableOpacity onPress={() => navigation.navigate('Home', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/home_aktif_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/home_aktif.png') : require('../../assets/İmage/HomePage_images/home_beyaz_aktif.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kaydet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/save_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/save.png') : require('../../assets/İmage/HomePage_images/save_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kesfet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/keşif_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/keşif.png') : require('../../assets/İmage/HomePage_images/keşif_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+</View>
+
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -237,39 +287,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 25,
-    paddingBottom: 15,
+    paddingBottom: 10,
     paddingTop: 10,
   },
-  titleContainer: {
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    color: '#ffb685',
-  },
-  subtitle: {
-    fontSize: 20,
-    color: '#ffb685',
-    position: 'relative',
-    left: 37,
-    top: -5,
-  },
-  logoyazi: {
+  profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
+  profilePicture: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginRight: 10,
-    width: 30,
-    height: 30,
+    marginTop:5,
+  },
+  greeting: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffb685',
+  },
+  username: {
+    fontSize: 14,
+    color: '#ffb685',
   },
   settingicon: {
     width: 35,
     height: 35,
-  },
-  bildirimicon: {
-    width: 35,
-    height: 35,
+    marginTop:10,
   },
   scrollView: {
     paddingHorizontal: 20,
@@ -277,7 +321,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 5,
-    marginBottom:20,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 24,
@@ -289,20 +333,20 @@ const styles = StyleSheet.create({
   },
   newWebtoon: {
     flexDirection: 'row',
-    width: 275, 
+    width: 275,
     height: 200,
     backgroundColor: 'gray',
     marginRight: 10,
     borderRadius: 10,
-    borderWidth:1,
-    borderColor:'gray',
+    borderWidth: 1,
+    borderColor: 'gray',
   },
   newWebtoonLeft: {
-    width: 150, 
+    width: 150,
   },
   newWebtoonRight: {
-    width: 125, 
-    alignItems:'center',
+    width: 125,
+    alignItems: 'center',
   },
   webtoonImageyeni: {
     width: 150,
@@ -318,15 +362,15 @@ const styles = StyleSheet.create({
   },
   webtoonButtons: {
     flexDirection: 'column',
-    alignItems:'center',
+    alignItems: 'center',
   },
   webtoonButton: {
-    backgroundColor: 'blue',
+    backgroundColor: 'purple',
     borderRadius: 5,
     margin: 10,
-    width:75, 
-    height: 20, 
-    alignItems:'center',
+    width: 75,
+    height: 20,
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
@@ -349,9 +393,15 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 25,
-    paddingBottom: 15,
-    paddingTop: 10,
+    paddingHorizontal: 35,
+    paddingBottom: 5,
+    paddingTop: 5,
+    borderRadius: 27,
+    borderWidth: 1,
+    margin: 15,
+    position: 'absolute',
+    bottom: 0,
+    width: '92%',
   },
   navIcon: {
     width: 35,
@@ -393,8 +443,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     marginBottom: 5,
-    marginTop:5,
-    borderWidth:1,
+    marginTop: 5,
+    borderWidth: 1,
   },
 });
 

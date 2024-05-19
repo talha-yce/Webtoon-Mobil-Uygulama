@@ -1,6 +1,6 @@
 import React, { useState, useEffect, } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView,RefreshControl } from 'react-native';
-import { useNavigation, } from '@react-navigation/native';
+import { useNavigation,useRoute } from '@react-navigation/native';
 import { getDocs, collection, query,getDoc,doc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig'; 
 import { useSelector } from 'react-redux';
@@ -9,11 +9,15 @@ import { getAuth } from "firebase/auth";
 
 const KaydetPage = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const {username, profileImage} = route.params;
   const [searchText, setSearchText] = useState('');
   const [webtoonsData, setWebtoonsData] = useState([]);
   const theme = useSelector(state => state.user.theme);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  
 
   useEffect(() => {
     fetchWebtoons();
@@ -117,7 +121,27 @@ const KaydetPage = () => {
       console.error('Arama yapılırken hata oluştu:', error);
     }
   };
-  
+  const getGreetingMessage = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour < 6) {
+      return 'Gece kuşu musun? İyi Geceler!';
+    } else if (currentHour < 9) {
+      return 'Keyifli okumalar.';
+    } else if (currentHour < 12) {
+      return 'Webtoon zamanı.';
+    } else if (currentHour < 14) {
+      return 'Yeni bölümler seni bekliyor.';
+    } else if (currentHour < 17) {
+      return 'Ara ver ve biraz oku.';
+    } else if (currentHour < 19) {
+      return 'Hikayelere devam.';
+    } else if (currentHour < 21) {
+      return 'Rahatla ve oku.';
+    } else {
+      return 'Güzel rüyalar.';
+    }
+  };
   
 
 
@@ -127,21 +151,18 @@ const KaydetPage = () => {
       ? lightTheme.whiteStil.backgroundColor
       : darkTheme.darkStil.backgroundColor }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
-        </TouchableOpacity>
-
-        <View style={styles.logoyazi}>
-          <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>DARK</Text>
-            <Text style={styles.subtitle}>TON</Text>
+        <View style={styles.profileContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { username: username, profileImage: profileImage })}>
+            <Image source={{ uri: profileImage }} style={styles.profilePicture} />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.greeting}>{getGreetingMessage()}</Text>
+            <Text style={styles.username}>{username}</Text>
           </View>
         </View>
-
-        <TouchableOpacity>
-          <Text style={styles.bildirimicon} />
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/settings_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/settings.png') : require('../../assets/İmage/HomePage_images/settings_beyaz.png')} style={styles.settingicon} />
+ </TouchableOpacity>
       </View>
 
       <View style={[styles.searchContainer, { backgroundColor: theme === 'DarkToon' 
@@ -215,20 +236,22 @@ const KaydetPage = () => {
 
       
       
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
-          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
+       {/* Alt navigasyon */}
+       <View style={[styles.bottomNav, { backgroundColor: theme === 'DarkToon' 
+ ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+ ? lightTheme.whiteStil.backgroundColor
+ : darkTheme.darkStil.backgroundColor }]}>
+ <TouchableOpacity onPress={() => navigation.navigate('Home', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/home_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/home.png') : require('../../assets/İmage/HomePage_images/home_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kaydet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/save_beyaz_aktif1.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/save_aktif.png') : require('../../assets/İmage/HomePage_images/save_beyaz_aktif.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kesfet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/keşif_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/keşif.png') : require('../../assets/İmage/HomePage_images/keşif_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+</View>
+
     </View>
   );
 };
@@ -242,7 +265,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 25,
-    paddingBottom: 15,
+    paddingBottom: 10,
     paddingTop: 10,
   },
   titleContainer: {
@@ -268,14 +291,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  settingicon: {
-    width: 35,
-    height: 35,
-  },
-  bildirimicon: {
-    width: 35,
-    height: 35,
-  },
+ 
   searchContainer: {
     backgroundColor: 'white',
     flexDirection: 'row',
@@ -326,17 +342,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     marginTop: 10,
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 25,
-    paddingBottom: 15,
-    paddingTop: 10,
-  },
-  navIcon: {
-    width: 35,
-    height: 35,
-  },
+  
   categoryTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -415,6 +421,49 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePicture: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+    marginTop:5,
+  },
+  greeting: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffb685',
+  },
+  username: {
+    fontSize: 14,
+    color: '#ffb685',
+  },
+  settingicon: {
+    width: 35,
+    height: 35,
+    marginTop:10,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 35,
+    paddingBottom: 5,
+    paddingTop: 5,
+    borderRadius: 27,
+    borderWidth: 1,
+    margin: 15,
+    position: 'absolute',
+    bottom: 0,
+    width: '92%',
+  },
+  navIcon: {
+    width: 35,
+    height: 35,
   },
 });
 
