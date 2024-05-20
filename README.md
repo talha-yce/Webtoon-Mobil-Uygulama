@@ -42,7 +42,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 1. Giriş Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Login_Screen.jpeg" alt="Login" width="50%"></td>
+       <td><img src="screenshots/Login_Screen.jpg" alt="Login" width="50%"></td>
        <td>Giriş ekranı, kullanıcıların hesaplarına erişmek için kullanılan ilk adımdır. Aynı zamanda şifrelerini unutan kullanıcıların şifre sıfırlama isteğini "Şifremi Unuttum" butonu ile gerçekleştirebilir.</td>
      </tr>
    </table>
@@ -50,7 +50,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 2. Kayıt Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Sign_up_Screen.jpeg" alt="Signup" width="50%"></td>
+       <td><img src="screenshots/Sign_up_Screen.jpg" alt="Signup" width="50%"></td>
        <td>Kayıt ekranı, yeni kullanıcıların hesap oluşturduğu yerdir.</td>
      </tr>
    </table>
@@ -58,7 +58,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 3. Ana Sayfa
    <table>
      <tr>
-       <td><img src="screenshots/Homepage_Screen.jpeg" alt="Ana Sayfa" width="50%"></td>
+       <td><img src="screenshots/Homepage_Screen.jpg" alt="Ana Sayfa" width="50%"></td>
        <td>Ana sayfa, kullanıcının favori webtoon'larına erişebileceği bir genel bakış sunar. Yeni webtoonlar, kişisel webtoonlar ve trend webtoonlar burada listelenir.</td>
      </tr>
    </table>
@@ -66,7 +66,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 4. Keşfet Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Discover_Screen.jpeg" alt="Keşfet" width="50%"></td>
+       <td><img src="screenshots/Discover_Screen.jpg" alt="Keşfet" width="50%"></td>
        <td>Keşfet ekranı, kullanıcının yeni webtoon'lar keşfetmesine olanak sağlar. İsterse kullanıcılar arama özelliği ile istedikleri webtoonu arayabilir.</td>
      </tr>
    </table>
@@ -74,7 +74,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 5. Kaydedilenler Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Saved_Screen.jpeg" alt="Kaydedilenler" width="50%"></td>
+       <td><img src="screenshots/Saved_Screen.jpg" alt="Kaydedilenler" width="50%"></td>
        <td>Kaydedilenler ekranı, kullanıcının favori webtoon'larını sakladığı yerdir.</td>
      </tr>
    </table>
@@ -82,7 +82,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 6. Profil Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Profile_Screen.jpeg" alt="Profil" width="50%"></td>
+       <td><img src="screenshots/Profile_Screen.jpg" alt="Profil" width="50%"></td>
        <td>Profil ekranı, kullanıcının hesap bilgilerini yönetebileceği bir alandır. Profil resmi, kullanıcı adı ve hakkımda kısmı burada sergilenir ve güncellenir. Favori kaydedilen webtoonların bir kısmı da listelenir.</td>
      </tr>
    </table>
@@ -90,7 +90,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 7. Webtoon Bilgi Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Webtoon_Information_Screen.jpeg" alt="Webtoon Bilgi" width="50%"></td>
+       <td><img src="screenshots/Webtoon_Information_Screen.jpg" alt="Webtoon Bilgi" width="50%"></td>
        <td>Webtoon bilgi ekranı, kullanıcının belirli bir webtoon hakkında detaylı bilgilere erişebileceği yerdir. Kapak resmi, konusu, beğenilme ve kaydedilme sayısı, bölümler ve webtoona yapılan yorumlar bu sayfada yer alır.</td>
      </tr>
    </table>
@@ -98,7 +98,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 8. Webtoon Okuma Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Webtoon_Reading_Screen.jpeg" alt="Webtoon Okuma" width="50%"></td>
+       <td><img src="screenshots/Webtoon_Reading_Screen.jpg" alt="Webtoon Okuma" width="50%"></td>
        <td>Webtoon okuma ekranı, kullanıcının webtoon'ları rahatça okuyabileceği bir arayüzdür. Webtoon bölümlerini okuyabilir ve okuduğu bölüme yorum yapabilir.</td>
      </tr>
    </table>
@@ -106,7 +106,7 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 9. Ayarlar Ekranı
    <table>
      <tr>
-       <td><img src="screenshots/Settings_Screen.jpeg" alt="Ayarlar" width="50%"></td>
+       <td><img src="screenshots/Settings_Screen.jpg" alt="Ayarlar" width="50%"></td>
        <td>Ayarlar ekranı, uygulama tercihlerini ve ayarlarını yönetmek için kullanılır. Şifremi unuttum ile şifre sıfırlama isteği. Tema değiştirme ile "Açık Tema", "Koyu Tema" ve "DarkTon" temaları arasında değişebilir. Resimler "DarkTon" tema altında gösterilmiştir.</td>
      </tr>
    </table>
@@ -114,19 +114,10 @@ DarkTon, kullanıcıların favori webtoon'larını keşfetmelerine, okumalarına
 10. Ana Sayfa Yüklenme Ekranı
     <table>
       <tr>
-        <td><img src="screenshots/Homepage_loading_Screen.jpeg" alt="Ana Sayfa Yüklenme Ekranı" width="50%"></td>
+        <td><img src="screenshots/Homepage_loading_Screen.jpg" alt="Ana Sayfa Yüklenme Ekranı" width="50%"></td>
         <td>Ana sayfa yüklenme ekranı, kullanıcının ana sayfanın yüklenmesini beklediği sırada görülen ekranı temsil eder. Webtoon Bilgileri alınırken kullanılan arayüz.</td>
       </tr>
     </table>
-
-11. Keşfet Yüklenme Ekranı
-    <table>
-      <tr>
-        <td><img src="screenshots/Discover_Loading_Screen.jpeg" alt="Keşfet Yüklenme Ekranı" width="50%"></td>
-        <td>Keşfet yüklenme ekranı, kullanıcının keşfet sayfasının yüklenmesini beklediği sırada görülen ekranı temsil eder.</td>
-      </tr>
-    </table>
-
 
 
 
