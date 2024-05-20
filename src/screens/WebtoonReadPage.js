@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef,  } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView, Dimensions,RefreshControl } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, TextInput, StyleSheet, ScrollView,RefreshControl } from 'react-native';
 import { useNavigation, useRoute,  } from '@react-navigation/native';
 import { getDownloadURL, ref, listAll } from 'firebase/storage';
 import { storage, db } from '../../firebaseConfig'; // Firebase ayarlarını içeren dosya
@@ -8,13 +8,13 @@ import { lightTheme, darkTheme, DarkToonTheme } from '../components/ThemaStil';
 import { doc, getDoc, query, collection, updateDoc, orderBy, addDoc, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-const windowWidth = Dimensions.get('window').width;
 
 const WebtoonReadPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const [refreshing, setRefreshing] = useState(false);
   const { webtoon, episode } = route.params;
+  const {username, profileImage} = route.params;
   const theme = useSelector(state => state.user.theme);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [commentText, setCommentText] = useState('');
@@ -22,108 +22,145 @@ const WebtoonReadPage = () => {
   const [shouldScrollToTop, setShouldScrollToTop] = useState(true);
 
   const [resimler, setResimler] = useState([]);
-  const [resimYukseklik, setResimYukseklik] = useState(0);
+
+  const [previousScrollPosition, setPreviousScrollPosition] = useState(0);
+  const [isBottomNavVisible, setIsBottomNavVisible] = useState(true);
+  const scrollViewRef = useRef();
 
   useEffect(() => {
     fetchComments();
     getBolumResimler();
-    sorgu();
+    
   }, [webtoon, episode]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchComments();
     await getBolumResimler();
-    await sorgu();
+    
     setRefreshing(false);
   };
 
  
 
-const fetchComments = async () => {
-      try {
-        const q = query(
-          collection(db, 'webtoonlar', webtoon, 'episodes',episode,'comments'),
-          orderBy('timestamp', 'desc')
-        );
+  const fetchComments = async () => {
+    try {
+      const q = query(
+        collection(db, 'webtoonlar', webtoon, 'episodes',episode,'comments'),
+        orderBy('timestamp', 'desc')
+      );
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-          const commentsData = [];
-          querySnapshot.forEach(async (doce) => {
-            try {
-              const commentData = doce.data();
-              const userDocref = doc(db, 'users', commentData.userId);
-              const userDoc = await getDoc(userDocref);
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const commentsData = [];
+        querySnapshot.forEach(async (doce) => {
+          try {
+            const commentData = doce.data();
+            const userDocref = doc(db, 'users', commentData.userId);
+            const userDoc = await getDoc(userDocref);
 
-              if (userDoc.exists()) {
-                const userProfile = userDoc.data().profileImage;
+            if (userDoc.exists()) {
+              const userProfile = userDoc.data().profileImage;
 
-                commentsData.push({
-                  ...commentData,
-                  id: doce.id,
-                  profileImage: userProfile
-                });
-              }
-            } catch (error) {
-              console.error("Error fetching user profile:", error);
+              commentsData.push({
+                ...commentData,
+                id: doce.id,
+                profileImage: userProfile
+              });
             }
-          });
-
-          setComments(commentsData);
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+          }
         });
 
-        return () => {
-          unsubscribe();
-        };
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    };
+        setComments(commentsData);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+ 
+
     
     const getBolumResimler = async () => {
       try {
         const resimURLs = [];
-        const resimListesi = await listAll(ref(storage, `Webtoons/${webtoon}/Bölümler/${episode}`));
+        let resimListesi;
+        
+        // Bölümün resimlerini almaya çalış
+        try {
+          resimListesi = await listAll(ref(storage, `Webtoons/${webtoon}/Bölümler/${episode}`));
+        } catch (error) {
+          // Eğer bölüm veri tabanında yoksa bir önceki bölümün resimlerini almaya çalış
+          const episodeNumber = parseInt(episode.split(' ')[1]);
+          if (episodeNumber > 1) {
+            const oncekiBolum = `Bölüm ${episodeNumber - 1}`;
+            resimListesi = await listAll(ref(storage, `Webtoons/${webtoon}/Bölümler/${oncekiBolum}`));
+          } else {
+            console.error("Bölüm veri tabanında bulunamadı ve bir önceki bölüm de yok.");
+            return;
+          }
+        }
+        
+        // Resim URL'lerini al ve resimler dizisine ekle
         for (const item of resimListesi.items) {
           const resimURL = await getDownloadURL(item);
           resimURLs.push(resimURL);
         }
+        
+        // Resimleri state'e at
         setResimler(resimURLs);
       } catch (error) {
         console.error("Bölüm resimleri alınamadı:", error);
       }
     };
+    
   
-  const sorgu = async () => {
-    if (resimler.length > 0) {
-      Image.getSize(resimler[0], (width, height) => {
-        const oran = height / width;
-        setResimYukseklik(windowWidth * oran);
-      });
-    }}
+ 
 
-  const [resimIndex, setResimIndex] = useState(0);
+
 
   const handleIleri = () => {
-    if (resimIndex < resimler.length - 1) {
-      setResimIndex(resimIndex + 1);
-      setShouldScrollToTop(true);
-        scrollToTop();
-      
-      
-    }
-  };
+    // episode değerini al
+    const { webtoon, episode } = route.params;
 
-  const handleGeri = () => {
-    if (resimIndex > 0) {
-      setResimIndex(resimIndex - 1);
-      setShouldScrollToTop(true);
-scrollToTop();
-      
-      
+    // Bölüm numarasını parçala ve sayısal değere çevir
+    const episodeNumber = parseInt(episode.split(' ')[1]);
+
+    // Bölüm numarasını 1 arttır
+    const yeniBolum = `Bölüm ${episodeNumber + 1}`;
+
+    // Yeni bölüm numarasını güncelle
+    navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: yeniBolum ,username: username, profileImage: profileImage});
+
+    // Yeni bölüm resimlerini al
+    getBolumResimler();
+};
+
+const handleGeri = () => {
+    // episode değerini al
+    const { webtoon, episode } = route.params;
+
+    // Bölüm numarasını parçala ve sayısal değere çevir
+    const episodeNumber = parseInt(episode.split(' ')[1]);
+
+    // Eğer bölüm numarası 1'den büyükse, 1 azalt
+    if (episodeNumber > 1) {
+        const yeniBolum = `Bölüm ${episodeNumber - 1}`;
+        
+        // Yeni bölüm numarasını güncelle
+        navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: yeniBolum,username: username, profileImage: profileImage });
+
+        // Yeni bölüm resimlerini al
+        getBolumResimler();
     }
-  };
-  const scrollViewRef = useRef();
+};
+
+ 
 
   const scrollToTop = () => {
     if (shouldScrollToTop) {
@@ -209,6 +246,37 @@ scrollToTop();
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 
+  const getGreetingMessage = () => {
+    const currentHour = new Date().getHours();
+    
+    const messages = [
+      { startHour: 0, endHour: 6, message: 'Gece kuşu musun? İyi Geceler!' },
+      { startHour: 6, endHour: 9, message: 'Keyifli okumalar.' },
+      { startHour: 9, endHour: 12, message: 'Webtoon zamanı.' },
+      { startHour: 12, endHour: 14, message: 'Yeni bölümler seni bekliyor.' },
+      { startHour: 14, endHour: 17, message: 'Ara ver ve biraz oku.' },
+      { startHour: 17, endHour: 19, message: 'Hikayelere devam.' },
+      { startHour: 19, endHour: 21, message: 'Rahatla ve oku.' },
+      { startHour: 21, endHour: 24, message: 'Güzel rüyalar.' },
+    ];
+  
+    const messageObj = messages.find(({ startHour, endHour }) => currentHour >= startHour && currentHour < endHour);
+  
+    return messageObj ? messageObj.message : 'Bir hata oluştu!';
+  };
+  
+
+  const handleScroll = (event) => {
+    const currentScrollPosition = event.nativeEvent.contentOffset.y;
+    if (currentScrollPosition > previousScrollPosition && isBottomNavVisible) {
+      setIsBottomNavVisible(false);
+    } else if (currentScrollPosition < previousScrollPosition && !isBottomNavVisible) {
+      setIsBottomNavVisible(true);
+    }
+    setPreviousScrollPosition(currentScrollPosition);
+  };
+  
+
   return (
     <View style={[styles.container, {
       backgroundColor: theme === 'DarkToon'
@@ -216,23 +284,19 @@ scrollToTop();
           ? lightTheme.whiteStil.backgroundColor
           : darkTheme.darkStil.backgroundColor
     }]}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
-        </TouchableOpacity>
-
-        <View style={styles.logoyazi}>
-          <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>DARK</Text>
-            <Text style={styles.subtitle}>TON</Text>
+        <View style={styles.profileContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { username: username, profileImage: profileImage })}>
+            <Image source={{ uri: profileImage }} style={styles.profilePicture} />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.greeting}>{getGreetingMessage()}</Text>
+            <Text style={styles.username}>{username}</Text>
           </View>
         </View>
-
-        <TouchableOpacity>
-          <Text style={styles.bildirimicon} />
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/settings_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/settings.png') : require('../../assets/İmage/HomePage_images/settings_beyaz.png')} style={styles.settingicon} />
+ </TouchableOpacity>
       </View>
 
       {/* Orta Bölüm */}
@@ -264,21 +328,19 @@ scrollToTop();
           style={[styles.bottomContainer, { backgroundColor: theme === 'DarkToon' 
     ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
       ? lightTheme.whiteStil.backgroundColor
-      : darkTheme.koyugrayStil.backgroundColor }]}
+      : darkTheme.koyugrayStil.backgroundColor }]} onScroll={handleScroll}
           onContentSizeChange={scrollToTop}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-          {/* Resimler Konteynırı */}
-          <View style={styles.imageContainer}>
-            {resimler.length > 0 && (
-              <Image
-                source={{ uri: resimler[resimIndex] }}
-                style={[styles.image, { height: resimYukseklik }]}
-                resizeMode="contain"
-              />
-            )}
-          </View>
+           <ScrollView
+          contentContainerStyle={styles.imageContainer}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
+          {resimler.map((resimURL, index) => (
+            <Image key={index} source={{ uri: resimURL }} style={styles.image} />
+          ))}
+        </ScrollView>
 
           <View style={[styles.topButtonContainer, { backgroundColor: theme === 'DarkToon' 
     ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
@@ -348,22 +410,23 @@ scrollToTop();
     </View>
   </View>
 </Modal>
-
- {/* Bottom Navigation */}
- <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
-          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
+{isBottomNavVisible && (
+ 
+ <View style={[styles.bottomNav, { backgroundColor: theme === 'DarkToon' 
+ ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+ ? lightTheme.whiteStil.backgroundColor
+ : darkTheme.darkStil.backgroundColor }]}>
+ <TouchableOpacity onPress={() => navigation.navigate('Home', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/home_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/home.png') : require('../../assets/İmage/HomePage_images/home_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kaydet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/save_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/save.png') : require('../../assets/İmage/HomePage_images/save_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kesfet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/keşif_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/keşif.png') : require('../../assets/İmage/HomePage_images/keşif_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+</View>
+)}
     </View>
   );
 };
@@ -378,7 +441,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 25,
-    paddingBottom: 15,
+    paddingBottom: 10,
     paddingTop: 10,
   },
   titleContainer: {
@@ -405,14 +468,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
-  settingicon: {
-    width: 35,
-    height: 35,
-  },
-  bildirimicon: {
-    width: 35,
-    height: 35,
-  },
+  
   middleContainer: {
     flex: 1,
   },
@@ -446,22 +502,12 @@ const styles = StyleSheet.create({
     backgroundColor:'white',
   },
   imageContainer: {
-    marginBottom: 1,
-    alignItems: 'center',
+    padding: 10,
   },
   image: {
-    width: windowWidth, 
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 25,
-    paddingBottom: 15,
-    paddingTop: 10,
-  },
-  navIcon: {
-    width: 35,
-    height: 35,
+    width: '100%',
+    aspectRatio: 9 / 16,  
+    
   },
   commentsContainer: {
     marginTop: 20,
@@ -585,6 +631,49 @@ const styles = StyleSheet.create({
     color: 'blue',
     marginTop: 10,
     textAlign: 'right',
+  },
+  
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePicture: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+    marginTop:5,
+  },
+  greeting: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffb685',
+  },
+  username: {
+    fontSize: 14,
+    color: '#ffb685',
+  },
+  settingicon: {
+    width: 35,
+    height: 35,
+    marginTop:10,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 35,
+    paddingBottom: 5,
+    paddingTop: 5,
+    borderRadius: 27,
+    borderWidth: 1,
+    margin: 15,
+    position: 'absolute',
+    bottom: 0,
+    width: '92%',
+  },
+  navIcon: {
+    width: 35,
+    height: 35,
   },
 });
 

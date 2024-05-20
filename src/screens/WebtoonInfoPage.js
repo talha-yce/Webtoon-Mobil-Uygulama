@@ -13,6 +13,7 @@ const WebtoonInfoPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { webtoon } = route.params;
+  const {username, profileImage} = route.params;
   const [webtoonLiked, setWebtoonLiked] = useState(false); 
   const [webtoonRecorded, setWebtoonRecorded] = useState(false); 
   const [comments, setComments] = useState([]);
@@ -331,7 +332,7 @@ const WebtoonInfoPage = () => {
     
 
   const goToWebtoonReadPage = (episode) => {
-    navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode });
+    navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: episode,username: username, profileImage: profileImage });
   };
 
  
@@ -412,6 +413,24 @@ const WebtoonInfoPage = () => {
       console.error('Yorum eklenirken bir hata oluştu:', error);
     }
   };
+  const getGreetingMessage = () => {
+    const currentHour = new Date().getHours();
+    
+    const messages = [
+      { startHour: 0, endHour: 6, message: 'Gece kuşu musun? İyi Geceler!' },
+      { startHour: 6, endHour: 9, message: 'Keyifli okumalar.' },
+      { startHour: 9, endHour: 12, message: 'Webtoon zamanı.' },
+      { startHour: 12, endHour: 14, message: 'Yeni bölümler seni bekliyor.' },
+      { startHour: 14, endHour: 17, message: 'Ara ver ve biraz oku.' },
+      { startHour: 17, endHour: 19, message: 'Hikayelere devam.' },
+      { startHour: 19, endHour: 21, message: 'Rahatla ve oku.' },
+      { startHour: 21, endHour: 24, message: 'Güzel rüyalar.' },
+    ];
+  
+    const messageObj = messages.find(({ startHour, endHour }) => currentHour >= startHour && currentHour < endHour);
+  
+    return messageObj ? messageObj.message : 'Bir hata oluştu!';
+  };
   
 
 const handleStopButtonPress = () => {
@@ -423,23 +442,19 @@ const handleStopButtonPress = () => {
       ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
         ? lightTheme.whiteStil.backgroundColor
         : darkTheme.darkStil.backgroundColor }]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Image source={require('../../assets/İmage/HomePage_images/settings.png')} style={styles.settingicon} />
-        </TouchableOpacity>
-
-        <View style={styles.logoyazi}>
-          <Image source={require('../../assets/İmage/HomePage_images/icon1.png')} style={styles.logo} />
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>DARK</Text>
-            <Text style={styles.subtitle}>TON</Text>
+       <View style={styles.header}>
+        <View style={styles.profileContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { username: username, profileImage: profileImage })}>
+            <Image source={{ uri: profileImage }} style={styles.profilePicture} />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.greeting}>{getGreetingMessage()}</Text>
+            <Text style={styles.username}>{username}</Text>
           </View>
         </View>
-
-        <TouchableOpacity>
-          <Text style={styles.bildirimicon} />
-        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/settings_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/settings.png') : require('../../assets/İmage/HomePage_images/settings_beyaz.png')} style={styles.settingicon} />
+ </TouchableOpacity>
       </View>
       <ScrollView style={[styles.scrollView, { backgroundColor: theme === 'DarkToon' 
     ? DarkToonTheme.toonStil.backgroundColor: theme === 'lightTheme'
@@ -566,22 +581,21 @@ const handleStopButtonPress = () => {
           </View>
         </View>
       </Modal>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Image source={require('../../assets/İmage/HomePage_images/home.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kesfet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/keşif.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Kaydet')}>
-          <Image source={require('../../assets/İmage/HomePage_images/save.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Profil')}>
-          <Image source={require('../../assets/İmage/HomePage_images/profil.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
+{/* Alt navigasyon */}
+<View style={[styles.bottomNav, { backgroundColor: theme === 'DarkToon' 
+ ? DarkToonTheme.purpleStil.backgroundColor : theme === 'lightTheme'
+ ? lightTheme.whiteStil.backgroundColor
+ : darkTheme.darkStil.backgroundColor }]}>
+ <TouchableOpacity onPress={() => navigation.navigate('Home', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/home_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/home.png') : require('../../assets/İmage/HomePage_images/home_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kaydet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/save_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/save.png') : require('../../assets/İmage/HomePage_images/save_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate('Kesfet', { username: username, profileImage: profileImage })}>
+   <Image source={theme === 'DarkToon' ? require('../../assets/İmage/HomePage_images/keşif_beyaz.png') : theme === 'lightTheme' ? require('../../assets/İmage/HomePage_images/keşif.png') : require('../../assets/İmage/HomePage_images/keşif_beyaz.png')} style={styles.navIcon} />
+ </TouchableOpacity>
+</View>
     </View>
   );
 }
@@ -596,7 +610,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 25,
-    paddingBottom: 15,
+    paddingBottom: 10,
     paddingTop: 10,
   },
   logoyazi: {
@@ -630,14 +644,7 @@ const styles = StyleSheet.create({
     left: 37,
     top: -5,
   },
-  settingicon: {
-    width: 35,
-    height: 35,
-  },
-  bildirimicon: {
-    width: 35,
-    height: 35,
-  },
+
   middleContent: {
     alignItems: 'center',
     paddingTop: 20,
@@ -761,17 +768,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'gray',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 25,
-    paddingBottom: 15,
-    paddingTop: 10,
-  },
-  navIcon: {
-    width: 35,
-    height: 35,
-  },
+ 
   scrollView: {
     paddingHorizontal: 20,
     backgroundColor: 'white',
@@ -852,7 +849,49 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'right',
   },
-
+ 
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profilePicture: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+    marginTop:5,
+  },
+  greeting: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffb685',
+  },
+  username: {
+    fontSize: 14,
+    color: '#ffb685',
+  },
+  settingicon: {
+    width: 35,
+    height: 35,
+    marginTop:10,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 35,
+    paddingBottom: 5,
+    paddingTop: 5,
+    borderRadius: 27,
+    borderWidth: 1,
+    margin: 15,
+    position: 'absolute',
+    bottom: 0,
+    width: '92%',
+  },
+  navIcon: {
+    width: 35,
+    height: 35,
+  },
 });
 
 export default WebtoonInfoPage;

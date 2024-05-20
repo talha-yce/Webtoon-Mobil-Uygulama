@@ -76,7 +76,7 @@ const KaydetPage = () => {
 
   const handleWebtoonSelect = (webtoon) => {
     console.log(`Seçilen webtoon: ${webtoon}`);
-    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName,username: username, profileImage: profileImage });
   };
 
   const handleSearch = async () => {
@@ -124,24 +124,22 @@ const KaydetPage = () => {
   const getGreetingMessage = () => {
     const currentHour = new Date().getHours();
     
-    if (currentHour < 6) {
-      return 'Gece kuşu musun? İyi Geceler!';
-    } else if (currentHour < 9) {
-      return 'Keyifli okumalar.';
-    } else if (currentHour < 12) {
-      return 'Webtoon zamanı.';
-    } else if (currentHour < 14) {
-      return 'Yeni bölümler seni bekliyor.';
-    } else if (currentHour < 17) {
-      return 'Ara ver ve biraz oku.';
-    } else if (currentHour < 19) {
-      return 'Hikayelere devam.';
-    } else if (currentHour < 21) {
-      return 'Rahatla ve oku.';
-    } else {
-      return 'Güzel rüyalar.';
-    }
+    const messages = [
+      { startHour: 0, endHour: 6, message: 'Gece kuşu musun? İyi Geceler!' },
+      { startHour: 6, endHour: 9, message: 'Keyifli okumalar.' },
+      { startHour: 9, endHour: 12, message: 'Webtoon zamanı.' },
+      { startHour: 12, endHour: 14, message: 'Yeni bölümler seni bekliyor.' },
+      { startHour: 14, endHour: 17, message: 'Ara ver ve biraz oku.' },
+      { startHour: 17, endHour: 19, message: 'Hikayelere devam.' },
+      { startHour: 19, endHour: 21, message: 'Rahatla ve oku.' },
+      { startHour: 21, endHour: 24, message: 'Güzel rüyalar.' },
+    ];
+  
+    const messageObj = messages.find(({ startHour, endHour }) => currentHour >= startHour && currentHour < endHour);
+  
+    return messageObj ? messageObj.message : 'Bir hata oluştu!';
   };
+  
   
 
 
