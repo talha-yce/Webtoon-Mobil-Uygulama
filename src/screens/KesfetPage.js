@@ -48,8 +48,8 @@ const KesfetPage = () => {
   
 
   const handleWebtoonSelect = (webtoon) => {
-    console.log(`Seçilen webtoon: ${webtoon}`);
-    navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName,username: username, profileImage: profileImage });
+    
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon,username: username, profileImage: profileImage });
   };
 
   const handleSearch = async () => {

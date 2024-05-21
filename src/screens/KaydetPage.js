@@ -40,12 +40,12 @@ const KaydetPage = () => {
       const userDoc = await getDoc(doc(db, 'users', userId));
   
       if (userDoc.exists()) {
-        // Kullanıcının kayıtlı webtoonları varsa
+        
         const savedWebtoons = userDoc.data().kaydet || [];
   
-        // Kayıtlı webtoonları al
+       
         const webtoonsData = await Promise.all(savedWebtoons.map(async webtoonId => {
-          // Webtoon bilgilerini al
+          
           const webtoonDoc = await getDoc(doc(db, 'webtoonlar', webtoonId));
           
           if (webtoonDoc.exists()) {
@@ -58,7 +58,7 @@ const KaydetPage = () => {
             console.error(`Webtoon ID'si "${webtoonId}" olan webtoon bulunamadı.`);
             return null;
           }
-        }).filter(webtoon => webtoon !== null)); // Null olanları filtrele
+        }).filter(webtoon => webtoon !== null)); 
   
         setWebtoonsData(webtoonsData);
         setLoading(false);
@@ -66,7 +66,7 @@ const KaydetPage = () => {
         console.error(`Kullanıcı ID'si "${userId}" olan kullanıcı bulunamadı veya belirtilen koleksiyon dökümanı yok.`);
       }
     }
-    else{console.log("Kullanıcı giriş yapmamaış")}
+    
   } catch (error) {
       console.error('Webtoonları getirirken hata oluştu:', error);
     }
@@ -75,8 +75,8 @@ const KaydetPage = () => {
   
 
   const handleWebtoonSelect = (webtoon) => {
-    console.log(`Seçilen webtoon: ${webtoon}`);
-    navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName,username: username, profileImage: profileImage });
+    
+    navigation.navigate('WebtoonInfoPage', { webtoon: webtoon,username: username, profileImage: profileImage });
   };
 
   const handleSearch = async () => {
@@ -92,10 +92,10 @@ const KaydetPage = () => {
       const userDoc = await getDoc(doc(db, 'users', userId));
   
       if (userDoc.exists()) {
-        // Kullanıcının kayıtlı webtoonları varsa
+       
         const savedWebtoons = userDoc.data().kaydet || [];
   
-        // Eğer aranan webtoon kullanıcının kayıtlı webtoonları arasında varsa
+       
         if (savedWebtoons.includes(searchText)) {
           const webtoonDoc = await getDoc(doc(db, 'webtoonlar', searchText));
           if (webtoonDoc.exists()) {
@@ -111,7 +111,7 @@ const KaydetPage = () => {
             setWebtoonsData([]);
           }
         } else {
-          // Kullanıcı kayıtlı webtoonları arasında aranan webtoon bulunmuyorsa
+        
           setWebtoonsData([]);
         }
       } else {

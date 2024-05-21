@@ -10,7 +10,7 @@ import { lightTheme, darkTheme,DarkToonTheme} from '../components/ThemaStil';
 
 
 const SettingsPage = () => {
-  const [contentLanguage, setContentLanguage] = useState('Türkçe');
+
   const [username, setUsername] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [showLogoutConfirmationModal, setShowLogoutConfirmationModal] = useState(false);
@@ -65,7 +65,7 @@ const vericek=async()=>{
   const handleThemeChange = (selectedTheme) => {
     dispatch(changeTheme(selectedTheme));
     setShowThemeModal(false);
-    console.log(`Selected theme: ${selectedTheme}`);
+    
   };
 
   const handlePasswordReset = async () => {

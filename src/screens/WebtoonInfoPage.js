@@ -179,7 +179,7 @@ const WebtoonInfoPage = () => {
                 begen: currentBegenCount - 1
               });
   
-              console.log("Webtoon unliked:", webtoonName);
+              
             } else {
               
               setWebtoonLiked(true);
@@ -193,10 +193,10 @@ const WebtoonInfoPage = () => {
                 begen: currentBegenCount + 1
               });
   
-              console.log("Webtoon liked:", webtoonName);
+              
             }
           } else {
-            console.error("Webtoon not found:", webtoonName);
+           
           }
         } else {
           console.error("User document not found:", userId);
@@ -254,7 +254,7 @@ const WebtoonInfoPage = () => {
                 kaydet: currentKaydetCount - 1
               });
   
-              console.log("Webtoon kaydetme:", webtoonName);
+              
             } else {
              
               setWebtoonRecorded(true);
@@ -268,10 +268,10 @@ const WebtoonInfoPage = () => {
                 kaydet: currentKaydetCount + 1
               });
   
-              console.log("Webtoon kaydet:", webtoonName);
+              
             }
           } else {
-            console.error("Webtoon not found:", webtoonName);
+            
           }
         } else {
           console.error("User document not found:", userId);
@@ -393,19 +393,19 @@ const WebtoonInfoPage = () => {
   
       if (webtoonDocSnap.exists()) {
         const webtoonId = webtoonDocSnap.id;
-        console.log('Webtoon ID:', webtoonId);
+       
   
         // Comments alt koleksiyonunu bul ve yeni döküman ekle
         const commentRef = collection(webtoonDocRef, 'comments');
         await addDoc(commentRef, commentData);
-        console.log('Yorum başarıyla eklendi.');
+       
   
         // Webtoon belgesindeki yorum sayısını arttır
         await updateDoc(webtoonDocRef, {
           yorum: increment(1) // Mevcut yorum sayısını 1 artır
         });
         setYorumCount(prevCount => prevCount + 1);
-        console.log('Webtoon yorum sayısı güncellendi.');
+        
       } else {
         console.error('Webtoon bulunamadı.');
       }

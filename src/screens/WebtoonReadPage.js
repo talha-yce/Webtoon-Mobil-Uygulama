@@ -91,11 +91,11 @@ const WebtoonReadPage = () => {
         const resimURLs = [];
         let resimListesi;
         
-        // Bölümün resimlerini almaya çalış
+       
         try {
           resimListesi = await listAll(ref(storage, `Webtoons/${webtoon}/Bölümler/${episode}`));
         } catch (error) {
-          // Eğer bölüm veri tabanında yoksa bir önceki bölümün resimlerini almaya çalış
+         
           const episodeNumber = parseInt(episode.split(' ')[1]);
           if (episodeNumber > 1) {
             const oncekiBolum = `Bölüm ${episodeNumber - 1}`;
@@ -106,13 +106,13 @@ const WebtoonReadPage = () => {
           }
         }
         
-        // Resim URL'lerini al ve resimler dizisine ekle
+        
         for (const item of resimListesi.items) {
           const resimURL = await getDownloadURL(item);
           resimURLs.push(resimURL);
         }
         
-        // Resimleri state'e at
+       
         setResimler(resimURLs);
       } catch (error) {
         console.error("Bölüm resimleri alınamadı:", error);
@@ -125,37 +125,37 @@ const WebtoonReadPage = () => {
 
 
   const handleIleri = () => {
-    // episode değerini al
+    
     const { webtoon, episode } = route.params;
 
-    // Bölüm numarasını parçala ve sayısal değere çevir
+   
     const episodeNumber = parseInt(episode.split(' ')[1]);
 
-    // Bölüm numarasını 1 arttır
+    
     const yeniBolum = `Bölüm ${episodeNumber + 1}`;
 
-    // Yeni bölüm numarasını güncelle
+    
     navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: yeniBolum ,username: username, profileImage: profileImage});
 
-    // Yeni bölüm resimlerini al
+    
     getBolumResimler();
 };
 
 const handleGeri = () => {
-    // episode değerini al
+    
     const { webtoon, episode } = route.params;
 
-    // Bölüm numarasını parçala ve sayısal değere çevir
+   
     const episodeNumber = parseInt(episode.split(' ')[1]);
 
-    // Eğer bölüm numarası 1'den büyükse, 1 azalt
+    
     if (episodeNumber > 1) {
         const yeniBolum = `Bölüm ${episodeNumber - 1}`;
         
-        // Yeni bölüm numarasını güncelle
+        
         navigation.navigate('WebtoonReadPage', { webtoon: webtoon, episode: yeniBolum,username: username, profileImage: profileImage });
 
-        // Yeni bölüm resimlerini al
+        
         getBolumResimler();
     }
 };
@@ -186,12 +186,12 @@ const handleGeri = () => {
       if (user) {
         const userId = user.uid;
 
-        // Kullanıcı belgesini Firestore'dan al
+        
         const userDocRef = doc(db, 'users', userId);
         const userDocSnapshot = await getDoc(userDocRef);
 
         if (userDocSnapshot.exists()) {
-          // Kullanıcı adını belgeden al
+          
           const userName = userDocSnapshot.data().name;
 
           const commentData = {
@@ -201,10 +201,10 @@ const handleGeri = () => {
             timestamp: new Date(),
           };
 
-          // Yorumu veritabanına ekleyin
+          
           await addCommentToDatabase(commentData);
 
-          // Modalı kapatın ve yorum metnini sıfırlayın
+          
           setIsModalVisible(false);
           setCommentText('');
           
@@ -221,18 +221,18 @@ const handleGeri = () => {
 
   const addCommentToDatabase = async (commentData) => {
     try {
-      // Webtoon belgesini bul
+     
       const webtoonDocRef = doc(db, 'webtoonlar', webtoon,'episodes',episode);
       const webtoonDocSnap = await getDoc(webtoonDocRef);
 
       if (webtoonDocSnap.exists()) {
         const webtoonId = webtoonDocSnap.id;
-        console.log('Webtoon ID:', webtoonId);
+        
 
-        // Comments alt koleksiyonunu bul ve yeni döküman ekle
+       
         const commentRef = collection(webtoonDocRef, 'comments');
         await addDoc(commentRef, commentData);
-        console.log('Yorum başarıyla eklendi.');
+       
       } else {
         console.error('Webtoon bulunamadı.');
       }
@@ -242,7 +242,7 @@ const handleGeri = () => {
   };
 
   const handleWebtoonSelect = (webtoon) => {
-    console.log(`Seçilen webtoon: ${webtoon}`);
+   
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoon });
   };
 

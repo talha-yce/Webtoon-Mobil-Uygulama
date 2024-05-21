@@ -97,7 +97,6 @@ const HomePage = () => {
   };
 
   const handleWebtoonSelect = (webtoonName) => {
-    console.log(`Seçilen webtoon: ${webtoonName}`);
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName,username: username, profileImage: profileImage });
   };
 

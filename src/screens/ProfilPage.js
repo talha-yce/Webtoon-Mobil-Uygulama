@@ -44,7 +44,7 @@ const [like, setLike] = useState([]);
       }
     }
 
-    // Webtoonları getir
+    
     if (user) {
       const userId = user.uid;
 
@@ -123,7 +123,7 @@ const [like, setLike] = useState([]);
   
 
   const handleWebtoonSelect = (webtoonName) => {
-    console.log(`Seçilen webtoon: ${webtoonName}`);
+   
     navigation.navigate('WebtoonInfoPage', { webtoon: webtoonName });
   };
   
@@ -183,7 +183,7 @@ const [like, setLike] = useState([]);
       const imageUrl = await getDownloadURL(storageRef);
       setImageUrl(imageUrl);
       await updateProfileImageUrl(imageUrl);
-      console.log("Profile image updated.");
+      
     } catch (error) {
       console.error("Profil resmi yüklenirken hata oluştu:", error);
     }
@@ -198,7 +198,7 @@ const [like, setLike] = useState([]);
         await updateDoc(userRef, {
           profileImage: imageUrl
         });
-        console.log("Firestore'daki profil resmi URL'si güncellendi.");
+        
         setProfileImage(imageUrl);
       } else {
         console.log("Kullanıcı oturum açmamış.");
@@ -212,7 +212,7 @@ const [like, setLike] = useState([]);
   const changeProfileImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      console.log("Permission status:", status);
+      
       if (status !== 'granted') {
         Alert.alert('Uyarı', 'Galeri erişimi reddedildi.');
         return;
