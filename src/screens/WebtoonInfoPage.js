@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     borderColor:'lightgray',
     borderRadius:15,
     borderWidth:1,
-    marginBottom:10,
+    marginBottom:120,
   },
   commentsTitle: {
     fontSize: 20,

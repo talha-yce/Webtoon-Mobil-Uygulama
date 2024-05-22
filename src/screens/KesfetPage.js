@@ -19,7 +19,7 @@ const KesfetPage = () => {
 
   useEffect(() => {
     fetchWebtoons();
-  }, [webtoonsData]);
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);

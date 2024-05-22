@@ -21,7 +21,7 @@ const KaydetPage = () => {
 
   useEffect(() => {
     fetchWebtoons();
-  }, [webtoonsData]);
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -370,6 +370,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 10,
+    backgroundColor:'white',
     
   },
   webtoonTitle: {

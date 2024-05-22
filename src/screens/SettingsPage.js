@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffb685',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 90,
   },
   exitButtonText: {
     color: '#fff',
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   },
   languageModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   themeModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
   },
   resetPasswordModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
   },
   faqModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
   },
   helpModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
   },
   usageModalClose: {
     fontSize: 18,
-    color: 'blue',
+    color: 'purple',
     marginTop: 10,
     textAlign: 'right',
   },
@@ -718,6 +718,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
+    backgroundColor:'purple',
   },
   buttonText: {
     color: '#fff',

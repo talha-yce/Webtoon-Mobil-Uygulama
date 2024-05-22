@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     borderColor:'lightgray',
     borderRadius:15,
     borderWidth:1,
-    marginBottom:10,
+    marginBottom:90,
   },
   yonIcon: {
     width: 30,
